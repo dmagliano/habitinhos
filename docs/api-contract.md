@@ -1,0 +1,92 @@
+# Initial REST API Contract
+
+Base format is JSON over REST. Endpoint names may be refined during planning, but MVP should preserve clarity over cleverness.
+
+## Phase 1 Boundary
+
+Phase 1 implements only auth, `/me`, and children endpoints. Mission, reward, wallet statement, dashboard, and mobile-specific flows are documented for later phases and must not be implemented during backend foundation.
+
+## Auth
+
+| Method | Path | Purpose |
+|--------|------|---------|
+| POST | `/auth/register` | Create responsible user and family unit from responsible name, email, password, and family name |
+| POST | `/auth/login` | Authenticate responsible user by email/password and return JWT |
+| GET | `/me` | Return authenticated user and family context |
+
+## Children
+
+| Method | Path | Purpose |
+|--------|------|---------|
+| POST | `/children` | Create child and wallet |
+| GET | `/children` | List family children |
+| GET | `/children/{id}` | Get child |
+| PUT | `/children/{id}` | Update child |
+| PATCH | `/children/{id}/deactivate` | Soft deactivate child |
+
+Phase 1 child endpoints are responsible-only. Children are not authenticatable `User` records in this phase.
+
+## Missions
+
+| Method | Path | Purpose |
+|--------|------|---------|
+| POST | `/missions` | Create mission |
+| GET | `/missions` | List missions |
+| GET | `/missions/{id}` | Get mission |
+| PUT | `/missions/{id}` | Update mission |
+| PATCH | `/missions/{id}/deactivate` | Soft deactivate mission |
+| POST | `/missions/{id}/assign` | Assign mission to one or more children |
+
+## Assigned Missions
+
+| Method | Path | Purpose |
+|--------|------|---------|
+| GET | `/children/{childId}/missions` | List child assigned missions |
+| GET | `/assigned-missions/pending-approval` | List missions awaiting responsible approval |
+| POST | `/assigned-missions/{id}/complete` | Child marks assigned mission complete |
+| POST | `/assigned-missions/{id}/approve` | Responsible approves mission |
+| POST | `/assigned-missions/{id}/reject` | Responsible rejects mission |
+
+## Rewards
+
+| Method | Path | Purpose |
+|--------|------|---------|
+| POST | `/rewards` | Create reward |
+| GET | `/rewards` | List rewards |
+| GET | `/rewards/{id}` | Get reward |
+| PUT | `/rewards/{id}` | Update reward |
+| PATCH | `/rewards/{id}/deactivate` | Soft deactivate reward |
+
+## Reward Redemptions
+
+| Method | Path | Purpose |
+|--------|------|---------|
+| POST | `/children/{childId}/reward-redemptions` | Redeem reward for child |
+| GET | `/children/{childId}/reward-redemptions` | List child redemptions |
+
+## Wallet
+
+| Method | Path | Purpose |
+|--------|------|---------|
+| GET | `/children/{childId}/wallet` | Get child balance |
+| GET | `/children/{childId}/wallet/transactions` | List child coin transactions |
+
+## Dashboard
+
+| Method | Path | Purpose |
+|--------|------|---------|
+| GET | `/dashboard/responsible` | Responsible dashboard summary |
+
+## Error Shape
+
+Use a simple structured error body:
+
+```json
+{
+  "code": "INSUFFICIENT_BALANCE",
+  "message": "Saldo insuficiente para resgatar esta recompensa.",
+  "details": {}
+}
+```
+
+Keep user-facing messages PT-BR where returned directly to mobile; keep internal codes stable and English.

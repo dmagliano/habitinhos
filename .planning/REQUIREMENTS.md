@@ -1,0 +1,122 @@
+# Requirements: Habitinhos
+
+**Defined:** 2026-05-26
+**Core Value:** The complete family flow must work end to end with family isolation, wallet integrity, and coin history.
+
+## v1 Requirements
+
+### Authentication and Family
+
+- [ ] **AUTH-01**: Responsible adult can create an account with name, email, and password.
+- [ ] **AUTH-02**: Responsible adult can log in and receive an authenticated session/token.
+- [ ] **AUTH-03**: System creates or associates a `FamilyUnit` for the responsible adult.
+- [ ] **AUTH-04**: Authenticated responsible adult can retrieve `/me` with user and family context.
+- [ ] **AUTH-05**: Backend derives `familyUnitId` from authentication context for protected operations.
+- [ ] **AUTH-06**: Users from one family cannot access data from another family.
+
+### Children
+
+- [ ] **CHLD-01**: Responsible adult can create a child profile without requiring child email.
+- [ ] **CHLD-02**: System creates a wallet automatically when a child is created.
+- [ ] **CHLD-03**: Responsible adult can list, view, edit, and deactivate children in the family.
+- [ ] **CHLD-04**: Child profile supports optional avatar key and optional hashed access PIN.
+
+### Missions
+
+- [ ] **MISS-01**: Responsible adult can create, edit, list, view, and deactivate missions.
+- [ ] **MISS-02**: Mission coin value must be a positive integer.
+- [ ] **MISS-03**: Responsible adult can assign a mission to one or more children.
+- [ ] **MISS-04**: Child can list only their own assigned pending missions.
+- [ ] **MISS-05**: Child can mark their own assigned mission as completed.
+- [ ] **MISS-06**: Mission without approval credits coins automatically on completion.
+- [ ] **MISS-07**: Mission requiring approval moves to `AWAITING_APPROVAL` after child completion.
+- [ ] **MISS-08**: Responsible adult can approve awaiting mission completion.
+- [ ] **MISS-09**: Responsible adult can reject awaiting mission completion with an optional reason.
+
+### Wallet and Coins
+
+- [ ] **WALT-01**: Child wallet exposes current balance.
+- [ ] **WALT-02**: Mission approval or auto-completion credits the child wallet transactionally.
+- [ ] **WALT-03**: Reward redemption debits the child wallet transactionally.
+- [ ] **WALT-04**: Every credit, debit, or adjustment creates a `CoinTransaction`.
+- [ ] **WALT-05**: Child wallet transaction history can be listed as a simple statement.
+- [ ] **WALT-06**: Balance-changing operations are atomic and safe from partial updates.
+
+### Rewards
+
+- [ ] **REWD-01**: Responsible adult can create, edit, list, view, and deactivate rewards.
+- [ ] **REWD-02**: Reward cost must be a positive integer.
+- [ ] **REWD-03**: Child can list active rewards from their family.
+- [ ] **REWD-04**: Child can redeem a reward when balance is sufficient.
+- [ ] **REWD-05**: System blocks reward redemption when balance is insufficient.
+- [ ] **REWD-06**: Successful MVP redemption can be recorded directly as `REDEEMED`.
+
+### Responsible Dashboard
+
+- [ ] **DASH-01**: Responsible dashboard lists children in the family.
+- [ ] **DASH-02**: Dashboard shows balance by child.
+- [ ] **DASH-03**: Dashboard shows pending, awaiting approval, and completed missions.
+- [ ] **DASH-04**: Dashboard shows recent reward redemptions.
+
+### Mobile App
+
+- [ ] **MOBL-01**: Mobile app is created with Expo, React Native, TypeScript, and React Navigation.
+- [ ] **MOBL-02**: Mobile app has PT-BR screens and English technical names in code.
+- [ ] **MOBL-03**: Responsible flow includes login, family onboarding, dashboard, children, missions, assignments, approvals, rewards, and child details.
+- [ ] **MOBL-04**: Child flow includes profile selection/access, home with balance, missions, completion feedback, reward catalog, redemption feedback, and insufficient balance message.
+- [ ] **MOBL-05**: Mobile app consumes the real backend API for the demo flow.
+
+### Documentation and Demo
+
+- [ ] **DOCS-01**: API is documented with OpenAPI/Swagger.
+- [ ] **DOCS-02**: `docs/` contains architecture, data model, API contract, and testing strategy.
+- [ ] **DOCS-03**: README explains local setup for backend, mobile, PostgreSQL, and demo flow.
+- [ ] **DOCS-04**: Demo seeds or documented setup steps create a repeatable TCC scenario.
+
+## v2 Requirements
+
+### Deferred Product Capabilities
+
+- **FUTR-01**: Subscription and real SaaS billing.
+- **FUTR-02**: Push notifications beyond simple MVP feedback.
+- **FUTR-03**: Advanced reports and analytics.
+- **FUTR-04**: Separate web admin panel.
+- **FUTR-05**: AI suggestions for missions.
+- **FUTR-06**: Multi-language UI.
+
+## Out of Scope
+
+| Feature | Reason |
+|---------|--------|
+| Real payments | Not needed for MVP/TCC and adds compliance/product complexity |
+| Public ranking | Could expose children/family comparisons and is not core to task flow |
+| Chat or social network | New product domain outside mission/reward loop |
+| Marketplace | Requires commercial model and moderation outside MVP |
+| Production-grade deployment | MVP needs local/demo reliability first |
+| Complex push notifications | Backend/mobile flow can be demonstrated without them |
+
+## Traceability
+
+| Requirement | Phase | Status |
+|-------------|-------|--------|
+| AUTH-01..AUTH-06 | Phase 1 | Pending |
+| CHLD-01..CHLD-04 | Phase 1 | Pending |
+| MISS-01..MISS-09 | Phase 2 | Pending |
+| WALT-01, WALT-02, WALT-04, WALT-06 | Phase 2 | Pending |
+| REWD-01..REWD-06 | Phase 3 | Pending |
+| WALT-03, WALT-05 | Phase 3 | Pending |
+| MOBL-01, MOBL-02 | Phase 4 | Pending |
+| AUTH-02, AUTH-04 | Phase 4 | Pending |
+| MOBL-04, MOBL-05 | Phase 5 | Pending |
+| CHLD-03, MISS-04..MISS-05, REWD-03..REWD-05, WALT-01 | Phase 5 | Pending |
+| MOBL-03, DASH-01..DASH-04 | Phase 6 | Pending |
+| DOCS-01..DOCS-04 | Phase 7 | Pending |
+
+**Coverage:**
+- v1 requirements: 41 total
+- Mapped to phases: 41
+- Unmapped: 0
+
+---
+*Requirements defined: 2026-05-26*
+*Last updated: 2026-05-26 after initialization*

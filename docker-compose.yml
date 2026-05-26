@@ -1,0 +1,15 @@
+services:
+  postgres:
+    image: postgres:16
+    container_name: habitinhos-postgres
+    environment:
+      POSTGRES_DB: habitinhos
+      POSTGRES_USER: habitinhos
+      POSTGRES_PASSWORD: habitinhos
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+
+volumes:
+  postgres_data:
