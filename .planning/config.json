@@ -3,6 +3,7 @@
   "granularity": "standard",
   "parallelization": true,
   "commit_docs": true,
+  "runtime": "codex",
   "model_profile": "inherit",
   "response_language": "pt-BR",
   "workflow": {
