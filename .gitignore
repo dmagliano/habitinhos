@@ -8,6 +8,8 @@ backend/build/
 backend/target/
 backend/.gradle/
 backend/.mvn/wrapper/maven-wrapper.jar
+backend/.mvn/apache-maven-*/
+backend/.mvn/apache-maven-*.tar.gz
 
 # Node / Expo
 mobile/node_modules/

@@ -1,0 +1,26 @@
+spring:
+  application:
+    name: habitinhos-backend
+  datasource:
+    url: ${DATABASE_URL:jdbc:postgresql://localhost:5432/habitinhos}
+    username: ${DATABASE_USERNAME:habitinhos}
+    password: ${DATABASE_PASSWORD:habitinhos}
+  flyway:
+    enabled: true
+  jpa:
+    hibernate:
+      ddl-auto: validate
+    open-in-view: false
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health
+
+habitinhos:
+  security:
+    jwt:
+      issuer: ${HABITINHOS_JWT_ISSUER:habitinhos}
+      expiration-minutes: ${HABITINHOS_JWT_EXPIRATION_MINUTES:120}
+      secret: ${HABITINHOS_JWT_SECRET:dev-only-change-this-secret-with-at-least-32-bytes}

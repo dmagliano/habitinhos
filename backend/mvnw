@@ -1,0 +1,30 @@
+#!/usr/bin/env sh
+set -eu
+
+BASE_DIR=$(CDPATH= cd -- "$(dirname -- "$0")" && pwd)
+MAVEN_VERSION="${MAVEN_VERSION:-3.9.11}"
+MAVEN_HOME="$BASE_DIR/.mvn/apache-maven-$MAVEN_VERSION"
+MAVEN_ARCHIVE="$BASE_DIR/.mvn/apache-maven-$MAVEN_VERSION-bin.tar.gz"
+MAVEN_URL="${MAVEN_DOWNLOAD_URL:-https://repo.maven.apache.org/maven2/org/apache/maven/apache-maven/$MAVEN_VERSION/apache-maven-$MAVEN_VERSION-bin.tar.gz}"
+
+if [ ! -x "$MAVEN_HOME/bin/mvn" ]; then
+  mkdir -p "$BASE_DIR/.mvn"
+  if [ ! -f "$MAVEN_ARCHIVE" ]; then
+    if command -v curl >/dev/null 2>&1; then
+      curl -fsSL "$MAVEN_URL" -o "$MAVEN_ARCHIVE"
+    elif command -v wget >/dev/null 2>&1; then
+      wget -q "$MAVEN_URL" -O "$MAVEN_ARCHIVE"
+    else
+      echo "Neither curl nor wget is available to download Maven." >&2
+      exit 1
+    fi
+  fi
+  tar -xzf "$MAVEN_ARCHIVE" -C "$BASE_DIR/.mvn"
+fi
+
+if [ -z "${DOCKER_HOST:-}" ] && [ -S "$HOME/.config/colima/default/docker.sock" ]; then
+  export DOCKER_HOST="unix://$HOME/.config/colima/default/docker.sock"
+  export TESTCONTAINERS_DOCKER_SOCKET_OVERRIDE="${TESTCONTAINERS_DOCKER_SOCKET_OVERRIDE:-/var/run/docker.sock}"
+fi
+
+exec "$MAVEN_HOME/bin/mvn" -f "$BASE_DIR/pom.xml" "$@"
