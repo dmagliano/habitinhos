@@ -30,9 +30,13 @@ Habitinhos will be built as a monorepo MVP in seven phases: backend foundation, 
 **Plans**: 4 plans
 
 Plans:
+**Wave 1**
 - [ ] 01-01: Spring Boot project, PostgreSQL, Flyway, health/config baseline
+**Wave 2** *(blocked on Wave 1 completion)*
 - [ ] 01-02: Core family/user/child/wallet entities, repositories, migrations
+**Wave 3** *(blocked on Wave 2 completion)*
 - [ ] 01-03: Initial authentication, `/me`, authorization context, family isolation
+**Wave 4** *(blocked on Wave 3 completion)*
 - [ ] 01-04: Children API, automatic wallet creation, baseline tests, OpenAPI setup
 
 ### Phase 2: Domínio de missões e moedas
