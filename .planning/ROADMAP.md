@@ -6,7 +6,7 @@ Habitinhos will be built as a monorepo MVP in seven phases: backend foundation, 
 
 ## Phases
 
-- [ ] **Phase 1: Fundação do backend** - Create Spring Boot backend foundation, PostgreSQL/Flyway setup, authentication, family isolation, children, wallets, and baseline tests.
+- [x] **Phase 1: Fundação do backend** - Create Spring Boot backend foundation, PostgreSQL/Flyway setup, authentication, family isolation, children, wallets, and baseline tests.
 - [ ] **Phase 2: Domínio de missões e moedas** - Implement missions, assignments, completion, approval/rejection, coin credits, ledger transactions, and transactional tests.
 - [ ] **Phase 3: Recompensas e resgates** - Implement rewards, redemptions, sufficient-balance validation, coin debits, ledger transactions, and balance tests.
 - [ ] **Phase 4: Mobile base** - Create Expo app foundation, navigation, API client, login flow, and base visual structure.
@@ -31,13 +31,13 @@ Habitinhos will be built as a monorepo MVP in seven phases: backend foundation, 
 
 Plans:
 **Wave 1**
-- [ ] 01-01: Spring Boot project, PostgreSQL, Flyway, health/config baseline
+- [x] 01-01: Spring Boot project, PostgreSQL, Flyway, health/config baseline
 **Wave 2** *(blocked on Wave 1 completion)*
-- [ ] 01-02: Core family/user/child/wallet entities, repositories, migrations
+- [x] 01-02: Core family/user/child/wallet entities, repositories, migrations
 **Wave 3** *(blocked on Wave 2 completion)*
-- [ ] 01-03: Initial authentication, `/me`, authorization context, family isolation
+- [x] 01-03: Initial authentication, `/me`, authorization context, family isolation
 **Wave 4** *(blocked on Wave 3 completion)*
-- [ ] 01-04: Children API, automatic wallet creation, baseline tests, OpenAPI setup
+- [x] 01-04: Children API, automatic wallet creation, baseline tests, OpenAPI setup
 
 ### Phase 2: Domínio de missões e moedas
 **Goal**: Mission assignment and completion flow can credit coins through an auditable transaction ledger.
@@ -152,7 +152,7 @@ Phases execute in numeric order: 1 → 2 → 3 → 4 → 5 → 6 → 7
 
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
-| 1. Fundação do backend | 0/4 | Not started | - |
+| 1. Fundação do backend | 4/4 | Complete | 2026-05-27 |
 | 2. Domínio de missões e moedas | 0/3 | Not started | - |
 | 3. Recompensas e resgates | 0/3 | Not started | - |
 | 4. Mobile base | 0/3 | Not started | - |

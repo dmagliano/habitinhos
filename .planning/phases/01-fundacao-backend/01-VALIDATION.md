@@ -38,14 +38,14 @@ created: 2026-05-26
 
 | Task ID | Plan | Wave | Requirement | Threat Ref | Secure Behavior | Test Type | Automated Command | File Exists | Status |
 |---------|------|------|-------------|------------|-----------------|-----------|-------------------|-------------|--------|
-| 01-01-01 | 01 | 1 | AUTH-01..AUTH-06, CHLD-01..CHLD-04 | T-04 | Backend starts with explicit config and test harness | integration | `cd backend && ./mvnw test` | ❌ W0 | ⬜ pending |
-| 01-01-02 | 01 | 1 | AUTH-05, AUTH-06 | T-02/T-03 | PostgreSQL/Flyway config is active, Hibernate validates schema | integration | `cd backend && ./mvnw test` | ❌ W0 | ⬜ pending |
-| 01-02-01 | 02 | 2 | AUTH-03, AUTH-05, CHLD-01..CHLD-04 | T-02/T-03/T-06 | Schema stores family-scoped rows and no plaintext PIN/password fields | integration | `cd backend && ./mvnw test` | ❌ W0 | ⬜ pending |
-| 01-02-02 | 02 | 2 | AUTH-03, CHLD-01, CHLD-02 | T-03 | Repositories expose family-scoped lookup methods | integration | `cd backend && ./mvnw test` | ❌ W0 | ⬜ pending |
-| 01-03-01 | 03 | 3 | AUTH-01, AUTH-02, AUTH-03, AUTH-04 | T-01/T-04/T-05 | Register/login/me work with hashed passwords and signed JWT | integration | `cd backend && ./mvnw test` | ❌ W0 | ⬜ pending |
-| 01-03-02 | 03 | 3 | AUTH-05, AUTH-06 | T-02/T-03 | JWT-derived `familyUnitId` is the only protected-operation tenant source | integration | `cd backend && ./mvnw test` | ❌ W0 | ⬜ pending |
-| 01-04-01 | 04 | 4 | CHLD-01, CHLD-02, CHLD-03, CHLD-04 | T-02/T-03/T-06 | Child CRUD is family-scoped and child wallet is created atomically | integration | `cd backend && ./mvnw test` | ❌ W0 | ⬜ pending |
-| 01-04-02 | 04 | 4 | AUTH-06, CHLD-03 | T-03 | Cross-family read/update/deactivate attempts are blocked | integration | `cd backend && ./mvnw test` | ❌ W0 | ⬜ pending |
+| 01-01-01 | 01 | 1 | AUTH-01..AUTH-06, CHLD-01..CHLD-04 | T-04 | Backend starts with explicit config and test harness | integration | `cd backend && ./mvnw test` | ✅ | ✅ green |
+| 01-01-02 | 01 | 1 | AUTH-05, AUTH-06 | T-02/T-03 | PostgreSQL/Flyway config is active, Hibernate validates schema | integration | `cd backend && ./mvnw test` | ✅ | ✅ green |
+| 01-02-01 | 02 | 2 | AUTH-03, AUTH-05, CHLD-01..CHLD-04 | T-02/T-03/T-06 | Schema stores family-scoped rows and no plaintext PIN/password fields | integration | `cd backend && ./mvnw test` | ✅ | ✅ green |
+| 01-02-02 | 02 | 2 | AUTH-03, CHLD-01, CHLD-02 | T-03 | Repositories expose family-scoped lookup methods | integration | `cd backend && ./mvnw test` | ✅ | ✅ green |
+| 01-03-01 | 03 | 3 | AUTH-01, AUTH-02, AUTH-03, AUTH-04 | T-01/T-04/T-05 | Register/login/me work with hashed passwords and signed JWT | integration | `cd backend && ./mvnw test` | ✅ | ✅ green |
+| 01-03-02 | 03 | 3 | AUTH-05, AUTH-06 | T-02/T-03 | JWT-derived `familyUnitId` is the only protected-operation tenant source | integration | `cd backend && ./mvnw test` | ✅ | ✅ green |
+| 01-04-01 | 04 | 4 | CHLD-01, CHLD-02, CHLD-03, CHLD-04 | T-02/T-03/T-06 | Child CRUD is family-scoped and child wallet is created atomically | integration | `cd backend && ./mvnw test` | ✅ | ✅ green |
+| 01-04-02 | 04 | 4 | AUTH-06, CHLD-03 | T-03 | Cross-family read/update/deactivate attempts are blocked | integration | `cd backend && ./mvnw test` | ✅ | ✅ green |
 
 *Status: ⬜ pending · ✅ green · ❌ red · ⚠️ flaky*
 
@@ -55,10 +55,10 @@ created: 2026-05-26
 
 Plan 01-01 acts as Wave 0 for test infrastructure:
 
-- [ ] `backend/pom.xml` — adds Spring Boot test, Spring Security test, and Testcontainers dependencies.
-- [ ] `backend/src/test/java/br/com/habitinhos/shared/AbstractIntegrationTest.java` — shared PostgreSQL Testcontainers setup.
-- [ ] `backend/src/test/java/br/com/habitinhos/HabitinhosApplicationTests.java` — first context-load smoke test.
-- [ ] `backend/src/main/resources/application.yml` — sets `spring.jpa.hibernate.ddl-auto=validate`.
+- [x] `backend/pom.xml` — adds Spring Boot test, Spring Security test, and Testcontainers dependencies.
+- [x] `backend/src/test/java/br/com/habitinhos/shared/AbstractIntegrationTest.java` — shared PostgreSQL Testcontainers setup.
+- [x] `backend/src/test/java/br/com/habitinhos/HabitinhosApplicationTests.java` — first context-load smoke test.
+- [x] `backend/src/main/resources/application.yml` — sets `spring.jpa.hibernate.ddl-auto=validate`.
 
 ---
 
@@ -82,4 +82,3 @@ All tenant, auth, child, and wallet behaviors must have automated verification.
 - [x] `nyquist_compliant: true` set in frontmatter
 
 **Approval:** approved 2026-05-26 for planning; execution still must make every row green.
-
