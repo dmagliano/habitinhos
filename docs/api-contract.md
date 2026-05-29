@@ -2,6 +2,17 @@
 
 Base format is JSON over REST. Endpoint names may be refined during planning, but MVP should preserve clarity over cleverness.
 
+## OpenAPI/Swagger
+
+The backend uses springdoc OpenAPI. Every backend phase that adds REST endpoints must expose those endpoints in `/v3/api-docs` and make them testable from Swagger UI at `/swagger-ui.html`.
+
+Protected endpoints use Bearer JWT authorization. Manual endpoint testing flow:
+
+1. Register or log in through `/auth/register` or `/auth/login`.
+2. Copy the returned `token`.
+3. Use Swagger UI's authorize action with `Bearer <token>`.
+4. Test protected endpoints from the same documented contract.
+
 ## Phase 1 Boundary
 
 Phase 1 implements only auth, `/me`, and children endpoints. Mission, reward, wallet statement, dashboard, and mobile-specific flows are documented for later phases and must not be implemented during backend foundation.

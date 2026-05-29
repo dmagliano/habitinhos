@@ -68,7 +68,7 @@
 
 ### Documentation and Demo
 
-- [ ] **DOCS-01**: API is documented with OpenAPI/Swagger.
+- [ ] **DOCS-01**: Backend endpoints implemented in each backend phase are exposed through OpenAPI/Swagger and can be inspected/tested from Swagger UI.
 - [ ] **DOCS-02**: `docs/` contains architecture, data model, API contract, and testing strategy.
 - [ ] **DOCS-03**: README explains local setup for backend, mobile, PostgreSQL, and demo flow.
 - [ ] **DOCS-04**: Demo seeds or documented setup steps create a repeatable TCC scenario.
@@ -99,8 +99,9 @@
 
 | Requirement | Phase | Status |
 |-------------|-------|--------|
-| AUTH-01..AUTH-06 | Phase 1 | Pending |
-| CHLD-01..CHLD-04 | Phase 1 | Pending |
+| AUTH-01..AUTH-06 | Phase 1 | Complete |
+| CHLD-01..CHLD-04 | Phase 1 | Complete |
+| DOCS-01 | Phases 1, 2, 3 | In progress |
 | MISS-01..MISS-09 | Phase 2 | Pending |
 | WALT-01, WALT-02, WALT-04, WALT-06 | Phase 2 | Pending |
 | REWD-01..REWD-06 | Phase 3 | Pending |
@@ -110,7 +111,7 @@
 | MOBL-04, MOBL-05 | Phase 5 | Pending |
 | CHLD-03, MISS-04..MISS-05, REWD-03..REWD-05, WALT-01 | Phase 5 | Pending |
 | MOBL-03, DASH-01..DASH-04 | Phase 6 | Pending |
-| DOCS-01..DOCS-04 | Phase 7 | Pending |
+| DOCS-02..DOCS-04 | Phase 7 | Pending |
 
 **Coverage:**
 - v1 requirements: 41 total
@@ -119,4 +120,4 @@
 
 ---
 *Requirements defined: 2026-05-26*
-*Last updated: 2026-05-26 after initialization*
+*Last updated: 2026-05-27 after adding Swagger/OpenAPI as a backend-phase requirement*

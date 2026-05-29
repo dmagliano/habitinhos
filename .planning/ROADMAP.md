@@ -19,7 +19,7 @@ Habitinhos will be built as a monorepo MVP in seven phases: backend foundation, 
 ### Phase 1: Fundação do backend
 **Goal**: A runnable Spring Boot backend with persistence, migrations, initial auth, tenant isolation, family/user/child/wallet model, and basic tests.
 **Depends on**: Nothing (first phase)
-**Requirements**: AUTH-01, AUTH-02, AUTH-03, AUTH-04, AUTH-05, AUTH-06, CHLD-01, CHLD-02, CHLD-03, CHLD-04
+**Requirements**: AUTH-01, AUTH-02, AUTH-03, AUTH-04, AUTH-05, AUTH-06, CHLD-01, CHLD-02, CHLD-03, CHLD-04, DOCS-01
 **Success Criteria** (what must be TRUE):
   1. Backend starts locally and connects to PostgreSQL from `docker-compose.yml`.
   2. Flyway creates tables for `FamilyUnit`, `User`, `ChildProfile`, and `Wallet`.
@@ -27,6 +27,7 @@ Habitinhos will be built as a monorepo MVP in seven phases: backend foundation, 
   4. Responsible adult can create/list children and each child receives a wallet.
   5. Protected endpoints enforce family isolation and do not trust client-supplied `familyUnitId`.
   6. Basic unit/integration tests cover auth, child creation, wallet creation, and tenant isolation.
+  7. Swagger/OpenAPI exposes Phase 1 endpoints and Bearer JWT authorization for manual endpoint testing.
 **Plans**: 4 plans
 
 Plans:
@@ -42,7 +43,7 @@ Plans:
 ### Phase 2: Domínio de missões e moedas
 **Goal**: Mission assignment and completion flow can credit coins through an auditable transaction ledger.
 **Depends on**: Phase 1
-**Requirements**: MISS-01, MISS-02, MISS-03, MISS-04, MISS-05, MISS-06, MISS-07, MISS-08, MISS-09, WALT-01, WALT-02, WALT-04, WALT-06
+**Requirements**: MISS-01, MISS-02, MISS-03, MISS-04, MISS-05, MISS-06, MISS-07, MISS-08, MISS-09, WALT-01, WALT-02, WALT-04, WALT-06, DOCS-01
 **Success Criteria** (what must be TRUE):
   1. Responsible adult can create/edit/deactivate missions and assign them to children.
   2. Child can complete assigned missions from the same family only.
@@ -50,17 +51,23 @@ Plans:
   4. Missions requiring approval credit coins only after responsible approval.
   5. Rejection preserves history and does not credit coins.
   6. Transactional tests prove wallet balance and `CoinTransaction` stay consistent.
-**Plans**: 3 plans
+  7. Swagger/OpenAPI exposes mission, assignment, approval, and wallet endpoints implemented in this phase.
+**Plans**: 4 plans
 
 Plans:
-- [ ] 02-01: Mission and AssignedMission model, migrations, CRUD and assignment endpoints
-- [ ] 02-02: Completion, approval, rejection, status transitions, and authorization rules
-- [ ] 02-03: Wallet credit service, CoinTransaction ledger, transactional tests
+**Wave 1**
+- [ ] 02-01-PLAN.md — Mission, AssignedMission, and CoinTransaction schema/model/repository contracts
+**Wave 2** *(blocked on 02-01 completion)*
+- [ ] 02-04-PLAN.md — Mission CRUD, explicit assignment API, assignment tests, and initial OpenAPI coverage
+**Wave 3** *(blocked on 02-01 and 02-04 completion)*
+- [ ] 02-03-PLAN.md — Wallet credit service, CoinTransaction ledger, wallet balance endpoint, transactional tests
+**Wave 4** *(blocked on 02-04 and 02-03 completion)*
+- [ ] 02-02-PLAN.md — Completion, approval, rejection, status transitions, authorization rules, and full Phase 2 OpenAPI coverage
 
 ### Phase 3: Recompensas e resgates
 **Goal**: Children can redeem active family rewards when they have enough coins, with transactional debits and history.
 **Depends on**: Phase 2
-**Requirements**: REWD-01, REWD-02, REWD-03, REWD-04, REWD-05, REWD-06, WALT-03, WALT-05
+**Requirements**: REWD-01, REWD-02, REWD-03, REWD-04, REWD-05, REWD-06, WALT-03, WALT-05, DOCS-01
 **Success Criteria** (what must be TRUE):
   1. Responsible adult can create/edit/deactivate rewards.
   2. Child can list active rewards from their own family.
@@ -68,6 +75,7 @@ Plans:
   4. System blocks redemption when balance is insufficient.
   5. Successful redemption debits wallet and writes `RewardRedemption` plus `CoinTransaction`.
   6. Tests cover sufficient balance, insufficient balance, debit, and ledger consistency.
+  7. Swagger/OpenAPI exposes reward, redemption, and wallet statement endpoints implemented in this phase.
 **Plans**: 3 plans
 
 Plans:
@@ -131,7 +139,7 @@ Plans:
 ### Phase 7: Polimento para demonstração do TCC
 **Goal**: The MVP is demo-ready with repeatable data, documentation, visual polish, and final verification.
 **Depends on**: Phase 6
-**Requirements**: DOCS-01, DOCS-02, DOCS-03, DOCS-04
+**Requirements**: DOCS-02, DOCS-03, DOCS-04
 **Success Criteria** (what must be TRUE):
   1. Demo data or seed instructions create a responsible user, family, children, missions, rewards, and history.
   2. README explains how to run backend, mobile, and database locally.
@@ -153,7 +161,7 @@ Phases execute in numeric order: 1 → 2 → 3 → 4 → 5 → 6 → 7
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
 | 1. Fundação do backend | 4/4 | Complete | 2026-05-27 |
-| 2. Domínio de missões e moedas | 0/3 | Not started | - |
+| 2. Domínio de missões e moedas | 0/4 | Not started | - |
 | 3. Recompensas e resgates | 0/3 | Not started | - |
 | 4. Mobile base | 0/3 | Not started | - |
 | 5. Fluxo da criança | 0/3 | Not started | - |

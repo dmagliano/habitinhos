@@ -4,6 +4,16 @@
 
 Focus automated tests on rules that can corrupt tenant boundaries, balances, or history.
 
+## OpenAPI/Swagger Verification
+
+Swagger is part of the backend acceptance criteria. For every backend phase that adds endpoints:
+
+- `/v3/api-docs` must be reachable when the backend is running.
+- `/swagger-ui.html` must load locally.
+- Newly implemented endpoints must appear in Swagger UI.
+- Protected endpoints must support Bearer JWT authorization in Swagger UI.
+- At least one manual smoke test should be performed through Swagger UI for each new endpoint group.
+
 ## Phase 1 Required Tests
 
 Phase 1 is complete only when these automated backend tests exist:

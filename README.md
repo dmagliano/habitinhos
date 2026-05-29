@@ -32,3 +32,43 @@ $gsd-plan-phase 1
 ## Local Database
 
 PostgreSQL is defined in `docker-compose.yml` for local development.
+
+Start the database:
+
+```bash
+docker compose up -d postgres
+```
+
+## Backend Tests
+
+Run the automated backend test suite:
+
+```bash
+cd backend
+./mvnw test
+```
+
+The integration tests use PostgreSQL through Testcontainers.
+
+## Swagger Endpoint Testing
+
+Start the backend:
+
+```bash
+cd backend
+./mvnw spring-boot:run
+```
+
+Open Swagger UI:
+
+```text
+http://localhost:8080/swagger-ui.html
+```
+
+To test protected endpoints:
+
+1. Call `POST /auth/register` or `POST /auth/login`.
+2. Copy the `token` from the response.
+3. Click `Authorize` in Swagger UI.
+4. Enter `Bearer <token>`.
+5. Test protected endpoints such as `GET /me` and `/children`.
