@@ -56,7 +56,7 @@ Plans:
 
 Plans:
 **Wave 1**
-- [ ] 02-01-PLAN.md — Mission, AssignedMission, and CoinTransaction schema/model/repository contracts
+- [x] 02-01-PLAN.md — Mission, AssignedMission, and CoinTransaction schema/model/repository contracts
 **Wave 2** *(blocked on 02-01 completion)*
 - [ ] 02-04-PLAN.md — Mission CRUD, explicit assignment API, assignment tests, and initial OpenAPI coverage
 **Wave 3** *(blocked on 02-01 and 02-04 completion)*
@@ -161,7 +161,7 @@ Phases execute in numeric order: 1 → 2 → 3 → 4 → 5 → 6 → 7
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
 | 1. Fundação do backend | 4/4 | Complete | 2026-05-27 |
-| 2. Domínio de missões e moedas | 0/4 | Not started | - |
+| 2. Domínio de missões e moedas | 1/4 | In Progress|  |
 | 3. Recompensas e resgates | 0/3 | Not started | - |
 | 4. Mobile base | 0/3 | Not started | - |
 | 5. Fluxo da criança | 0/3 | Not started | - |
