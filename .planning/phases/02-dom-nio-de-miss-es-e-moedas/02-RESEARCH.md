@@ -356,13 +356,13 @@ assertThat(coinTransactionRepository.findAll()).singleElement()
 
 1. **Child authentication model for Phase 2 endpoints**
    - What we know: Phase 1 children are not `User` records and protected endpoints currently use responsible JWTs. [VERIFIED: DECISIONS.md] [VERIFIED: codebase grep]
-   - What's unclear: Whether child completion in backend Phase 2 is simulated via responsible-authenticated `/children/{childId}` scoped calls or a separate child access mechanism later. [ASSUMED]
-   - Recommendation: Implement child-facing endpoints as authenticated responsible/family-scoped operations with `childId` path ownership checks for now, and avoid adding child JWT auth in Phase 2. [ASSUMED]
+   - RESOLVED: Phase 2 implements child-facing backend endpoints as authenticated family-scoped calls using the existing responsible JWT and `childId` path ownership checks. No child JWT/auth model is introduced in Phase 2; that remains a later mobile/access concern. [VERIFIED: Phase 2 revision decision]
+   - Recommendation decision: implement `GET /children/{childId}/missions` and `POST /assigned-missions/{id}/complete` with `CurrentUser.familyUnitId` guards and safe not-found responses. [VERIFIED: Phase 2 revision decision]
 
 2. **Ledger statement endpoint scope**
    - What we know: `GET /children/{childId}/wallet/transactions` is in docs/api-contract, but WALT-05 is Phase 3. [VERIFIED: docs/api-contract.md] [VERIFIED: .planning/REQUIREMENTS.md]
-   - What's unclear: Whether Phase 2 should list transactions or only persist ledger and expose balance. [VERIFIED: ROADMAP.md]
-   - Recommendation: Implement balance endpoint in Phase 2 and keep transaction listing deferred unless needed to manually inspect ledger. [ASSUMED]
+   - RESOLVED: Phase 2 persists `CoinTransaction` for credits and exposes only `GET /children/{childId}/wallet` for balance. Transaction listing remains out of Phase 2 because WALT-05 is mapped to Phase 3. [VERIFIED: ROADMAP.md] [VERIFIED: Phase 2 revision decision]
+   - Recommendation decision: implement ledger writes and tests in Phase 2, but do not add `/children/{childId}/wallet/transactions` until Phase 3. [VERIFIED: Phase 2 revision decision]
 
 ## Environment Availability
 
