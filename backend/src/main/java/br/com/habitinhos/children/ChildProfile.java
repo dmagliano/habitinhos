@@ -5,9 +5,14 @@ import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Table;
 import java.util.UUID;
+import lombok.AccessLevel;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
 
 @Entity
 @Table(name = "child_profiles")
+@Getter
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class ChildProfile extends BaseEntity {
 
   @Column(name = "family_unit_id", nullable = false)
@@ -28,9 +33,6 @@ public class ChildProfile extends BaseEntity {
   @Column(nullable = false)
   private boolean active = true;
 
-  protected ChildProfile() {
-  }
-
   public ChildProfile(UUID familyUnitId, String name, Integer age, String avatarKey,
       String accessPinHash) {
     this.familyUnitId = familyUnitId;
@@ -40,51 +42,17 @@ public class ChildProfile extends BaseEntity {
     this.accessPinHash = accessPinHash;
   }
 
-  public UUID getFamilyUnitId() {
-    return familyUnitId;
-  }
-
-  public void setFamilyUnitId(UUID familyUnitId) {
-    this.familyUnitId = familyUnitId;
-  }
-
-  public String getName() {
-    return name;
-  }
-
-  public void setName(String name) {
+  public void updateProfile(String name, Integer age, String avatarKey) {
     this.name = name;
-  }
-
-  public Integer getAge() {
-    return age;
-  }
-
-  public void setAge(Integer age) {
     this.age = age;
-  }
-
-  public String getAvatarKey() {
-    return avatarKey;
-  }
-
-  public void setAvatarKey(String avatarKey) {
     this.avatarKey = avatarKey;
   }
 
-  public String getAccessPinHash() {
-    return accessPinHash;
-  }
-
-  public void setAccessPinHash(String accessPinHash) {
+  public void updateAccessPinHash(String accessPinHash) {
     this.accessPinHash = accessPinHash;
   }
 
-  public boolean isActive() {
-    return active;
-  }
-
-  public void setActive(boolean active) {
-    this.active = active;
+  public void deactivate() {
+    this.active = false;
   }
 }

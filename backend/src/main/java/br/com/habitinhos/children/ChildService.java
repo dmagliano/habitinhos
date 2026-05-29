@@ -70,11 +70,12 @@ public class ChildService {
         .findByIdAndFamilyUnitIdAndActiveTrue(id, currentUser.familyUnitId())
         .orElseThrow(this::childNotFound);
 
-    child.setName(request.name().trim());
-    child.setAge(request.age());
-    child.setAvatarKey(normalizeOptional(request.avatarKey()));
+    child.updateProfile(
+        request.name().trim(),
+        request.age(),
+        normalizeOptional(request.avatarKey()));
     if (hasText(request.accessPin())) {
-      child.setAccessPinHash(passwordEncoder.encode(request.accessPin()));
+      child.updateAccessPinHash(passwordEncoder.encode(request.accessPin()));
     }
 
     return toResponse(child);
@@ -86,7 +87,7 @@ public class ChildService {
     ChildProfile child = childProfileRepository
         .findByIdAndFamilyUnitIdAndActiveTrue(id, currentUser.familyUnitId())
         .orElseThrow(this::childNotFound);
-    child.setActive(false);
+    child.deactivate();
     return toResponse(child);
   }
 

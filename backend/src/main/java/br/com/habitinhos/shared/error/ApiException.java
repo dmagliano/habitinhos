@@ -1,7 +1,9 @@
 package br.com.habitinhos.shared.error;
 
+import lombok.Getter;
 import org.springframework.http.HttpStatus;
 
+@Getter
 public class ApiException extends RuntimeException {
 
   private final String code;
@@ -11,13 +13,5 @@ public class ApiException extends RuntimeException {
     super(message);
     this.status = status;
     this.code = code;
-  }
-
-  public String getCode() {
-    return code;
-  }
-
-  public HttpStatus getStatus() {
-    return status;
   }
 }

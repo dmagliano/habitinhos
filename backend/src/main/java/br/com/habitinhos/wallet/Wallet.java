@@ -5,9 +5,14 @@ import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Table;
 import java.util.UUID;
+import lombok.AccessLevel;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
 
 @Entity
 @Table(name = "wallets")
+@Getter
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class Wallet extends BaseEntity {
 
   @Column(name = "family_unit_id", nullable = false)
@@ -19,36 +24,9 @@ public class Wallet extends BaseEntity {
   @Column(nullable = false)
   private int balance;
 
-  protected Wallet() {
-  }
-
   public Wallet(UUID familyUnitId, UUID childId, int balance) {
     this.familyUnitId = familyUnitId;
     this.childId = childId;
-    this.balance = balance;
-  }
-
-  public UUID getFamilyUnitId() {
-    return familyUnitId;
-  }
-
-  public void setFamilyUnitId(UUID familyUnitId) {
-    this.familyUnitId = familyUnitId;
-  }
-
-  public UUID getChildId() {
-    return childId;
-  }
-
-  public void setChildId(UUID childId) {
-    this.childId = childId;
-  }
-
-  public int getBalance() {
-    return balance;
-  }
-
-  public void setBalance(int balance) {
     this.balance = balance;
   }
 }
