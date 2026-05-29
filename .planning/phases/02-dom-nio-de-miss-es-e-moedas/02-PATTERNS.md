@@ -195,6 +195,11 @@ private NotFoundException childNotFound() {
 **Apply to:** `Mission.java`, `AssignedMission.java`, `CoinTransaction.java`
 **Analog:** `backend/src/main/java/br/com/habitinhos/children/ChildProfile.java`; `backend/src/main/java/br/com/habitinhos/wallet/Wallet.java`; `backend/src/main/java/br/com/habitinhos/shared/model/BaseEntity.java`
 
+**Phase 2 Lombok decision:** New Phase 2 JPA entities should use Lombok for boilerplate only:
+`@Getter` and `@NoArgsConstructor(access = AccessLevel.PROTECTED)`. Do not add broad class-level
+`@Setter`; state transitions stay in explicit domain methods such as `update`, `deactivate`,
+`markCompleted`, `approve`, `reject`, and wallet credit methods.
+
 **Entity annotation and tenant field pattern** (`ChildProfile.java` lines 3-17):
 ```java
 import br.com.habitinhos.shared.model.BaseEntity;

@@ -119,7 +119,7 @@ No new external packages are required for Phase 2; use existing Maven dependenci
 
 ## Package Legitimacy Audit
 
-No new external package install is recommended for this phase, so the Package Legitimacy Gate is not applicable. [VERIFIED: backend/pom.xml] `slopcheck` was not available locally, but no package is being introduced. [VERIFIED: command -v slopcheck]
+Lombok is now a user-directed Phase 2 planning decision for JPA entity boilerplate. Use only `org.projectlombok:lombok` as a Spring Boot managed optional dependency, and exclude it from the Spring Boot runtime artifact. Do not add extra Lombok plugins or broaden the dependency to runtime packaging. `slopcheck` was not available locally. [VERIFIED: backend/pom.xml] [VERIFIED: command -v slopcheck]
 
 ## Architecture Patterns
 

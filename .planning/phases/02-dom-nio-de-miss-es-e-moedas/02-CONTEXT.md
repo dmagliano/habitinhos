@@ -33,6 +33,9 @@ This phase does not implement rewards, reward redemptions, mobile screens, dashb
 - **D-13:** Wallet balance changes must happen in transactional services and must write a matching `CoinTransaction`.
 - **D-14:** Missions should be soft-deactivated, not physically deleted, to preserve assignment, approval, and transaction history.
 
+### Backend Boilerplate
+- **D-15:** Use Lombok for new Phase 2 JPA entity boilerplate. Generate getters and protected no-args constructors with `@Getter` and `@NoArgsConstructor(access = AccessLevel.PROTECTED)`, but do not add broad class-level `@Setter` to entities whose state changes must go through domain methods.
+
 ### the agent's Discretion
 - Completion, approval, rejection, child-access endpoint details, wallet locking strategy, and exact `CoinTransaction` field names were not discussed by the user in this session. Researcher and planner may choose pragmatic defaults that preserve the locked requirements, family isolation, transactional wallet integrity, and auditability.
 
