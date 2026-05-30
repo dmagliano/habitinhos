@@ -29,4 +29,11 @@ public class Wallet extends BaseEntity {
     this.childId = childId;
     this.balance = balance;
   }
+
+  public void credit(int amount) {
+    if (amount <= 0) {
+      throw new IllegalArgumentException("Amount must be positive.");
+    }
+    this.balance += amount;
+  }
 }

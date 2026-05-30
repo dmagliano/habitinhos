@@ -73,7 +73,7 @@ class MissionWalletTransactionIntegrationTest extends AbstractIntegrationTest {
 
     assertThat(wallet.getBalance()).isEqualTo(7);
     assertThat(transactions).hasSize(1);
-    CoinTransaction transaction = transactions.getFirst();
+    CoinTransaction transaction = transactions.get(0);
     assertThat(transaction.getType()).isEqualTo(CoinTransactionType.CREDIT);
     assertThat(transaction.getSourceType()).isEqualTo(CoinTransactionSourceType.MISSION_COMPLETION);
     assertThat(transaction.getAmount()).isEqualTo(7);
@@ -152,7 +152,7 @@ class MissionWalletTransactionIntegrationTest extends AbstractIntegrationTest {
             .content(objectMapper.writeValueAsString(
                 new AssignMissionRequest(List.of(childId), LocalDate.of(2026, 6, 1)))))
         .andExpect(status().isCreated());
-    return assignedMissionRepository.findAll().getFirst().getId();
+    return assignedMissionRepository.findAll().get(0).getId();
   }
 
   private UUID createMission(String token, MissionRequest request) throws Exception {
