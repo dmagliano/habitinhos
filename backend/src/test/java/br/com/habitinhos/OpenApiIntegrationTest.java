@@ -24,6 +24,7 @@ class OpenApiIntegrationTest extends AbstractIntegrationTest {
         .andExpect(content().string(containsString("\"/missions\"")))
         .andExpect(content().string(containsString("\"/missions/{id}\"")))
         .andExpect(content().string(containsString("\"/missions/{id}/deactivate\"")))
-        .andExpect(content().string(containsString("\"/missions/{id}/assign\"")));
+        .andExpect(content().string(containsString("\"/missions/{id}/assign\"")))
+        .andExpect(content().string(containsString("\"/children/{childId}/wallet\"")));
   }
 }
