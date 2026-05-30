@@ -109,6 +109,49 @@ public class AssignedMissionService {
     return toResponse(assignedMission);
   }
 
+  @Transactional(readOnly = true)
+  public List<AssignedMissionResponse> listPendingApproval(CurrentUser currentUser) {
+    requireResponsible(currentUser);
+    return assignedMissionRepository
+        .findAllByFamilyUnitIdAndStatusOrderByCompletedAtAsc(
+            currentUser.familyUnitId(),
+            AssignedMissionStatus.AWAITING_APPROVAL)
+        .stream()
+        .map(this::toResponse)
+        .toList();
+  }
+
+  @Transactional
+  public AssignedMissionResponse approve(CurrentUser currentUser, UUID assignedMissionId) {
+    requireResponsible(currentUser);
+    UUID familyUnitId = currentUser.familyUnitId();
+    AssignedMission assignedMission = assignedMissionRepository
+        .findByIdAndFamilyUnitId(assignedMissionId, familyUnitId)
+        .orElseThrow(this::assignedMissionNotFound);
+    requireStatus(assignedMission, AssignedMissionStatus.AWAITING_APPROVAL);
+
+    assignedMission.approve();
+    walletService.creditForMission(
+        familyUnitId,
+        assignedMission.getChildId(),
+        assignedMission.getId(),
+        assignedMission.getSnapshotCoinValue(),
+        currentUser.userId());
+    return toResponse(assignedMission);
+  }
+
+  @Transactional
+  public AssignedMissionResponse reject(CurrentUser currentUser, UUID assignedMissionId, String reason) {
+    requireResponsible(currentUser);
+    AssignedMission assignedMission = assignedMissionRepository
+        .findByIdAndFamilyUnitId(assignedMissionId, currentUser.familyUnitId())
+        .orElseThrow(this::assignedMissionNotFound);
+    requireStatus(assignedMission, AssignedMissionStatus.AWAITING_APPROVAL);
+
+    assignedMission.reject(normalizeOptional(reason));
+    return toResponse(assignedMission);
+  }
+
   private void requireResponsible(CurrentUser currentUser) {
     if (currentUser.role() != UserRole.RESPONSIBLE) {
       throw new ForbiddenException("RESPONSIBLE_REQUIRED", "Apenas responsáveis podem realizar esta ação.");
@@ -131,6 +174,10 @@ public class AssignedMissionService {
     if (assignedMission.getStatus() != expectedStatus) {
       throw new ConflictException("INVALID_MISSION_STATUS", "Status da missão atribuída não permite esta ação.");
     }
+  }
+
+  private String normalizeOptional(String value) {
+    return value == null || value.trim().isEmpty() ? null : value.trim();
   }
 
   private AssignedMissionResponse toResponse(AssignedMission assignedMission) {
