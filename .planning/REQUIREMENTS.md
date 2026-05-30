@@ -26,12 +26,12 @@
 - [ ] **MISS-01**: Responsible adult can create, edit, list, view, and deactivate missions.
 - [ ] **MISS-02**: Mission coin value must be a positive integer.
 - [ ] **MISS-03**: Responsible adult can assign a mission to one or more children.
-- [ ] **MISS-04**: Child can list only their own assigned pending missions.
-- [ ] **MISS-05**: Child can mark their own assigned mission as completed.
-- [ ] **MISS-06**: Mission without approval credits coins automatically on completion.
-- [ ] **MISS-07**: Mission requiring approval moves to `AWAITING_APPROVAL` after child completion.
-- [ ] **MISS-08**: Responsible adult can approve awaiting mission completion.
-- [ ] **MISS-09**: Responsible adult can reject awaiting mission completion with an optional reason.
+- [x] **MISS-04**: Child can list only their own assigned pending missions.
+- [x] **MISS-05**: Child can mark their own assigned mission as completed.
+- [x] **MISS-06**: Mission without approval credits coins automatically on completion.
+- [x] **MISS-07**: Mission requiring approval moves to `AWAITING_APPROVAL` after child completion.
+- [x] **MISS-08**: Responsible adult can approve awaiting mission completion.
+- [x] **MISS-09**: Responsible adult can reject awaiting mission completion with an optional reason.
 
 ### Wallet and Coins
 

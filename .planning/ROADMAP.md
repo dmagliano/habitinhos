@@ -7,7 +7,7 @@ Habitinhos will be built as a monorepo MVP in seven phases: backend foundation, 
 ## Phases
 
 - [x] **Phase 1: Fundação do backend** - Create Spring Boot backend foundation, PostgreSQL/Flyway setup, authentication, family isolation, children, wallets, and baseline tests.
-- [ ] **Phase 2: Domínio de missões e moedas** - Implement missions, assignments, completion, approval/rejection, coin credits, ledger transactions, and transactional tests.
+- [x] **Phase 2: Domínio de missões e moedas** - Implement missions, assignments, completion, approval/rejection, coin credits, ledger transactions, and transactional tests. (completed 2026-05-30)
 - [ ] **Phase 3: Recompensas e resgates** - Implement rewards, redemptions, sufficient-balance validation, coin debits, ledger transactions, and balance tests.
 - [ ] **Phase 4: Mobile base** - Create Expo app foundation, navigation, API client, login flow, and base visual structure.
 - [ ] **Phase 5: Fluxo da criança** - Build child home, balance, missions, completion feedback, rewards catalog, and redemption flow.
@@ -62,7 +62,7 @@ Plans:
 **Wave 3** *(blocked on 02-01 and 02-04 completion)*
 - [x] 02-03-PLAN.md — Wallet credit service, CoinTransaction ledger, wallet balance endpoint, transactional tests
 **Wave 4** *(blocked on 02-04 and 02-03 completion)*
-- [ ] 02-02-PLAN.md — Completion, approval, rejection, status transitions, authorization rules, and full Phase 2 OpenAPI coverage
+- [x] 02-02-PLAN.md — Completion, approval, rejection, status transitions, authorization rules, and full Phase 2 OpenAPI coverage
 
 ### Phase 3: Recompensas e resgates
 **Goal**: Children can redeem active family rewards when they have enough coins, with transactional debits and history.
@@ -161,7 +161,7 @@ Phases execute in numeric order: 1 → 2 → 3 → 4 → 5 → 6 → 7
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
 | 1. Fundação do backend | 4/4 | Complete | 2026-05-27 |
-| 2. Domínio de missões e moedas | 3/4 | In Progress|  |
+| 2. Domínio de missões e moedas | 4/4 | Complete   | 2026-05-30 |
 | 3. Recompensas e resgates | 0/3 | Not started | - |
 | 4. Mobile base | 0/3 | Not started | - |
 | 5. Fluxo da criança | 0/3 | Not started | - |
