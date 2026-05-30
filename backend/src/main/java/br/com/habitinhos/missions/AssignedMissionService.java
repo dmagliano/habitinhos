@@ -8,6 +8,7 @@ import br.com.habitinhos.missions.dto.AssignedMissionResponse;
 import br.com.habitinhos.shared.error.ConflictException;
 import br.com.habitinhos.shared.error.ForbiddenException;
 import br.com.habitinhos.shared.error.NotFoundException;
+import br.com.habitinhos.wallet.WalletService;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
@@ -21,14 +22,17 @@ public class AssignedMissionService {
   private final MissionRepository missionRepository;
   private final AssignedMissionRepository assignedMissionRepository;
   private final ChildProfileRepository childProfileRepository;
+  private final WalletService walletService;
 
   public AssignedMissionService(
       MissionRepository missionRepository,
       AssignedMissionRepository assignedMissionRepository,
-      ChildProfileRepository childProfileRepository) {
+      ChildProfileRepository childProfileRepository,
+      WalletService walletService) {
     this.missionRepository = missionRepository;
     this.assignedMissionRepository = assignedMissionRepository;
     this.childProfileRepository = childProfileRepository;
+    this.walletService = walletService;
   }
 
   @Transactional
@@ -66,6 +70,45 @@ public class AssignedMissionService {
     return assignments.stream().map(this::toResponse).toList();
   }
 
+  @Transactional(readOnly = true)
+  public List<AssignedMissionResponse> listPendingForChild(CurrentUser currentUser, UUID childId) {
+    UUID familyUnitId = currentUser.familyUnitId();
+    childProfileRepository.findByIdAndFamilyUnitId(childId, familyUnitId)
+        .orElseThrow(this::childNotFound);
+
+    return assignedMissionRepository
+        .findAllByFamilyUnitIdAndChildIdAndStatusOrderByDueDateAscCreatedAtAsc(
+            familyUnitId,
+            childId,
+            AssignedMissionStatus.PENDING)
+        .stream()
+        .map(this::toResponse)
+        .toList();
+  }
+
+  @Transactional
+  public AssignedMissionResponse complete(CurrentUser currentUser, UUID assignedMissionId) {
+    UUID familyUnitId = currentUser.familyUnitId();
+    AssignedMission assignedMission = assignedMissionRepository
+        .findByIdAndFamilyUnitId(assignedMissionId, familyUnitId)
+        .orElseThrow(this::assignedMissionNotFound);
+
+    childProfileRepository.findByIdAndFamilyUnitId(assignedMission.getChildId(), familyUnitId)
+        .orElseThrow(this::childNotFound);
+    requireStatus(assignedMission, AssignedMissionStatus.PENDING);
+
+    assignedMission.markCompleted();
+    if (!assignedMission.isSnapshotRequiresApproval()) {
+      walletService.creditForMission(
+          familyUnitId,
+          assignedMission.getChildId(),
+          assignedMission.getId(),
+          assignedMission.getSnapshotCoinValue(),
+          currentUser.userId());
+    }
+    return toResponse(assignedMission);
+  }
+
   private void requireResponsible(CurrentUser currentUser) {
     if (currentUser.role() != UserRole.RESPONSIBLE) {
       throw new ForbiddenException("RESPONSIBLE_REQUIRED", "Apenas responsáveis podem realizar esta ação.");
@@ -78,6 +121,16 @@ public class AssignedMissionService {
 
   private NotFoundException childNotFound() {
     return new NotFoundException("CHILD_NOT_FOUND", "Criança não encontrada.");
+  }
+
+  private NotFoundException assignedMissionNotFound() {
+    return new NotFoundException("ASSIGNED_MISSION_NOT_FOUND", "Missão atribuída não encontrada.");
+  }
+
+  private void requireStatus(AssignedMission assignedMission, AssignedMissionStatus expectedStatus) {
+    if (assignedMission.getStatus() != expectedStatus) {
+      throw new ConflictException("INVALID_MISSION_STATUS", "Status da missão atribuída não permite esta ação.");
+    }
   }
 
   private AssignedMissionResponse toResponse(AssignedMission assignedMission) {
