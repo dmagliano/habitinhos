@@ -60,7 +60,7 @@ Plans:
 **Wave 2** *(blocked on 02-01 completion)*
 - [x] 02-04-PLAN.md — Mission CRUD, explicit assignment API, assignment tests, and initial OpenAPI coverage
 **Wave 3** *(blocked on 02-01 and 02-04 completion)*
-- [ ] 02-03-PLAN.md — Wallet credit service, CoinTransaction ledger, wallet balance endpoint, transactional tests
+- [x] 02-03-PLAN.md — Wallet credit service, CoinTransaction ledger, wallet balance endpoint, transactional tests
 **Wave 4** *(blocked on 02-04 and 02-03 completion)*
 - [ ] 02-02-PLAN.md — Completion, approval, rejection, status transitions, authorization rules, and full Phase 2 OpenAPI coverage
 
@@ -161,7 +161,7 @@ Phases execute in numeric order: 1 → 2 → 3 → 4 → 5 → 6 → 7
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
 | 1. Fundação do backend | 4/4 | Complete | 2026-05-27 |
-| 2. Domínio de missões e moedas | 2/4 | In Progress|  |
+| 2. Domínio de missões e moedas | 3/4 | In Progress|  |
 | 3. Recompensas e resgates | 0/3 | Not started | - |
 | 4. Mobile base | 0/3 | Not started | - |
 | 5. Fluxo da criança | 0/3 | Not started | - |
