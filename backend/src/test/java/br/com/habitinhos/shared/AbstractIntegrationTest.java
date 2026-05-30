@@ -30,7 +30,17 @@ public abstract class AbstractIntegrationTest {
         DO $$
         BEGIN
           IF to_regclass('public.family_units') IS NOT NULL THEN
-            TRUNCATE TABLE coin_transactions, assigned_missions, missions, wallets, child_profiles, app_users, family_units RESTART IDENTITY CASCADE;
+            TRUNCATE TABLE
+              coin_transactions,
+              reward_redemptions,
+              assigned_missions,
+              rewards,
+              missions,
+              wallets,
+              child_profiles,
+              app_users,
+              family_units
+            RESTART IDENTITY CASCADE;
           END IF;
         END $$;
         """);
