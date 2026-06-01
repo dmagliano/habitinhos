@@ -60,8 +60,8 @@
 
 ### Mobile App
 
-- [ ] **MOBL-01**: Mobile app is created with Expo, React Native, TypeScript, and React Navigation.
-- [ ] **MOBL-02**: Mobile app has PT-BR screens and English technical names in code.
+- [x] **MOBL-01**: Mobile app is created with Expo, React Native, TypeScript, and React Navigation.
+- [x] **MOBL-02**: Mobile app has PT-BR screens and English technical names in code.
 - [ ] **MOBL-03**: Responsible flow includes login, family onboarding, dashboard, children, missions, assignments, approvals, rewards, and child details.
 - [ ] **MOBL-04**: Child flow includes profile selection/access, home with balance, missions, completion feedback, reward catalog, redemption feedback, and insufficient balance message.
 - [ ] **MOBL-05**: Mobile app consumes the real backend API for the demo flow.
@@ -107,8 +107,8 @@
 | WALT-01, WALT-02, WALT-04, WALT-06 | Phase 2 | Complete |
 | REWD-01..REWD-06 | Phase 3 | Complete |
 | WALT-03, WALT-05 | Phase 3 | Complete |
-| MOBL-01, MOBL-02 | Phase 4 | Pending |
-| AUTH-02, AUTH-04 | Phase 4 | Pending |
+| MOBL-01, MOBL-02 | Phase 4 | Complete |
+| AUTH-02, AUTH-04 | Phase 4 | Complete |
 | MOBL-04, MOBL-05 | Phase 5 | Pending |
 | CHLD-03, MISS-04..MISS-05, REWD-03..REWD-05, WALT-01 | Phase 5 | Pending |
 | MOBL-03, DASH-01..DASH-04 | Phase 6 | Pending |

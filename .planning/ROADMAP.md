@@ -9,7 +9,7 @@ Habitinhos will be built as a monorepo MVP in seven phases: backend foundation, 
 - [x] **Phase 1: Fundação do backend** - Create Spring Boot backend foundation, PostgreSQL/Flyway setup, authentication, family isolation, children, wallets, and baseline tests.
 - [x] **Phase 2: Domínio de missões e moedas** - Implement missions, assignments, completion, approval/rejection, coin credits, ledger transactions, and transactional tests. (completed 2026-05-30)
 - [x] **Phase 3: Recompensas e resgates** - Implement rewards, redemptions, sufficient-balance validation, coin debits, ledger transactions, and balance tests. (completed 2026-06-01)
-- [ ] **Phase 4: Mobile base** - Create Expo app foundation, navigation, API client, login flow, and base visual structure.
+- [x] **Phase 4: Mobile base** - Create Expo app foundation, navigation, API client, login flow, and base visual structure. (completed 2026-06-01)
 - [ ] **Phase 5: Fluxo da criança** - Build child home, balance, missions, completion feedback, rewards catalog, and redemption flow.
 - [ ] **Phase 6: Fluxo do responsável** - Build dashboard, children, missions, assignments, rewards, approvals, and child detail views.
 - [ ] **Phase 7: Polimento para demonstração do TCC** - Add demo seeds, visual polish, README, architecture docs, presentation script, and final testing.
@@ -125,16 +125,16 @@ Plans:
 Plans:
 **Wave 1**
 
-- [ ] 04-01: Expo app scaffold, TypeScript, lint/basic structure
+- [x] 04-01: Expo app scaffold, TypeScript, lint/basic structure
 
 **Wave 2** *(blocked on Wave 1 completion)*
 
-- [ ] 04-02: API client, environment configuration, auth storage, session state
-- [ ] 04-03: Visual tokens and base components
+- [x] 04-02: API client, environment configuration, auth storage, session state
+- [x] 04-03: Visual tokens and base components
 
 **Wave 3** *(blocked on 04-02 and 04-03 completion)*
 
-- [ ] 04-04: Navigation, login/access screens, family hub, and mode stubs
+- [x] 04-04: Navigation, login/access screens, family hub, and mode stubs
 
 ### Phase 5: Fluxo da criança
 
@@ -214,7 +214,7 @@ Phases execute in numeric order: 1 → 2 → 3 → 4 → 5 → 6 → 7
 | 1. Fundação do backend | 4/4 | Complete | 2026-05-27 |
 | 2. Domínio de missões e moedas | 4/4 | Complete   | 2026-05-30 |
 | 3. Recompensas e resgates | 3/3 | Complete    | 2026-06-01 |
-| 4. Mobile base | 0/4 | Planned | - |
+| 4. Mobile base | 4/4 | Complete   | 2026-06-01 |
 | 5. Fluxo da criança | 0/3 | Not started | - |
 | 6. Fluxo do responsável | 0/4 | Not started | - |
 | 7. Polimento para demonstração do TCC | 0/3 | Not started | - |
