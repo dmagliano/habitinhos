@@ -6,6 +6,8 @@ import br.com.habitinhos.children.dto.ChildResponse;
 import jakarta.validation.Valid;
 import java.util.List;
 import java.util.UUID;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
@@ -21,6 +23,8 @@ import org.springframework.web.bind.annotation.RestController;
 @RequestMapping("/children")
 public class ChildController {
 
+  private static final Logger log = LoggerFactory.getLogger(ChildController.class);
+
   private final ChildService childService;
   private final CurrentUserProvider currentUserProvider;
 
@@ -32,26 +36,36 @@ public class ChildController {
   @PostMapping
   @ResponseStatus(HttpStatus.CREATED)
   public ChildResponse create(@Valid @RequestBody ChildRequest request) {
-    return childService.create(currentUserProvider.getCurrentUser(), request);
+    var currentUser = currentUserProvider.getCurrentUser();
+    log.info("Create child request: familyUnitId={}", currentUser.familyUnitId());
+    return childService.create(currentUser, request);
   }
 
   @GetMapping
   public List<ChildResponse> list() {
-    return childService.list(currentUserProvider.getCurrentUser());
+    var currentUser = currentUserProvider.getCurrentUser();
+    log.debug("List children request: familyUnitId={}", currentUser.familyUnitId());
+    return childService.list(currentUser);
   }
 
   @GetMapping("/{id}")
   public ChildResponse get(@PathVariable UUID id) {
-    return childService.get(currentUserProvider.getCurrentUser(), id);
+    var currentUser = currentUserProvider.getCurrentUser();
+    log.debug("Get child request: familyUnitId={} childId={}", currentUser.familyUnitId(), id);
+    return childService.get(currentUser, id);
   }
 
   @PutMapping("/{id}")
   public ChildResponse update(@PathVariable UUID id, @Valid @RequestBody ChildRequest request) {
-    return childService.update(currentUserProvider.getCurrentUser(), id, request);
+    var currentUser = currentUserProvider.getCurrentUser();
+    log.info("Update child request: familyUnitId={} childId={}", currentUser.familyUnitId(), id);
+    return childService.update(currentUser, id, request);
   }
 
   @PatchMapping("/{id}/deactivate")
   public ChildResponse deactivate(@PathVariable UUID id) {
-    return childService.deactivate(currentUserProvider.getCurrentUser(), id);
+    var currentUser = currentUserProvider.getCurrentUser();
+    log.info("Deactivate child request: familyUnitId={} childId={}", currentUser.familyUnitId(), id);
+    return childService.deactivate(currentUser, id);
   }
 }

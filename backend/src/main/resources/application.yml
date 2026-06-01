@@ -18,6 +18,11 @@ management:
       exposure:
         include: health
 
+logging:
+  level:
+    root: ${LOG_LEVEL_ROOT:INFO}
+    br.com.habitinhos: ${LOG_LEVEL_APP:DEBUG}
+
 habitinhos:
   security:
     jwt:

@@ -7,11 +7,15 @@ import br.com.habitinhos.missions.dto.MissionResponse;
 import br.com.habitinhos.shared.error.ForbiddenException;
 import br.com.habitinhos.shared.error.NotFoundException;
 import java.util.List;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 @Service
 public class MissionService {
+
+  private static final Logger log = LoggerFactory.getLogger(MissionService.class);
 
   private final MissionRepository missionRepository;
 
@@ -31,16 +35,19 @@ public class MissionService {
         request.recurrenceType(),
         currentUser.userId());
     missionRepository.saveAndFlush(mission);
+    log.info("Mission created: familyUnitId={} missionId={}", currentUser.familyUnitId(), mission.getId());
     return toResponse(mission);
   }
 
   @Transactional(readOnly = true)
   public List<MissionResponse> list(CurrentUser currentUser) {
     requireResponsible(currentUser);
-    return missionRepository.findAllByFamilyUnitIdAndActiveTrueOrderByCreatedAtAsc(currentUser.familyUnitId())
+    List<MissionResponse> missions = missionRepository.findAllByFamilyUnitIdAndActiveTrueOrderByCreatedAtAsc(currentUser.familyUnitId())
         .stream()
         .map(this::toResponse)
         .toList();
+    log.debug("Missions listed: familyUnitId={} count={}", currentUser.familyUnitId(), missions.size());
+    return missions;
   }
 
   @Transactional(readOnly = true)
@@ -62,6 +69,7 @@ public class MissionService {
         request.coinValue(),
         request.requiresApproval(),
         request.recurrenceType());
+    log.info("Mission updated: familyUnitId={} missionId={}", currentUser.familyUnitId(), id);
     return toResponse(mission);
   }
 
@@ -71,11 +79,13 @@ public class MissionService {
     Mission mission = missionRepository.findByIdAndFamilyUnitIdAndActiveTrue(id, currentUser.familyUnitId())
         .orElseThrow(this::missionNotFound);
     mission.deactivate();
+    log.info("Mission deactivated: familyUnitId={} missionId={}", currentUser.familyUnitId(), id);
     return toResponse(mission);
   }
 
   private void requireResponsible(CurrentUser currentUser) {
     if (currentUser.role() != UserRole.RESPONSIBLE) {
+      log.warn("Access denied: non-responsible role={} familyUnitId={}", currentUser.role(), currentUser.familyUnitId());
       throw new ForbiddenException("RESPONSIBLE_REQUIRED", "Apenas responsáveis podem realizar esta ação.");
     }
   }

@@ -13,11 +13,15 @@ import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 @Service
 public class AssignedMissionService {
+
+  private static final Logger log = LoggerFactory.getLogger(AssignedMissionService.class);
 
   private final MissionRepository missionRepository;
   private final AssignedMissionRepository assignedMissionRepository;
@@ -43,6 +47,7 @@ public class AssignedMissionService {
       LocalDate dueDate) {
     requireResponsible(currentUser);
     UUID familyUnitId = currentUser.familyUnitId();
+    log.debug("Assigning mission: familyUnitId={} missionId={} childCount={}", familyUnitId, missionId, childIds.size());
     Mission mission = missionRepository.findByIdAndFamilyUnitIdAndActiveTrue(missionId, familyUnitId)
         .orElseThrow(this::missionNotFound);
 
@@ -57,6 +62,11 @@ public class AssignedMissionService {
       boolean hasOpenAssignment = assignedMissionRepository.existsByMissionIdAndChildIdAndStatusIn(
           missionId, child.getId(), openStatuses);
       if (hasOpenAssignment) {
+        log.warn(
+            "Duplicate assignment blocked: familyUnitId={} missionId={} childId={}",
+            familyUnitId,
+            missionId,
+            child.getId());
         throw new ConflictException(
             "MISSION_DUPLICATE_ASSIGNMENT",
             "Missão já atribuída para esta criança.");
@@ -67,6 +77,7 @@ public class AssignedMissionService {
 
     assignedMissionRepository.saveAll(assignments);
     assignedMissionRepository.flush();
+    log.info("Mission assigned: familyUnitId={} missionId={} assignments={}", familyUnitId, missionId, assignments.size());
     return assignments.stream().map(this::toResponse).toList();
   }
 
@@ -76,7 +87,7 @@ public class AssignedMissionService {
     childProfileRepository.findByIdAndFamilyUnitId(childId, familyUnitId)
         .orElseThrow(this::childNotFound);
 
-    return assignedMissionRepository
+    List<AssignedMissionResponse> pendingMissions = assignedMissionRepository
         .findAllByFamilyUnitIdAndChildIdAndStatusOrderByDueDateAscCreatedAtAsc(
             familyUnitId,
             childId,
@@ -84,6 +95,12 @@ public class AssignedMissionService {
         .stream()
         .map(this::toResponse)
         .toList();
+    log.debug(
+        "Pending assigned missions listed: familyUnitId={} childId={} count={}",
+        familyUnitId,
+        childId,
+        pendingMissions.size());
+    return pendingMissions;
   }
 
   @Transactional
@@ -105,6 +122,17 @@ public class AssignedMissionService {
           assignedMission.getId(),
           assignedMission.getSnapshotCoinValue(),
           currentUser.userId());
+      log.info(
+          "Assigned mission completed with automatic credit: familyUnitId={} assignedMissionId={} childId={}",
+          familyUnitId,
+          assignedMissionId,
+          assignedMission.getChildId());
+    } else {
+      log.info(
+          "Assigned mission completed awaiting approval: familyUnitId={} assignedMissionId={} childId={}",
+          familyUnitId,
+          assignedMissionId,
+          assignedMission.getChildId());
     }
     return toResponse(assignedMission);
   }
@@ -112,13 +140,18 @@ public class AssignedMissionService {
   @Transactional(readOnly = true)
   public List<AssignedMissionResponse> listPendingApproval(CurrentUser currentUser) {
     requireResponsible(currentUser);
-    return assignedMissionRepository
+    List<AssignedMissionResponse> pendingApproval = assignedMissionRepository
         .findAllByFamilyUnitIdAndStatusOrderByCompletedAtAsc(
             currentUser.familyUnitId(),
             AssignedMissionStatus.AWAITING_APPROVAL)
         .stream()
         .map(this::toResponse)
         .toList();
+    log.debug(
+        "Pending approval assigned missions listed: familyUnitId={} count={}",
+        currentUser.familyUnitId(),
+        pendingApproval.size());
+    return pendingApproval;
   }
 
   @Transactional
@@ -137,6 +170,11 @@ public class AssignedMissionService {
         assignedMission.getId(),
         assignedMission.getSnapshotCoinValue(),
         currentUser.userId());
+    log.info(
+        "Assigned mission approved: familyUnitId={} assignedMissionId={} childId={}",
+        familyUnitId,
+        assignedMissionId,
+        assignedMission.getChildId());
     return toResponse(assignedMission);
   }
 
@@ -149,11 +187,17 @@ public class AssignedMissionService {
     requireStatus(assignedMission, AssignedMissionStatus.AWAITING_APPROVAL);
 
     assignedMission.reject(normalizeOptional(reason));
+    log.info(
+        "Assigned mission rejected: familyUnitId={} assignedMissionId={} childId={}",
+        currentUser.familyUnitId(),
+        assignedMissionId,
+        assignedMission.getChildId());
     return toResponse(assignedMission);
   }
 
   private void requireResponsible(CurrentUser currentUser) {
     if (currentUser.role() != UserRole.RESPONSIBLE) {
+      log.warn("Access denied: non-responsible role={} familyUnitId={}", currentUser.role(), currentUser.familyUnitId());
       throw new ForbiddenException("RESPONSIBLE_REQUIRED", "Apenas responsáveis podem realizar esta ação.");
     }
   }
@@ -172,6 +216,11 @@ public class AssignedMissionService {
 
   private void requireStatus(AssignedMission assignedMission, AssignedMissionStatus expectedStatus) {
     if (assignedMission.getStatus() != expectedStatus) {
+      log.warn(
+          "Invalid assigned mission status: assignedMissionId={} expected={} actual={}",
+          assignedMission.getId(),
+          expectedStatus,
+          assignedMission.getStatus());
       throw new ConflictException("INVALID_MISSION_STATUS", "Status da missão atribuída não permite esta ação.");
     }
   }

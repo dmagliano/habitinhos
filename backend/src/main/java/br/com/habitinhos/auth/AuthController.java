@@ -5,6 +5,8 @@ import br.com.habitinhos.auth.dto.LoginRequest;
 import br.com.habitinhos.auth.dto.MeResponse;
 import br.com.habitinhos.auth.dto.RegisterRequest;
 import jakarta.validation.Valid;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -14,6 +16,8 @@ import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 public class AuthController {
+
+  private static final Logger log = LoggerFactory.getLogger(AuthController.class);
 
   private final AuthService authService;
   private final CurrentUserProvider currentUserProvider;
@@ -26,16 +30,20 @@ public class AuthController {
   @PostMapping("/auth/register")
   @ResponseStatus(HttpStatus.CREATED)
   public AuthResponse register(@Valid @RequestBody RegisterRequest request) {
+    log.info("Auth register request received");
     return authService.register(request);
   }
 
   @PostMapping("/auth/login")
   public AuthResponse login(@Valid @RequestBody LoginRequest request) {
+    log.info("Auth login request received");
     return authService.login(request);
   }
 
   @GetMapping("/me")
   public MeResponse me() {
-    return authService.me(currentUserProvider.getCurrentUser());
+    CurrentUser currentUser = currentUserProvider.getCurrentUser();
+    log.debug("Auth me request for userId={} familyUnitId={}", currentUser.userId(), currentUser.familyUnitId());
+    return authService.me(currentUser);
   }
 }

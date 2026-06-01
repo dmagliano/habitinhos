@@ -17,11 +17,15 @@ import br.com.habitinhos.wallet.WalletRepository;
 import br.com.habitinhos.wallet.WalletService;
 import java.util.List;
 import java.util.UUID;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 @Service
 public class RewardService {
+
+  private static final Logger log = LoggerFactory.getLogger(RewardService.class);
 
   private final RewardRepository rewardRepository;
   private final RewardRedemptionRepository rewardRedemptionRepository;
@@ -52,15 +56,18 @@ public class RewardService {
         request.cost(),
         currentUser.userId());
     rewardRepository.saveAndFlush(reward);
+    log.info("Reward created: familyUnitId={} rewardId={}", currentUser.familyUnitId(), reward.getId());
     return toResponse(reward);
   }
 
   @Transactional(readOnly = true)
   public List<RewardResponse> listActive(CurrentUser currentUser) {
-    return rewardRepository.findAllByFamilyUnitIdAndActiveTrueOrderByCreatedAtAsc(currentUser.familyUnitId())
+    List<RewardResponse> rewards = rewardRepository.findAllByFamilyUnitIdAndActiveTrueOrderByCreatedAtAsc(currentUser.familyUnitId())
         .stream()
         .map(this::toResponse)
         .toList();
+    log.debug("Rewards listed: familyUnitId={} count={}", currentUser.familyUnitId(), rewards.size());
+    return rewards;
   }
 
   @Transactional(readOnly = true)
@@ -68,6 +75,7 @@ public class RewardService {
     requireResponsible(currentUser);
     Reward reward = rewardRepository.findByIdAndFamilyUnitId(rewardId, currentUser.familyUnitId())
         .orElseThrow(this::rewardNotFound);
+    log.debug("Reward resolved: familyUnitId={} rewardId={}", currentUser.familyUnitId(), rewardId);
     return toResponse(reward);
   }
 
@@ -80,6 +88,7 @@ public class RewardService {
         request.title().trim(),
         normalizeOptional(request.description()),
         request.cost());
+    log.info("Reward updated: familyUnitId={} rewardId={}", currentUser.familyUnitId(), rewardId);
     return toResponse(reward);
   }
 
@@ -89,6 +98,7 @@ public class RewardService {
     Reward reward = rewardRepository.findByIdAndFamilyUnitIdAndActiveTrue(rewardId, currentUser.familyUnitId())
         .orElseThrow(this::rewardNotFound);
     reward.deactivate();
+    log.info("Reward deactivated: familyUnitId={} rewardId={}", currentUser.familyUnitId(), rewardId);
     return toResponse(reward);
   }
 
@@ -115,11 +125,19 @@ public class RewardService {
         reward.getCost(),
         currentUser.userId());
     redemption.linkCoinTransaction(transaction.getId());
+    log.info(
+        "Reward redeemed: familyUnitId={} rewardId={} childId={} redemptionId={} transactionId={}",
+        familyUnitId,
+        rewardId,
+        child.getId(),
+        redemption.getId(),
+        transaction.getId());
     return toResponse(redemption);
   }
 
   private void requireResponsible(CurrentUser currentUser) {
     if (currentUser.role() != UserRole.RESPONSIBLE) {
+      log.warn("Access denied: non-responsible role={} familyUnitId={}", currentUser.role(), currentUser.familyUnitId());
       throw new ForbiddenException("RESPONSIBLE_REQUIRED", "Apenas responsáveis podem realizar esta ação.");
     }
   }

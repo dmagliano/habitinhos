@@ -10,12 +10,16 @@ import br.com.habitinhos.shared.error.ConflictException;
 import br.com.habitinhos.shared.error.NotFoundException;
 import br.com.habitinhos.shared.error.UnauthorizedException;
 import java.util.Locale;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 @Service
 public class AuthService {
+
+  private static final Logger log = LoggerFactory.getLogger(AuthService.class);
 
   private final AppUserRepository appUserRepository;
   private final FamilyUnitRepository familyUnitRepository;
@@ -37,6 +41,7 @@ public class AuthService {
   public AuthResponse register(RegisterRequest request) {
     String email = normalizeEmail(request.email());
     if (appUserRepository.existsByEmailIgnoreCase(email)) {
+      log.warn("Register blocked: email already registered");
       throw new ConflictException("EMAIL_ALREADY_REGISTERED", "E-mail já cadastrado.");
     }
 
@@ -48,6 +53,7 @@ public class AuthService {
         UserRole.RESPONSIBLE,
         passwordEncoder.encode(request.password()));
     appUserRepository.saveAndFlush(user);
+    log.info("Register succeeded: userId={} familyUnitId={}", user.getId(), family.getId());
 
     return toAuthResponse(user, family);
   }
@@ -55,6 +61,7 @@ public class AuthService {
   @Transactional(readOnly = true)
   public AuthResponse login(LoginRequest request) {
     String email = normalizeEmail(request.email());
+    log.debug("Login request processing");
     AppUser user = appUserRepository.findByEmailIgnoreCase(email)
         .filter(AppUser::isActive)
         .filter(found -> passwordEncoder.matches(request.password(), found.getPasswordHash()))
@@ -67,18 +74,21 @@ public class AuthService {
         .orElseThrow(() -> new UnauthorizedException(
             "INVALID_CREDENTIALS",
             "E-mail ou senha inválidos."));
+    log.info("Login succeeded: userId={} familyUnitId={}", user.getId(), family.getId());
 
     return toAuthResponse(user, family);
   }
 
   @Transactional(readOnly = true)
   public MeResponse me(CurrentUser currentUser) {
+    log.debug("Resolving /me for userId={} familyUnitId={}", currentUser.userId(), currentUser.familyUnitId());
     AppUser user = appUserRepository.findById(currentUser.userId())
         .filter(AppUser::isActive)
         .orElseThrow(() -> new NotFoundException("USER_NOT_FOUND", "Usuário não encontrado."));
     FamilyUnit family = familyUnitRepository.findById(currentUser.familyUnitId())
         .filter(FamilyUnit::isActive)
         .orElseThrow(() -> new NotFoundException("FAMILY_NOT_FOUND", "Família não encontrada."));
+    log.debug("Resolved /me for userId={} familyUnitId={}", user.getId(), family.getId());
 
     return new MeResponse(
         user.getId(),

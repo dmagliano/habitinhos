@@ -9,12 +9,16 @@ import br.com.habitinhos.shared.error.NotFoundException;
 import br.com.habitinhos.wallet.WalletService;
 import java.util.List;
 import java.util.UUID;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 @Service
 public class ChildService {
+
+  private static final Logger log = LoggerFactory.getLogger(ChildService.class);
 
   private final ChildProfileRepository childProfileRepository;
   private final WalletService walletService;
@@ -42,17 +46,20 @@ public class ChildService {
 
     childProfileRepository.saveAndFlush(child);
     walletService.createForChild(familyUnitId, child.getId());
+    log.info("Child created: familyUnitId={} childId={}", familyUnitId, child.getId());
     return toResponse(child);
   }
 
   @Transactional(readOnly = true)
   public List<ChildResponse> list(CurrentUser currentUser) {
     requireResponsible(currentUser);
-    return childProfileRepository
+    List<ChildResponse> children = childProfileRepository
         .findAllByFamilyUnitIdAndActiveTrueOrderByCreatedAtAsc(currentUser.familyUnitId())
         .stream()
         .map(this::toResponse)
         .toList();
+    log.debug("Children listed: familyUnitId={} count={}", currentUser.familyUnitId(), children.size());
+    return children;
   }
 
   @Transactional(readOnly = true)
@@ -77,6 +84,7 @@ public class ChildService {
     if (hasText(request.accessPin())) {
       child.updateAccessPinHash(passwordEncoder.encode(request.accessPin()));
     }
+    log.info("Child updated: familyUnitId={} childId={}", currentUser.familyUnitId(), id);
 
     return toResponse(child);
   }
@@ -88,11 +96,13 @@ public class ChildService {
         .findByIdAndFamilyUnitIdAndActiveTrue(id, currentUser.familyUnitId())
         .orElseThrow(this::childNotFound);
     child.deactivate();
+    log.info("Child deactivated: familyUnitId={} childId={}", currentUser.familyUnitId(), id);
     return toResponse(child);
   }
 
   private void requireResponsible(CurrentUser currentUser) {
     if (currentUser.role() != UserRole.RESPONSIBLE) {
+      log.warn("Access denied: non-responsible role={} familyUnitId={}", currentUser.role(), currentUser.familyUnitId());
       throw new ForbiddenException("RESPONSIBLE_REQUIRED", "Apenas responsáveis podem realizar esta ação.");
     }
   }
