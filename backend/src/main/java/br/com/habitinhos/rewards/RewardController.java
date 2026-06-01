@@ -2,6 +2,8 @@ package br.com.habitinhos.rewards;
 
 import br.com.habitinhos.auth.CurrentUserProvider;
 import br.com.habitinhos.rewards.dto.CreateRewardRequest;
+import br.com.habitinhos.rewards.dto.RedeemRewardRequest;
+import br.com.habitinhos.rewards.dto.RewardRedemptionResponse;
 import br.com.habitinhos.rewards.dto.RewardResponse;
 import br.com.habitinhos.rewards.dto.UpdateRewardRequest;
 import jakarta.validation.Valid;
@@ -54,5 +56,13 @@ public class RewardController {
   @PatchMapping("/{id}/deactivate")
   public RewardResponse deactivate(@PathVariable UUID id) {
     return rewardService.deactivate(currentUserProvider.getCurrentUser(), id);
+  }
+
+  @PostMapping("/{id}/redeem")
+  @ResponseStatus(HttpStatus.CREATED)
+  public RewardRedemptionResponse redeem(
+      @PathVariable UUID id,
+      @Valid @RequestBody RedeemRewardRequest request) {
+    return rewardService.redeem(currentUserProvider.getCurrentUser(), id, request);
   }
 }
