@@ -37,9 +37,9 @@
 
 - [x] **WALT-01**: Child wallet exposes current balance.
 - [x] **WALT-02**: Mission approval or auto-completion credits the child wallet transactionally.
-- [ ] **WALT-03**: Reward redemption debits the child wallet transactionally.
+- [x] **WALT-03**: Reward redemption debits the child wallet transactionally.
 - [x] **WALT-04**: Every credit, debit, or adjustment creates a `CoinTransaction`.
-- [ ] **WALT-05**: Child wallet transaction history can be listed as a simple statement.
+- [x] **WALT-05**: Child wallet transaction history can be listed as a simple statement.
 - [x] **WALT-06**: Balance-changing operations are atomic and safe from partial updates.
 
 ### Rewards
