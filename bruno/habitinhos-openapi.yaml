@@ -1,0 +1,622 @@
+openapi: 3.0.3
+info:
+  title: Habitinhos API
+  version: 0.1.0
+  description: OpenAPI spec gerada manualmente a partir dos controllers atuais do backend.
+servers:
+  - url: http://localhost:8080
+    description: Local
+
+tags:
+  - name: Auth
+  - name: Children
+  - name: Missions
+  - name: Assigned Missions
+  - name: Rewards
+  - name: Wallet
+
+paths:
+  /auth/register:
+    post:
+      tags: [Auth]
+      summary: Registrar responsável
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/RegisterRequest'
+      responses:
+        '201':
+          description: Criado
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AuthResponse'
+
+  /auth/login:
+    post:
+      tags: [Auth]
+      summary: Login
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/LoginRequest'
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AuthResponse'
+
+  /me:
+    get:
+      tags: [Auth]
+      summary: Perfil do usuário autenticado
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+
+  /children:
+    post:
+      tags: [Children]
+      summary: Criar criança
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ChildRequest'
+      responses:
+        '201':
+          description: Criado
+          content:
+            application/json:
+              schema:
+                type: object
+    get:
+      tags: [Children]
+      summary: Listar crianças
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: object
+
+  /children/{id}:
+    get:
+      tags: [Children]
+      summary: Buscar criança por ID
+      security:
+        - bearerAuth: []
+      parameters:
+        - $ref: '#/components/parameters/IdPath'
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+    put:
+      tags: [Children]
+      summary: Atualizar criança
+      security:
+        - bearerAuth: []
+      parameters:
+        - $ref: '#/components/parameters/IdPath'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ChildRequest'
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+
+  /children/{id}/deactivate:
+    patch:
+      tags: [Children]
+      summary: Desativar criança
+      security:
+        - bearerAuth: []
+      parameters:
+        - $ref: '#/components/parameters/IdPath'
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+
+  /missions:
+    post:
+      tags: [Missions]
+      summary: Criar missão
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/MissionRequest'
+      responses:
+        '201':
+          description: Criado
+          content:
+            application/json:
+              schema:
+                type: object
+    get:
+      tags: [Missions]
+      summary: Listar missões
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: object
+
+  /missions/{id}:
+    get:
+      tags: [Missions]
+      summary: Buscar missão por ID
+      security:
+        - bearerAuth: []
+      parameters:
+        - $ref: '#/components/parameters/IdPath'
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+    put:
+      tags: [Missions]
+      summary: Atualizar missão
+      security:
+        - bearerAuth: []
+      parameters:
+        - $ref: '#/components/parameters/IdPath'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/MissionRequest'
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+
+  /missions/{id}/deactivate:
+    patch:
+      tags: [Missions]
+      summary: Desativar missão
+      security:
+        - bearerAuth: []
+      parameters:
+        - $ref: '#/components/parameters/IdPath'
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+
+  /missions/{id}/assign:
+    post:
+      tags: [Missions]
+      summary: Atribuir missão para crianças
+      security:
+        - bearerAuth: []
+      parameters:
+        - $ref: '#/components/parameters/IdPath'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/AssignMissionRequest'
+      responses:
+        '201':
+          description: Criado
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: object
+
+  /children/{childId}/missions:
+    get:
+      tags: [Assigned Missions]
+      summary: Listar missões pendentes da criança
+      security:
+        - bearerAuth: []
+      parameters:
+        - $ref: '#/components/parameters/ChildIdPath'
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: object
+
+  /assigned-missions/pending-approval:
+    get:
+      tags: [Assigned Missions]
+      summary: Listar missões pendentes de aprovação
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: object
+
+  /assigned-missions/{id}/complete:
+    post:
+      tags: [Assigned Missions]
+      summary: Marcar missão atribuída como concluída
+      security:
+        - bearerAuth: []
+      parameters:
+        - $ref: '#/components/parameters/IdPath'
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+
+  /assigned-missions/{id}/approve:
+    post:
+      tags: [Assigned Missions]
+      summary: Aprovar missão atribuída
+      security:
+        - bearerAuth: []
+      parameters:
+        - $ref: '#/components/parameters/IdPath'
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+
+  /assigned-missions/{id}/reject:
+    post:
+      tags: [Assigned Missions]
+      summary: Rejeitar missão atribuída
+      security:
+        - bearerAuth: []
+      parameters:
+        - $ref: '#/components/parameters/IdPath'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/RejectAssignedMissionRequest'
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+
+  /rewards:
+    post:
+      tags: [Rewards]
+      summary: Criar recompensa
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateRewardRequest'
+      responses:
+        '201':
+          description: Criado
+          content:
+            application/json:
+              schema:
+                type: object
+    get:
+      tags: [Rewards]
+      summary: Listar recompensas ativas
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: object
+
+  /rewards/{id}:
+    get:
+      tags: [Rewards]
+      summary: Buscar recompensa por ID
+      security:
+        - bearerAuth: []
+      parameters:
+        - $ref: '#/components/parameters/IdPath'
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+    put:
+      tags: [Rewards]
+      summary: Atualizar recompensa
+      security:
+        - bearerAuth: []
+      parameters:
+        - $ref: '#/components/parameters/IdPath'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateRewardRequest'
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+
+  /rewards/{id}/deactivate:
+    patch:
+      tags: [Rewards]
+      summary: Desativar recompensa
+      security:
+        - bearerAuth: []
+      parameters:
+        - $ref: '#/components/parameters/IdPath'
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+
+  /children/{childId}/wallet:
+    get:
+      tags: [Wallet]
+      summary: Consultar carteira da criança
+      security:
+        - bearerAuth: []
+      parameters:
+        - $ref: '#/components/parameters/ChildIdPath'
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+
+components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+
+  parameters:
+    IdPath:
+      name: id
+      in: path
+      required: true
+      schema:
+        type: string
+        format: uuid
+    ChildIdPath:
+      name: childId
+      in: path
+      required: true
+      schema:
+        type: string
+        format: uuid
+
+  schemas:
+    RegisterRequest:
+      type: object
+      required: [name, email, password, familyName]
+      properties:
+        name:
+          type: string
+          maxLength: 160
+          example: Ana Silva
+        email:
+          type: string
+          format: email
+          maxLength: 320
+          example: ana@email.com
+        password:
+          type: string
+          minLength: 8
+          maxLength: 120
+          example: SenhaForte123
+        familyName:
+          type: string
+          maxLength: 160
+          example: Família Silva
+
+    LoginRequest:
+      type: object
+      required: [email, password]
+      properties:
+        email:
+          type: string
+          format: email
+          example: ana@email.com
+        password:
+          type: string
+          example: SenhaForte123
+
+    AuthResponse:
+      type: object
+      properties:
+        token:
+          type: string
+          example: eyJhbGciOiJIUzI1NiJ9...
+
+    ChildRequest:
+      type: object
+      required: [name]
+      properties:
+        name:
+          type: string
+          maxLength: 160
+          example: Pedro
+        age:
+          type: integer
+          minimum: 0
+          example: 8
+        avatarKey:
+          type: string
+          maxLength: 80
+          example: astronaut
+        accessPin:
+          type: string
+          minLength: 4
+          maxLength: 20
+          example: "1234"
+
+    MissionRequest:
+      type: object
+      required: [title, coinValue, requiresApproval, recurrenceType]
+      properties:
+        title:
+          type: string
+          maxLength: 160
+          example: Arrumar a cama
+        description:
+          type: string
+          maxLength: 1000
+          example: Organizar coberta e travesseiro.
+        coinValue:
+          type: integer
+          minimum: 1
+          example: 5
+        requiresApproval:
+          type: boolean
+          example: true
+        recurrenceType:
+          type: string
+          enum: [ONCE, DAILY, WEEKLY, CUSTOM]
+          example: DAILY
+
+    AssignMissionRequest:
+      type: object
+      required: [childIds]
+      properties:
+        childIds:
+          type: array
+          minItems: 1
+          items:
+            type: string
+            format: uuid
+        dueDate:
+          type: string
+          format: date
+          example: 2026-06-10
+
+    RejectAssignedMissionRequest:
+      type: object
+      properties:
+        reason:
+          type: string
+          maxLength: 500
+          example: Foto não comprova conclusão.
+
+    CreateRewardRequest:
+      type: object
+      required: [title, cost]
+      properties:
+        title:
+          type: string
+          maxLength: 160
+          example: 30 min de videogame
+        description:
+          type: string
+          maxLength: 1000
+          example: Tempo extra no fim de semana.
+        cost:
+          type: integer
+          minimum: 1
+          example: 30
+
+    UpdateRewardRequest:
+      type: object
+      required: [title, cost]
+      properties:
+        title:
+          type: string
+          maxLength: 160
+          example: 45 min de videogame
+        description:
+          type: string
+          maxLength: 1000
+          example: Tempo extra no fim de semana.
+        cost:
+          type: integer
+          minimum: 1
+          example: 45
