@@ -4,7 +4,9 @@ import br.com.habitinhos.auth.CurrentUser;
 import br.com.habitinhos.children.ChildProfileRepository;
 import br.com.habitinhos.shared.error.ConflictException;
 import br.com.habitinhos.shared.error.NotFoundException;
+import br.com.habitinhos.wallet.dto.CoinTransactionResponse;
 import br.com.habitinhos.wallet.dto.WalletResponse;
+import java.util.List;
 import java.util.UUID;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -119,5 +121,31 @@ public class WalletService {
         wallet.getBalance(),
         wallet.getCreatedAt(),
         wallet.getUpdatedAt());
+  }
+
+  @Transactional(readOnly = true)
+  public List<CoinTransactionResponse> getStatement(CurrentUser currentUser, UUID childId) {
+    childProfileRepository.findByIdAndFamilyUnitId(childId, currentUser.familyUnitId())
+        .orElseThrow(() -> new NotFoundException("CHILD_NOT_FOUND", "Criança não encontrada."));
+
+    return coinTransactionRepository
+        .findAllByFamilyUnitIdAndChildIdOrderByCreatedAtDesc(currentUser.familyUnitId(), childId)
+        .stream()
+        .map(this::toResponse)
+        .toList();
+  }
+
+  private CoinTransactionResponse toResponse(CoinTransaction transaction) {
+    return new CoinTransactionResponse(
+        transaction.getId(),
+        transaction.getChildId(),
+        transaction.getAssignedMissionId(),
+        transaction.getRewardRedemptionId(),
+        transaction.getType(),
+        transaction.getSourceType(),
+        transaction.getAmount(),
+        transaction.getBalanceAfter(),
+        transaction.getDescription(),
+        transaction.getCreatedAt());
   }
 }

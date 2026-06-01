@@ -1,5 +1,6 @@
 package br.com.habitinhos.wallet;
 
+import java.util.List;
 import java.util.UUID;
 import org.springframework.data.jpa.repository.JpaRepository;
 
@@ -14,4 +15,8 @@ public interface CoinTransactionRepository extends JpaRepository<CoinTransaction
       UUID rewardRedemptionId,
       CoinTransactionType type,
       CoinTransactionSourceType sourceType);
+
+  List<CoinTransaction> findAllByFamilyUnitIdAndChildIdOrderByCreatedAtDesc(
+      UUID familyUnitId,
+      UUID childId);
 }

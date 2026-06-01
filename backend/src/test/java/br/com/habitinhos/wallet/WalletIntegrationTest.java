@@ -80,6 +80,49 @@ class WalletIntegrationTest extends AbstractIntegrationTest {
   }
 
   @Test
+  void responsibleCanListOwnChildWalletStatementWithoutTenantLeak() throws Exception {
+    String token = registerToken("responsavel@example.com", "Familia Demo");
+    UUID childId = createChild(token, new ChildRequest("Lia", 8, "star", null));
+    AppUser user = appUserRepository.findByEmailIgnoreCase("responsavel@example.com").orElseThrow();
+    Wallet wallet = walletRepository.findByChildIdAndFamilyUnitId(childId, user.getFamilyUnitId())
+        .orElseThrow();
+    wallet.credit(15);
+    walletRepository.saveAndFlush(wallet);
+    RewardRedemption redemption = createRedemption(user, childId, wallet.getId(), 10);
+    CoinTransaction transaction = walletService.debitForRewardRedemption(
+        user.getFamilyUnitId(),
+        childId,
+        redemption.getId(),
+        10,
+        user.getId());
+
+    mockMvc.perform(get("/children/{childId}/wallet/transactions", childId)
+            .header("Authorization", "Bearer " + token))
+        .andExpect(status().isOk())
+        .andExpect(jsonPath("$[0].id").value(transaction.getId().toString()))
+        .andExpect(jsonPath("$[0].childId").value(childId.toString()))
+        .andExpect(jsonPath("$[0].rewardRedemptionId").value(redemption.getId().toString()))
+        .andExpect(jsonPath("$[0].assignedMissionId").doesNotExist())
+        .andExpect(jsonPath("$[0].type").value("DEBIT"))
+        .andExpect(jsonPath("$[0].sourceType").value("REWARD_REDEMPTION"))
+        .andExpect(jsonPath("$[0].amount").value(10))
+        .andExpect(jsonPath("$[0].balanceAfter").value(5))
+        .andExpect(jsonPath("$[0].familyUnitId").doesNotExist());
+  }
+
+  @Test
+  void responsibleCannotListWalletStatementFromAnotherFamily() throws Exception {
+    String familyAToken = registerToken("responsavel.a@example.com", "Familia A");
+    String familyBToken = registerToken("responsavel.b@example.com", "Familia B");
+    UUID foreignChildId = createChild(familyBToken, new ChildRequest("Noah", 7, "rocket", null));
+
+    mockMvc.perform(get("/children/{childId}/wallet/transactions", foreignChildId)
+            .header("Authorization", "Bearer " + familyAToken))
+        .andExpect(status().isNotFound())
+        .andExpect(jsonPath("$.code").value("CHILD_NOT_FOUND"));
+  }
+
+  @Test
   void debitForRewardRedemptionUpdatesWalletAndCreatesAuditableLedger() throws Exception {
     String token = registerToken("responsavel@example.com", "Familia Demo");
     UUID childId = createChild(token, new ChildRequest("Lia", 8, "star", null));
