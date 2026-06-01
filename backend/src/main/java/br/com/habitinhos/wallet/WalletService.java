@@ -69,6 +69,44 @@ public class WalletService {
     return coinTransactionRepository.save(transaction);
   }
 
+  @Transactional
+  public CoinTransaction debitForRewardRedemption(
+      UUID familyUnitId,
+      UUID childId,
+      UUID rewardRedemptionId,
+      int amount,
+      UUID createdByUserId) {
+    if (amount <= 0) {
+      throw new ConflictException("INVALID_COIN_AMOUNT", "Quantidade de moedas deve ser maior que zero.");
+    }
+    if (coinTransactionRepository.existsByRewardRedemptionIdAndTypeAndSourceType(
+        rewardRedemptionId,
+        CoinTransactionType.DEBIT,
+        CoinTransactionSourceType.REWARD_REDEMPTION)) {
+      throw new ConflictException(
+          "COIN_TRANSACTION_ALREADY_EXISTS",
+          "Débito de moedas já registrado para este resgate.");
+    }
+
+    Wallet wallet = walletRepository.findByChildIdAndFamilyUnitIdForUpdate(childId, familyUnitId)
+        .orElseThrow(() -> new NotFoundException("WALLET_NOT_FOUND", "Carteira não encontrada."));
+    if (wallet.getBalance() < amount) {
+      throw new ConflictException("INSUFFICIENT_BALANCE", "Saldo insuficiente para resgatar esta recompensa.");
+    }
+    wallet.debit(amount);
+
+    CoinTransaction transaction = CoinTransaction.rewardRedemptionDebit(
+        familyUnitId,
+        wallet.getId(),
+        childId,
+        rewardRedemptionId,
+        amount,
+        wallet.getBalance(),
+        "Débito por resgate de recompensa",
+        createdByUserId);
+    return coinTransactionRepository.save(transaction);
+  }
+
   @Transactional(readOnly = true)
   public WalletResponse getWallet(CurrentUser currentUser, UUID childId) {
     childProfileRepository.findByIdAndFamilyUnitId(childId, currentUser.familyUnitId())

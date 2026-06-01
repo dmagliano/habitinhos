@@ -9,4 +9,9 @@ public interface CoinTransactionRepository extends JpaRepository<CoinTransaction
       UUID assignedMissionId,
       CoinTransactionType type,
       CoinTransactionSourceType sourceType);
+
+  boolean existsByRewardRedemptionIdAndTypeAndSourceType(
+      UUID rewardRedemptionId,
+      CoinTransactionType type,
+      CoinTransactionSourceType sourceType);
 }

@@ -36,4 +36,14 @@ public class Wallet extends BaseEntity {
     }
     this.balance += amount;
   }
+
+  public void debit(int amount) {
+    if (amount <= 0) {
+      throw new IllegalArgumentException("Amount must be positive.");
+    }
+    if (balance < amount) {
+      throw new IllegalArgumentException("Insufficient balance.");
+    }
+    this.balance -= amount;
+  }
 }

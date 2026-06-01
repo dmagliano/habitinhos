@@ -112,6 +112,29 @@ public class CoinTransaction {
         createdByUserId);
   }
 
+  public static CoinTransaction rewardRedemptionDebit(
+      UUID familyUnitId,
+      UUID walletId,
+      UUID childId,
+      UUID rewardRedemptionId,
+      int amount,
+      int balanceAfter,
+      String description,
+      UUID createdByUserId) {
+    return new CoinTransaction(
+        familyUnitId,
+        walletId,
+        childId,
+        null,
+        rewardRedemptionId,
+        CoinTransactionType.DEBIT,
+        CoinTransactionSourceType.REWARD_REDEMPTION,
+        amount,
+        balanceAfter,
+        description,
+        createdByUserId);
+  }
+
   @PrePersist
   void prePersist() {
     createdAt = Instant.now();
