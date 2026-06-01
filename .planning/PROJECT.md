@@ -46,7 +46,7 @@ Repository shape is a monorepo:
 
 - `backend/` — Java 17, Spring Boot 3.x, REST API, PostgreSQL, Flyway, Spring Security or a simple equivalent, JPA/Hibernate, OpenAPI/Swagger, unit and integration tests.
 - `mobile/` — React Native, Expo, TypeScript, React Navigation, PT-BR interface, API client, responsible and child flows.
-- `docs/` — technical architecture, data model, API contract, decisions, and testing strategy.
+- `docs/` — technical architecture, data model, API contract, decisions, testing strategy, and mobile design contract.
 - `.planning/` — GSD planning artifacts.
 
 The MVP must stay simple enough for a TCC demo while preserving the important backend guarantees: tenant isolation, atomic wallet operations, no plaintext passwords/PINs, soft deactivation instead of physical deletion for mission/reward history, and no trust in client-supplied `familyUnitId` when it can be derived from the authenticated user.
@@ -56,6 +56,7 @@ The MVP must stay simple enough for a TCC demo while preserving the important ba
 - **Monorepo**: Backend, mobile, docs, and planning live in one repository — keeps TCC delivery and cross-stack planning simple.
 - **Backend stack**: Java 17, Spring Boot 3.x, PostgreSQL, Flyway, JPA/Hibernate, OpenAPI/Swagger — preferred default unless a later plan documents a strong reason to change.
 - **Mobile stack**: React Native + Expo + TypeScript + React Navigation — mobile-first MVP with PT-BR UI and English technical names in code.
+- **Mobile design**: Phases 4+ must follow `docs/design/mobile-design-contract.md` and use `docs/design/phase-design-map.md` to select Stitch visual references. Stitch `code.html` exports are visual reference only and must not be copied into React Native.
 - **Security**: Passwords, PINs, and access codes must never be stored in plaintext — protects family and child-related data.
 - **Data integrity**: Wallet balance changes must be atomic and must always write a `CoinTransaction` — prevents inconsistent balances.
 - **Scope**: Avoid overengineering; choose the simplest option that preserves family isolation, balance integrity, coin history, clear responsible/child flows, and demo readiness.
@@ -69,6 +70,7 @@ The MVP must stay simple enough for a TCC demo while preserving the important ba
 | Keep critical rules in the backend even when mobile validates for UX | Backend is the source of truth for money-like coin operations and child/family data | — Pending |
 | Use integer coin values only | Avoids decimal money complexity and fits simple gamification | — Pending |
 | Preserve history with soft deactivation and ledger records | Demonstration needs auditability for missions, rewards, credits, debits, approvals, and redemptions | — Pending |
+| Follow the Habitinhos mobile design contract from Phase 4 onward | Keeps child and responsible flows visually consistent while avoiding copied web exports or heavy visual dependencies | — Pending |
 
 ## Evolution
 
@@ -88,4 +90,4 @@ This document evolves at phase transitions and milestone boundaries.
 4. Update Context with current state
 
 ---
-*Last updated: 2026-06-01 after Phase 3 backend reward/redemption verification*
+*Last updated: 2026-06-01 after adding the mobile design contract for Phase 4+*

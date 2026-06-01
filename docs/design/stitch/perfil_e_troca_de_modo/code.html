@@ -1,0 +1,260 @@
+<!DOCTYPE html>
+
+<html lang="pt-BR"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Habitinhos - Perfil</title>
+<!-- Google Fonts -->
+<link href="https://fonts.googleapis.com" rel="preconnect"/>
+<link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&amp;family=Plus+Jakarta+Sans:wght@700;800&amp;display=swap" rel="stylesheet"/>
+<!-- Material Symbols -->
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<!-- Tailwind CSS -->
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<!-- Tailwind Config -->
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "on-secondary-fixed": "#001e2b",
+                        "on-background": "#171d1c",
+                        "on-secondary-container": "#446779",
+                        "surface-container-lowest": "#ffffff",
+                        "tertiary-fixed-dim": "#ffb77f",
+                        "on-tertiary-fixed-variant": "#6f3800",
+                        "on-tertiary-fixed": "#2f1500",
+                        "secondary-fixed-dim": "#a7cce0",
+                        "on-error-container": "#93000a",
+                        "background": "#f5fbf8",
+                        "tertiary": "#8e4e11",
+                        "on-primary-fixed-variant": "#00504a",
+                        "on-primary": "#ffffff",
+                        "on-tertiary-container": "#773d00",
+                        "inverse-surface": "#2b3231",
+                        "secondary": "#3f6375",
+                        "error": "#ba1a1a",
+                        "outline": "#6c7a77",
+                        "secondary-fixed": "#c3e8fd",
+                        "surface-container-low": "#eff5f3",
+                        "on-tertiary": "#ffffff",
+                        "on-secondary-fixed-variant": "#274b5c",
+                        "inverse-on-surface": "#ecf2f0",
+                        "surface-dim": "#d5dbd9",
+                        "on-primary-fixed": "#00201d",
+                        "primary-container": "#4fd1c5",
+                        "surface-container-highest": "#dee4e2",
+                        "primary-fixed-dim": "#5adace",
+                        "surface-variant": "#dee4e2",
+                        "inverse-primary": "#5adace",
+                        "on-error": "#ffffff",
+                        "primary-fixed": "#79f7ea",
+                        "primary": "#006a63",
+                        "tertiary-container": "#ffab67",
+                        "on-secondary": "#ffffff",
+                        "surface-container-high": "#e3e9e7",
+                        "secondary-container": "#c0e5fa",
+                        "error-container": "#ffdad6",
+                        "surface": "#f5fbf8",
+                        "on-primary-container": "#005750",
+                        "on-surface": "#171d1c",
+                        "tertiary-fixed": "#ffdcc4",
+                        "surface-tint": "#006a63",
+                        "surface-bright": "#f5fbf8",
+                        "on-surface-variant": "#3c4947",
+                        "outline-variant": "#bbc9c7",
+                        "surface-container": "#e9efed"
+                    },
+                    "borderRadius": {
+                        "DEFAULT": "0.25rem",
+                        "lg": "0.5rem",
+                        "xl": "0.75rem",
+                        "full": "9999px"
+                    },
+                    "spacing": {
+                        "margin-mobile": "20px",
+                        "lg": "24px",
+                        "gutter": "16px",
+                        "unit": "4px",
+                        "md": "16px",
+                        "xl": "32px",
+                        "sm": "8px",
+                        "xs": "4px",
+                        "margin-tablet": "48px"
+                    },
+                    "fontFamily": {
+                        "body-lg": ["Inter"],
+                        "label-sm": ["Inter"],
+                        "label-md": ["Inter"],
+                        "headline-xl": ["Plus Jakarta Sans"],
+                        "headline-lg-mobile": ["Plus Jakarta Sans"],
+                        "headline-lg": ["Plus Jakarta Sans"],
+                        "body-md": ["Inter"]
+                    },
+                    "fontSize": {
+                        "body-lg": ["18px", {"lineHeight": "28px", "fontWeight": "400"}],
+                        "label-sm": ["12px", {"lineHeight": "16px", "fontWeight": "500"}],
+                        "label-md": ["14px", {"lineHeight": "20px", "letterSpacing": "0.01em", "fontWeight": "600"}],
+                        "headline-xl": ["32px", {"lineHeight": "40px", "letterSpacing": "-0.02em", "fontWeight": "800"}],
+                        "headline-lg-mobile": ["20px", {"lineHeight": "28px", "fontWeight": "700"}],
+                        "headline-lg": ["24px", {"lineHeight": "32px", "fontWeight": "700"}],
+                        "body-md": ["16px", {"lineHeight": "24px", "fontWeight": "400"}]
+                    }
+                }
+            }
+        }
+    </script>
+<style>
+        /* Base styles to ensure soft shadows as requested */
+        .ambient-shadow {
+            box-shadow: 0px 4px 20px rgba(45, 55, 72, 0.05);
+        }
+        .active-sink:active {
+            transform: scale(0.98);
+            box-shadow: 0px 2px 10px rgba(45, 55, 72, 0.03);
+        }
+    </style>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+</head>
+<body class="bg-background text-on-background font-body-md antialiased min-h-screen flex flex-col">
+<!-- TopAppBar JSON Translation -->
+<header class="fixed top-0 w-full z-40 bg-background flex justify-between items-center px-margin-mobile h-16 max-w-7xl mx-auto transition-transform duration-100 ease-in-out">
+<!-- Leading Avatar -->
+<div aria-label="Profile" class="w-10 h-10 rounded-full bg-surface-container-high flex items-center justify-center text-xl overflow-hidden cursor-pointer hover:bg-surface-container-low transition-colors" role="button">
+<span>👨</span>
+</div>
+<!-- Headline -->
+<h1 class="font-headline-lg-mobile text-headline-lg-mobile font-extrabold text-primary tracking-tight">Habitinhos</h1>
+<!-- Trailing Icon -->
+<button aria-label="Moedas" class="w-10 h-10 rounded-full flex items-center justify-center text-primary hover:bg-surface-container-low transition-colors">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">monetization_on</span>
+</button>
+</header>
+<!-- Main Content Area -->
+<main class="flex-1 w-full max-w-xl mx-auto pt-[80px] pb-[100px] px-margin-mobile flex flex-col gap-lg">
+<!-- Section: Família Silva (Current Parent Profile) -->
+<section class="bg-surface-container-lowest rounded-xl p-md shadow-sm flex items-center gap-md border border-surface-container-low">
+<div class="w-16 h-16 rounded-full overflow-hidden border-2 border-primary-container shrink-0">
+<img alt="Foto de perfil do pai" class="w-full h-full object-cover" data-alt="A close-up portrait of a smiling father with short dark hair, wearing a casual light blue button-down shirt. The background is softly blurred showing a bright, sunlit modern home interior. The lighting is warm and inviting, fitting a light-mode family application. The mood is happy, trustworthy, and approachable." src="https://lh3.googleusercontent.com/aida-public/AB6AXuA47NkyNg7hBQ2cGsYwonzdrI7mf3CSfMM4Wt0sfe3UB7iOlDRMJqBG80cw95bH412wZrPjMERx5mrHVPS9G8C1Vi6LySyfY0PYWr_-s_ChXyvJ_mDtfZZDMyJ_nzpfMGW-XkJ4uI1O8SxV5ai6RQ_OLKIBqc-sBdxdCMbzXM4e7LIvJtMvDE3DT7sdU6pRD0JZyHRHm1vY8N4kMEk_lpDSPdb2f4jF9yqnG-aJc9zrBMwJ8s5hwog6v-8-ff6jzB6s9sOY7HTTmNhy"/>
+</div>
+<div class="flex-1">
+<h2 class="font-headline-lg-mobile text-headline-lg-mobile text-on-surface">Família Silva</h2>
+<p class="font-body-md text-on-surface-variant">Conta Principal</p>
+</div>
+<button class="w-10 h-10 rounded-full flex items-center justify-center text-on-surface-variant hover:bg-surface-container transition-colors">
+<span class="material-symbols-outlined">edit</span>
+</button>
+</section>
+<!-- Section: Trocar de perfil -->
+<section class="flex flex-col gap-sm">
+<h3 class="font-label-md text-label-md text-on-surface-variant uppercase tracking-wider pl-xs">Trocar de perfil</h3>
+<div class="grid grid-cols-2 gap-gutter">
+<!-- Child: Joaquim -->
+<button class="bg-surface-container-lowest rounded-xl p-md shadow-sm flex flex-col items-center justify-center gap-sm active-sink hover:bg-surface-container-low transition-all border border-surface-container-low group">
+<div class="w-16 h-16 rounded-full bg-secondary-container flex items-center justify-center text-3xl group-hover:scale-105 transition-transform">
+                        👦
+                    </div>
+<span class="font-label-md text-label-md text-on-surface">Joaquim</span>
+</button>
+<!-- Child: Maria -->
+<button class="bg-surface-container-lowest rounded-xl p-md shadow-sm flex flex-col items-center justify-center gap-sm active-sink hover:bg-surface-container-low transition-all border border-surface-container-low group">
+<div class="w-16 h-16 rounded-full bg-tertiary-container flex items-center justify-center text-3xl group-hover:scale-105 transition-transform">
+                        👧
+                    </div>
+<span class="font-label-md text-label-md text-on-surface">Maria</span>
+</button>
+</div>
+<!-- Parent Mode Button -->
+<button class="mt-sm w-full bg-primary text-on-primary font-label-md text-label-md py-4 rounded-xl flex items-center justify-center gap-sm shadow-sm active-sink hover:bg-primary-fixed-dim transition-colors">
+<span class="material-symbols-outlined">shield_person</span>
+                Entrar no modo pai
+            </button>
+</section>
+<!-- Section: Settings List -->
+<section class="flex flex-col gap-sm">
+<h3 class="font-label-md text-label-md text-on-surface-variant uppercase tracking-wider pl-xs">Ajustes</h3>
+<div class="bg-surface-container-lowest rounded-xl shadow-sm flex flex-col overflow-hidden border border-surface-container-low">
+<!-- Item: Configurações da conta -->
+<button class="flex items-center gap-md p-4 hover:bg-surface-container-low transition-colors border-b border-surface-container-low w-full text-left group">
+<div class="w-8 h-8 rounded-full bg-surface-container flex items-center justify-center text-on-surface-variant group-hover:text-primary transition-colors">
+<span class="material-symbols-outlined text-lg">manage_accounts</span>
+</div>
+<span class="font-body-md text-on-surface flex-1">Configurações da conta</span>
+<span class="material-symbols-outlined text-outline-variant group-hover:text-primary transition-colors">chevron_right</span>
+</button>
+<!-- Item: Segurança -->
+<button class="flex items-center gap-md p-4 hover:bg-surface-container-low transition-colors border-b border-surface-container-low w-full text-left group">
+<div class="w-8 h-8 rounded-full bg-surface-container flex items-center justify-center text-on-surface-variant group-hover:text-primary transition-colors">
+<span class="material-symbols-outlined text-lg">lock</span>
+</div>
+<span class="font-body-md text-on-surface flex-1">Segurança</span>
+<span class="material-symbols-outlined text-outline-variant group-hover:text-primary transition-colors">chevron_right</span>
+</button>
+<!-- Item: Notificações -->
+<button class="flex items-center gap-md p-4 hover:bg-surface-container-low transition-colors border-b border-surface-container-low w-full text-left group">
+<div class="w-8 h-8 rounded-full bg-surface-container flex items-center justify-center text-on-surface-variant group-hover:text-primary transition-colors">
+<span class="material-symbols-outlined text-lg">notifications</span>
+</div>
+<span class="font-body-md text-on-surface flex-1">Notificações</span>
+<span class="material-symbols-outlined text-outline-variant group-hover:text-primary transition-colors">chevron_right</span>
+</button>
+<!-- Item: Sair (Danger Action) -->
+<button class="flex items-center gap-md p-4 hover:bg-error-container/50 transition-colors w-full text-left group">
+<div class="w-8 h-8 rounded-full bg-error-container/30 flex items-center justify-center text-error group-hover:bg-error-container transition-colors">
+<span class="material-symbols-outlined text-lg">logout</span>
+</div>
+<span class="font-body-md text-error flex-1 font-medium">Sair</span>
+</button>
+</div>
+</section>
+</main>
+<!-- BottomNavBar JSON Translation (Active: Perfil) -->
+<nav class="fixed bottom-0 left-0 w-full z-50 flex justify-around items-center px-4 py-2 pb-safe bg-surface-container-lowest border-t border-surface-container-low shadow-sm hidden md:hidden flex">
+<!-- Início (Inactive) -->
+<a class="flex flex-col items-center justify-center text-on-surface-variant px-4 py-1 hover:bg-surface-container transition-all rounded-lg" href="#">
+<span class="material-symbols-outlined mb-1">home</span>
+<span class="font-label-sm text-label-sm">Início</span>
+</a>
+<!-- Missões (Inactive) -->
+<a class="flex flex-col items-center justify-center text-on-surface-variant px-4 py-1 hover:bg-surface-container transition-all rounded-lg" href="#">
+<span class="material-symbols-outlined mb-1">assignment</span>
+<span class="font-label-sm text-label-sm">Missões</span>
+</a>
+<!-- Recompensas (Inactive) -->
+<a class="flex flex-col items-center justify-center text-on-surface-variant px-4 py-1 hover:bg-surface-container transition-all rounded-lg" href="#">
+<span class="material-symbols-outlined mb-1">redeem</span>
+<span class="font-label-sm text-label-sm">Recompensas</span>
+</a>
+<!-- Perfil (Active) -->
+<a class="flex flex-col items-center justify-center text-primary rounded-lg px-4 py-1 transition-all" href="#">
+<span class="material-symbols-outlined mb-1" style="font-variation-settings: 'FILL' 1;">person</span>
+<span class="font-label-sm text-label-sm font-bold">Perfil</span>
+</a>
+</nav>
+<!-- Tablet/Desktop Bottom Nav Placeholder (to prevent breaking layout, though instructions say focus on mobile) -->
+<nav class="fixed bottom-0 left-0 w-full z-50 flex justify-around items-center px-4 py-2 pb-safe bg-surface-container-lowest border-t border-surface-container-low shadow-sm hidden md:flex lg:hidden">
+<a class="flex flex-col items-center justify-center text-on-surface-variant px-4 py-1 hover:bg-surface-container transition-all rounded-lg" href="#">
+<span class="material-symbols-outlined mb-1">home</span>
+<span class="font-label-sm text-label-sm">Início</span>
+</a>
+<a class="flex flex-col items-center justify-center text-on-surface-variant px-4 py-1 hover:bg-surface-container transition-all rounded-lg" href="#">
+<span class="material-symbols-outlined mb-1">assignment</span>
+<span class="font-label-sm text-label-sm">Missões</span>
+</a>
+<a class="flex flex-col items-center justify-center text-on-surface-variant px-4 py-1 hover:bg-surface-container transition-all rounded-lg" href="#">
+<span class="material-symbols-outlined mb-1">redeem</span>
+<span class="font-label-sm text-label-sm">Recompensas</span>
+</a>
+<a class="flex flex-col items-center justify-center text-primary rounded-lg px-4 py-1 transition-all" href="#">
+<span class="material-symbols-outlined mb-1" style="font-variation-settings: 'FILL' 1;">person</span>
+<span class="font-label-sm text-label-sm font-bold">Perfil</span>
+</a>
+</nav>
+</body></html>

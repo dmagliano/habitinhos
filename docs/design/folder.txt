@@ -1,0 +1,41 @@
+stitch
+├── aprovacoes
+│   ├── code.html
+│   └── screen.png
+├── boas_vindas
+│   ├── code.html
+│   └── screen.png
+├── DESIGN.md
+├── detalhes_da_missao
+│   ├── code.html
+│   └── screen.png
+├── gerenciar_missoes
+│   ├── code.html
+│   └── screen.png
+├── gerenciar_recompensas
+│   ├── code.html
+│   └── screen.png
+├── minhas_missoes
+│   ├── code.html
+│   └── screen.png
+├── nova_missao_1
+│   ├── code.html
+│   └── screen.png
+├── nova_missao_2
+│   ├── code.html
+│   └── screen.png
+├── painel_do_joaquim
+│   ├── code.html
+│   └── screen.png
+├── painel_do_responsavel
+│   ├── code.html
+│   └── screen.png
+├── perfil_e_troca_de_modo
+│   ├── code.html
+│   └── screen.png
+├── prd_habitinhos_project_brief.md
+└── recompensas
+    ├── code.html
+    └── screen.png
+
+13 directories, 26 files

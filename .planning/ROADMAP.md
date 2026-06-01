@@ -93,6 +93,7 @@ Plans:
   3. API client can call the backend and persist/use auth token/session.
   4. Login/access flow reaches a post-login landing area.
   5. PT-BR interface baseline is established.
+  6. Mobile design foundation follows `docs/design/mobile-design-contract.md`; Stitch screenshots may guide visuals, but `code.html` exports are not copied.
 **Plans**: 3 plans
 
 Plans:
@@ -111,6 +112,7 @@ Plans:
   4. Child can browse rewards and redeem with sufficient balance.
   5. Child sees an understandable PT-BR message for insufficient balance.
   6. Screens consume backend data rather than mock-only state.
+  7. Child screens follow `docs/design/mobile-design-contract.md` and the Phase 5 references in `docs/design/phase-design-map.md`.
 **Plans**: 3 plans
 
 Plans:
@@ -128,6 +130,7 @@ Plans:
   3. Responsible adult can create/edit/deactivate missions and assign them to children.
   4. Responsible adult can approve or reject mission completions.
   5. Responsible adult can create/edit/deactivate rewards.
+  6. Responsible screens follow `docs/design/mobile-design-contract.md` and the Phase 6 references in `docs/design/phase-design-map.md`.
 **Plans**: 4 plans
 
 Plans:
@@ -146,6 +149,7 @@ Plans:
   3. Docs describe architecture, data model, API contract, and test strategy.
   4. TCC presentation script walks through the complete MVP flow.
   5. Final tests pass and demo flow works against the real API.
+  6. Final mobile polish verifies all implemented screens against `docs/design/mobile-design-contract.md` and the Stitch visual references mapped in `docs/design/phase-design-map.md`.
 **Plans**: 3 plans
 
 Plans:

@@ -21,6 +21,7 @@
 | ADR-015 | Use domain-oriented backend packages: `auth`, `family`, `children`, `wallet`, `shared`, plus config/security | Keeps Spring code modular without overengineering early architecture | Accepted |
 | ADR-016 | Phase 1 API is limited to auth, `/me`, and children CRUD/deactivation | Prevents scope bleed into missions, rewards, dashboard, wallet statement, or mobile implementation | Accepted |
 | ADR-017 | Phase 1 readiness requires integration tests for registration, family creation, child creation, wallet creation, and cross-family blocking | These are the backend foundation rules most likely to break the MVP if wrong | Accepted |
+| ADR-018 | Adopt the Habitinhos/Stitch mobile design system as the Phase 4+ design contract | Keeps mobile screens consistent with the approved visual direction while prohibiting copied HTML/CSS and unnecessary visual dependencies | Accepted |
 
 ## Pending Decisions
 

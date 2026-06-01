@@ -65,6 +65,7 @@
 - [ ] **MOBL-03**: Responsible flow includes login, family onboarding, dashboard, children, missions, assignments, approvals, rewards, and child details.
 - [ ] **MOBL-04**: Child flow includes profile selection/access, home with balance, missions, completion feedback, reward catalog, redemption feedback, and insufficient balance message.
 - [ ] **MOBL-05**: Mobile app consumes the real backend API for the demo flow.
+- [ ] **MOBL-06**: Mobile screens from Phase 4 onward follow `docs/design/mobile-design-contract.md`, use `docs/design/phase-design-map.md` for visual references, and do not copy Stitch HTML/CSS exports.
 
 ### Documentation and Demo
 
@@ -111,11 +112,12 @@
 | MOBL-04, MOBL-05 | Phase 5 | Pending |
 | CHLD-03, MISS-04..MISS-05, REWD-03..REWD-05, WALT-01 | Phase 5 | Pending |
 | MOBL-03, DASH-01..DASH-04 | Phase 6 | Pending |
+| MOBL-06 | Phases 4, 5, 6, 7 | Pending |
 | DOCS-02..DOCS-04 | Phase 7 | Pending |
 
 **Coverage:**
-- v1 requirements: 41 total
-- Mapped to phases: 41
+- v1 requirements: 42 total
+- Mapped to phases: 42
 - Unmapped: 0
 
 ---

@@ -1,0 +1,228 @@
+<!DOCTYPE html>
+
+<html lang="pt-BR"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Habitinhos - Dashboard</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com" rel="preconnect"/>
+<link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&amp;family=Plus+Jakarta+Sans:wght@700;800&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "on-secondary-fixed": "#001e2b",
+                        "on-background": "#171d1c",
+                        "on-secondary-container": "#446779",
+                        "surface-container-lowest": "#ffffff",
+                        "tertiary-fixed-dim": "#ffb77f",
+                        "on-tertiary-fixed-variant": "#6f3800",
+                        "on-tertiary-fixed": "#2f1500",
+                        "secondary-fixed-dim": "#a7cce0",
+                        "on-error-container": "#93000a",
+                        "background": "#f5fbf8",
+                        "tertiary": "#8e4e11",
+                        "on-primary-fixed-variant": "#00504a",
+                        "on-primary": "#ffffff",
+                        "on-tertiary-container": "#773d00",
+                        "inverse-surface": "#2b3231",
+                        "secondary": "#3f6375",
+                        "error": "#ba1a1a",
+                        "outline": "#6c7a77",
+                        "secondary-fixed": "#c3e8fd",
+                        "surface-container-low": "#eff5f3",
+                        "on-tertiary": "#ffffff",
+                        "on-secondary-fixed-variant": "#274b5c",
+                        "inverse-on-surface": "#ecf2f0",
+                        "surface-dim": "#d5dbd9",
+                        "on-primary-fixed": "#00201d",
+                        "primary-container": "#4fd1c5",
+                        "surface-container-highest": "#dee4e2",
+                        "primary-fixed-dim": "#5adace",
+                        "surface-variant": "#dee4e2",
+                        "inverse-primary": "#5adace",
+                        "on-error": "#ffffff",
+                        "primary-fixed": "#79f7ea",
+                        "primary": "#006a63",
+                        "tertiary-container": "#ffab67",
+                        "on-secondary": "#ffffff",
+                        "surface-container-high": "#e3e9e7",
+                        "secondary-container": "#c0e5fa",
+                        "error-container": "#ffdad6",
+                        "surface": "#f5fbf8",
+                        "on-primary-container": "#005750",
+                        "on-surface": "#171d1c",
+                        "tertiary-fixed": "#ffdcc4",
+                        "surface-tint": "#006a63",
+                        "surface-bright": "#f5fbf8",
+                        "on-surface-variant": "#3c4947",
+                        "outline-variant": "#bbc9c7",
+                        "surface-container": "#e9efed"
+                    },
+                    "borderRadius": {
+                        "DEFAULT": "0.25rem",
+                        "lg": "0.5rem",
+                        "xl": "0.75rem",
+                        "full": "9999px"
+                    },
+                    "spacing": {
+                        "margin-mobile": "20px",
+                        "lg": "24px",
+                        "gutter": "16px",
+                        "unit": "4px",
+                        "md": "16px",
+                        "xl": "32px",
+                        "sm": "8px",
+                        "xs": "4px",
+                        "margin-tablet": "48px"
+                    },
+                    "fontFamily": {
+                        "body-lg": ["Inter"],
+                        "label-sm": ["Inter"],
+                        "label-md": ["Inter"],
+                        "headline-xl": ["Plus Jakarta Sans"],
+                        "headline-lg-mobile": ["Plus Jakarta Sans"],
+                        "headline-lg": ["Plus Jakarta Sans"],
+                        "body-md": ["Inter"]
+                    },
+                    "fontSize": {
+                        "body-lg": ["18px", { "lineHeight": "28px", "fontWeight": "400" }],
+                        "label-sm": ["12px", { "lineHeight": "16px", "fontWeight": "500" }],
+                        "label-md": ["14px", { "lineHeight": "20px", "letterSpacing": "0.01em", "fontWeight": "600" }],
+                        "headline-xl": ["32px", { "lineHeight": "40px", "letterSpacing": "-0.02em", "fontWeight": "800" }],
+                        "headline-lg-mobile": ["20px", { "lineHeight": "28px", "fontWeight": "700" }],
+                        "headline-lg": ["24px", { "lineHeight": "32px", "fontWeight": "700" }],
+                        "body-md": ["16px", { "lineHeight": "24px", "fontWeight": "400" }]
+                    }
+                }
+            }
+        }
+    </script>
+<style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 1, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+        /* Soft Ambient Depth */
+        .ambient-shadow {
+            box-shadow: 0px 4px 20px rgba(45, 55, 72, 0.08);
+        }
+        .active-sink:active {
+            transform: scale(0.98);
+            box-shadow: 0px 2px 10px rgba(45, 55, 72, 0.05);
+        }
+    </style>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+</head>
+<body class="bg-background text-on-background font-body-md min-h-screen flex flex-col antialiased">
+<!-- TopAppBar -->
+<header class="bg-background sticky top-0 z-40">
+<div class="flex justify-between items-center px-margin-mobile h-16 w-full max-w-7xl mx-auto">
+<div class="flex items-center gap-sm cursor-pointer hover:bg-surface-container-low transition-colors p-2 rounded-full">
+<span aria-label="Child Emoji Avatar" class="text-2xl">👦</span>
+</div>
+<div class="flex-1 flex justify-center md:justify-start md:ml-4">
+<h1 class="font-headline-lg-mobile text-headline-lg-mobile font-extrabold text-primary">Habitinhos</h1>
+</div>
+<!-- Desktop Navigation Cluster (Hidden on Mobile) -->
+<nav class="hidden md:flex items-center gap-lg mr-8">
+<a class="text-primary font-bold transition-colors" href="#">Início</a>
+<a class="text-on-surface-variant hover:text-primary transition-colors" href="#">Missões</a>
+<a class="text-on-surface-variant hover:text-primary transition-colors" href="#">Recompensas</a>
+<a class="text-on-surface-variant hover:text-primary transition-colors" href="#">Perfil</a>
+</nav>
+<div class="flex items-center justify-center p-2 rounded-full text-primary hover:bg-surface-container-low transition-colors cursor-pointer" style="font-variation-settings: 'FILL' 1;">
+<span class="material-symbols-outlined">monetization_on</span>
+</div>
+</div>
+</header>
+<!-- Main Content Canvas -->
+<main class="flex-1 overflow-y-auto pb-24 md:pb-12 px-margin-mobile md:px-margin-tablet max-w-7xl mx-auto w-full pt-lg space-y-xl">
+<!-- Greeting Section -->
+<section class="text-center md:text-left mt-sm">
+<h2 class="font-headline-xl text-headline-xl text-on-background">Oi, Joaquim! <span class="inline-block animate-bounce" style="animation-duration: 2s;">👋</span></h2>
+<p class="font-body-lg text-body-lg text-secondary mt-xs">Você está indo muito bem! 🚀</p>
+</section>
+<!-- Bento Grid Layout -->
+<section class="grid grid-cols-1 md:grid-cols-12 gap-lg">
+<!-- Large Coin Balance Card -->
+<div class="md:col-span-5 bg-surface-container-lowest rounded-xl p-lg ambient-shadow border border-outline-variant/20 flex flex-col items-center justify-center space-y-md relative overflow-hidden group hover:border-primary-container transition-colors duration-300">
+<div class="w-24 h-24 rounded-full bg-tertiary-container flex items-center justify-center shadow-inner relative z-10">
+<span class="text-6xl drop-shadow-md">🪙</span>
+</div>
+<div class="text-center relative z-10">
+<p class="font-label-sm text-label-sm text-on-surface-variant uppercase tracking-widest mb-1">Seu Tesouro</p>
+<p class="font-headline-xl text-headline-xl text-tertiary">120 moedas</p>
+</div>
+</div>
+<!-- Progress Card -->
+<div class="md:col-span-7 bg-surface-container-lowest rounded-xl p-lg ambient-shadow border border-outline-variant/20 flex flex-col justify-center space-y-lg relative overflow-hidden group hover:border-primary-container transition-colors duration-300">
+<div class="flex justify-between items-start">
+<div>
+<p class="font-label-sm text-label-sm text-on-surface-variant uppercase tracking-widest mb-1">Missões de Hoje</p>
+<h3 class="font-headline-lg-mobile text-headline-lg-mobile text-on-background">3 de 5 completas</h3>
+<p class="font-body-md text-body-md text-secondary mt-xs">Falta pouco para o bônus!</p>
+</div>
+<div class="w-12 h-12 rounded-full bg-primary-container/20 flex items-center justify-center text-2xl group-hover:rotate-12 transition-transform duration-300">
+                        🎯
+                    </div>
+</div>
+<!-- Colorful Progress Bar -->
+<div class="w-full space-y-2">
+<div class="h-3 w-full bg-surface-container-high rounded-full overflow-hidden flex">
+<!-- Filled portion -->
+<div class="h-full bg-primary-container rounded-full relative" style="width: 60%">
+</div>
+</div>
+<div class="flex justify-between font-label-sm text-label-sm text-on-surface-variant px-1">
+<span>0</span>
+<span>5</span>
+</div>
+</div>
+</div>
+</section>
+<!-- Big Primary Action -->
+<section class="flex justify-center md:justify-start pt-sm">
+<button class="w-full md:w-auto min-h-[56px] bg-primary-container text-on-primary-container font-label-md text-label-md px-10 py-4 rounded-[16px] ambient-shadow active-sink transition-all duration-200 flex items-center justify-center gap-md group">
+<span class="text-lg">Ver missões</span>
+<span class="material-symbols-outlined group-hover:translate-x-1 transition-transform">arrow_forward</span>
+</button>
+</section>
+</main>
+<!-- BottomNavBar (Mobile Only) -->
+<nav class="md:hidden fixed bottom-0 left-0 w-full z-50 flex justify-around items-center px-4 py-2 pb-safe bg-surface-container border-t-0 shadow-[0_-4px_20px_rgba(45,55,72,0.05)] rounded-t-xl pb-6 pt-2">
+<!-- Início (Active) -->
+<a class="flex flex-col items-center justify-center bg-primary-container text-on-primary-container rounded-full px-4 py-1 transition-all duration-200 scale-90" href="#">
+<span class="material-symbols-outlined mb-1" style="font-variation-settings: 'FILL' 1;">home</span>
+<span class="font-label-sm text-label-sm">Início</span>
+</a>
+<!-- Missões (Inactive) -->
+<a class="flex flex-col items-center justify-center text-on-surface-variant hover:bg-surface-container-high rounded-full px-4 py-1 transition-all" href="#">
+<span class="material-symbols-outlined mb-1">assignment</span>
+<span class="font-label-sm text-label-sm">Missões</span>
+</a>
+<!-- Recompensas (Inactive) -->
+<a class="flex flex-col items-center justify-center text-on-surface-variant hover:bg-surface-container-high rounded-full px-4 py-1 transition-all" href="#">
+<span class="material-symbols-outlined mb-1">redeem</span>
+<span class="font-label-sm text-label-sm">Recompensas</span>
+</a>
+<!-- Perfil (Inactive) -->
+<a class="flex flex-col items-center justify-center text-on-surface-variant hover:bg-surface-container-high rounded-full px-4 py-1 transition-all" href="#">
+<span class="material-symbols-outlined mb-1">person</span>
+<span class="font-label-sm text-label-sm">Perfil</span>
+</a>
+</nav>
+<style>
+        .pb-safe {
+            padding-bottom: env(safe-area-inset-bottom, 24px);
+        }
+    </style>
+</body></html>

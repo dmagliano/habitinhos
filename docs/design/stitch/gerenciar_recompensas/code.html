@@ -1,0 +1,294 @@
+<!DOCTYPE html>
+
+<html lang="pt"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Gerenciamento de Recompensas - Habitinhos</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com" rel="preconnect"/>
+<link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&amp;family=Plus+Jakarta+Sans:wght@700;800&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            "colors": {
+                    "on-secondary-fixed": "#001e2b",
+                    "on-background": "#171d1c",
+                    "on-secondary-container": "#446779",
+                    "surface-container-lowest": "#ffffff",
+                    "tertiary-fixed-dim": "#ffb77f",
+                    "on-tertiary-fixed-variant": "#6f3800",
+                    "on-tertiary-fixed": "#2f1500",
+                    "secondary-fixed-dim": "#a7cce0",
+                    "on-error-container": "#93000a",
+                    "background": "#f5fbf8",
+                    "tertiary": "#8e4e11",
+                    "on-primary-fixed-variant": "#00504a",
+                    "on-primary": "#ffffff",
+                    "on-tertiary-container": "#773d00",
+                    "inverse-surface": "#2b3231",
+                    "secondary": "#3f6375",
+                    "error": "#ba1a1a",
+                    "outline": "#6c7a77",
+                    "secondary-fixed": "#c3e8fd",
+                    "surface-container-low": "#eff5f3",
+                    "on-tertiary": "#ffffff",
+                    "on-secondary-fixed-variant": "#274b5c",
+                    "inverse-on-surface": "#ecf2f0",
+                    "surface-dim": "#d5dbd9",
+                    "on-primary-fixed": "#00201d",
+                    "primary-container": "#4fd1c5",
+                    "surface-container-highest": "#dee4e2",
+                    "primary-fixed-dim": "#5adace",
+                    "surface-variant": "#dee4e2",
+                    "inverse-primary": "#5adace",
+                    "on-error": "#ffffff",
+                    "primary-fixed": "#79f7ea",
+                    "primary": "#006a63",
+                    "tertiary-container": "#ffab67",
+                    "on-secondary": "#ffffff",
+                    "surface-container-high": "#e3e9e7",
+                    "secondary-container": "#c0e5fa",
+                    "error-container": "#ffdad6",
+                    "surface": "#f5fbf8",
+                    "on-primary-container": "#005750",
+                    "on-surface": "#171d1c",
+                    "tertiary-fixed": "#ffdcc4",
+                    "surface-tint": "#006a63",
+                    "surface-bright": "#f5fbf8",
+                    "on-surface-variant": "#3c4947",
+                    "outline-variant": "#bbc9c7",
+                    "surface-container": "#e9efed"
+            },
+            "borderRadius": {
+                    "DEFAULT": "0.25rem",
+                    "lg": "0.5rem",
+                    "xl": "0.75rem",
+                    "full": "9999px"
+            },
+            "spacing": {
+                    "margin-mobile": "20px",
+                    "lg": "24px",
+                    "gutter": "16px",
+                    "unit": "4px",
+                    "md": "16px",
+                    "xl": "32px",
+                    "sm": "8px",
+                    "xs": "4px",
+                    "margin-tablet": "48px"
+            },
+            "fontFamily": {
+                    "body-lg": ["Inter"],
+                    "label-sm": ["Inter"],
+                    "label-md": ["Inter"],
+                    "headline-xl": ["Plus Jakarta Sans"],
+                    "headline-lg-mobile": ["Plus Jakarta Sans"],
+                    "headline-lg": ["Plus Jakarta Sans"],
+                    "body-md": ["Inter"]
+            },
+            "fontSize": {
+                    "body-lg": ["18px", {"lineHeight": "28px", "fontWeight": "400"}],
+                    "label-sm": ["12px", {"lineHeight": "16px", "fontWeight": "500"}],
+                    "label-md": ["14px", {"lineHeight": "20px", "letterSpacing": "0.01em", "fontWeight": "600"}],
+                    "headline-xl": ["32px", {"lineHeight": "40px", "letterSpacing": "-0.02em", "fontWeight": "800"}],
+                    "headline-lg-mobile": ["20px", {"lineHeight": "28px", "fontWeight": "700"}],
+                    "headline-lg": ["24px", {"lineHeight": "32px", "fontWeight": "700"}],
+                    "body-md": ["16px", {"lineHeight": "24px", "fontWeight": "400"}]
+            }
+          }
+        }
+      }
+    </script>
+<style>
+        body { background-color: theme('colors.background'); color: theme('colors.on-background'); }
+        .material-symbols-outlined { font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24; }
+        .fill-icon { font-variation-settings: 'FILL' 1; }
+        
+        .toggle-checkbox:checked {
+            right: 0;
+            border-color: theme('colors.primary');
+        }
+        .toggle-checkbox:checked + .toggle-label {
+            background-color: theme('colors.primary');
+        }
+        .toggle-checkbox:checked + .toggle-label:after {
+            transform: translateX(100%);
+            border-color: white;
+        }
+    </style>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+</head>
+<body class="antialiased min-h-screen pb-[100px] md:pb-0">
+<!-- TopAppBar (Web & Mobile) -->
+<header class="bg-background dark:bg-on-background text-primary dark:text-primary-fixed docked full-width top-0 sticky z-40 transition-colors">
+<div class="flex justify-between items-center px-margin-mobile h-16 w-full max-w-7xl mx-auto border-b border-surface-variant">
+<!-- Leading Avatar -->
+<div class="w-10 h-10 rounded-full bg-surface-container-high flex items-center justify-center overflow-hidden border border-surface cursor-pointer hover:scale-95 duration-100 ease-in-out">
+<span class="text-xl">👩</span>
+</div>
+<!-- Headline -->
+<h1 class="font-headline-lg-mobile text-headline-lg-mobile font-extrabold text-primary dark:text-primary-fixed tracking-tight">Habitinhos</h1>
+<!-- Trailing Action -->
+<div class="w-10 h-10 rounded-full bg-tertiary-container/20 flex items-center justify-center text-tertiary-container cursor-pointer hover:bg-surface-container-low transition-colors hover:scale-95 duration-100 ease-in-out">
+<span class="material-symbols-outlined fill-icon text-[24px]">monetization_on</span>
+</div>
+</div>
+</header>
+<!-- Main Content Canvas -->
+<main class="max-w-7xl mx-auto px-margin-mobile pt-lg flex flex-col gap-lg">
+<!-- Header Section -->
+<section class="flex flex-col md:flex-row justify-between items-start md:items-center gap-md">
+<div>
+<h2 class="font-headline-xl text-headline-xl text-on-background mb-xs">Recompensas</h2>
+<p class="font-body-md text-body-md text-on-surface-variant">Gerencie o que os pequenos podem resgatar.</p>
+</div>
+<button class="bg-primary text-on-primary font-label-md text-label-md rounded-xl px-lg py-sm h-[48px] flex items-center gap-sm active:translate-y-1">
+<span class="material-symbols-outlined">add</span>
+                Nova recompensa
+            </button>
+</section>
+<!-- Stats Bento Grid -->
+<section class="grid grid-cols-2 md:grid-cols-4 gap-md">
+<div class="bg-surface-container-lowest rounded-xl p-md border border-outline-variant/30 flex flex-col justify-center">
+<span class="text-3xl mb-xs">🎉</span>
+<p class="font-label-sm text-label-sm text-on-surface-variant uppercase tracking-wider">Resgatadas este mês</p>
+<p class="font-headline-lg text-headline-lg text-on-background mt-1">12</p>
+</div>
+<div class="bg-surface-container-lowest rounded-xl p-md border border-outline-variant/30 flex flex-col justify-center">
+<span class="text-3xl mb-xs">🔥</span>
+<p class="font-label-sm text-label-sm text-on-surface-variant uppercase tracking-wider">Mais popular</p>
+<p class="font-headline-lg-mobile text-headline-lg-mobile text-on-background flex items-center gap-2 mt-1">🎬 <span class="font-body-md text-body-md text-on-surface-variant font-normal">Cinema</span></p>
+</div>
+<div class="bg-tertiary-container/20 rounded-xl p-md border border-tertiary-container/30 flex flex-col justify-center col-span-2 md:col-span-2 relative overflow-hidden">
+<p class="font-label-sm text-label-sm text-tertiary uppercase tracking-wider relative z-10">Dica do Habitinhos</p>
+<p class="font-body-md text-body-md text-on-background mt-xs relative z-10">Ofereça recompensas imateriais como "1 hora a mais no parque" para incentivar bons hábitos.</p>
+</div>
+</section>
+<!-- Rewards List -->
+<section class="flex flex-col gap-md">
+<h3 class="font-headline-lg-mobile text-headline-lg-mobile text-on-background">Ativas</h3>
+<div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-md">
+<!-- Reward Card 1 -->
+<div class="bg-surface-container-lowest border border-outline-variant/30 rounded-xl p-md flex items-center justify-between group">
+<div class="flex items-center gap-md">
+<div class="w-12 h-12 rounded-full bg-secondary-container/30 flex items-center justify-center text-2xl">
+                            🎬
+                        </div>
+<div>
+<h4 class="font-label-md text-label-md text-on-background">Noite de Cinema</h4>
+<div class="flex items-center gap-1 mt-1">
+<span class="material-symbols-outlined text-[16px] fill-icon text-tertiary-container">monetization_on</span>
+<span class="font-label-sm text-label-sm text-tertiary">50 moedas</span>
+</div>
+</div>
+</div>
+<div class="flex flex-col items-end gap-2">
+<!-- Toggle -->
+<div class="relative inline-block w-10 mr-2 align-middle select-none transition duration-200 ease-in">
+<input checked="" class="toggle-checkbox absolute block w-5 h-5 rounded-full bg-white border-4 appearance-none cursor-pointer z-10 checked:right-0 checked:border-primary top-[2px]" id="toggle1" name="toggle1" style="right: 0; border-color: #006a63;" type="checkbox"/>
+<label class="toggle-label block overflow-hidden h-6 rounded-full bg-primary cursor-pointer" for="toggle1"></label>
+</div>
+<button aria-label="Editar" class="text-on-surface-variant p-1">
+<span class="material-symbols-outlined text-[20px]">edit</span>
+</button>
+</div>
+</div>
+<!-- Reward Card 2 -->
+<div class="bg-surface-container-lowest border border-outline-variant/30 rounded-xl p-md flex items-center justify-between group">
+<div class="flex items-center gap-md">
+<div class="w-12 h-12 rounded-full bg-primary-container/20 flex items-center justify-center text-2xl">
+                            🎮
+                        </div>
+<div>
+<h4 class="font-label-md text-label-md text-on-background">1h de Videogame</h4>
+<div class="flex items-center gap-1 mt-1">
+<span class="material-symbols-outlined text-[16px] fill-icon text-tertiary-container">monetization_on</span>
+<span class="font-label-sm text-label-sm text-tertiary">30 moedas</span>
+</div>
+</div>
+</div>
+<div class="flex flex-col items-end gap-2">
+<div class="relative inline-block w-10 mr-2 align-middle select-none transition duration-200 ease-in">
+<input checked="" class="toggle-checkbox absolute block w-5 h-5 rounded-full bg-white border-4 appearance-none cursor-pointer z-10 checked:right-0 checked:border-primary top-[2px]" id="toggle2" name="toggle2" style="right: 0; border-color: #006a63;" type="checkbox"/>
+<label class="toggle-label block overflow-hidden h-6 rounded-full bg-primary cursor-pointer" for="toggle2"></label>
+</div>
+<button aria-label="Editar" class="text-on-surface-variant p-1">
+<span class="material-symbols-outlined text-[20px]">edit</span>
+</button>
+</div>
+</div>
+<!-- Reward Card 3 (Inactive) -->
+<div class="bg-surface-container-lowest/50 rounded-xl p-md flex items-center justify-between border border-outline-variant/30 opacity-75 group">
+<div class="flex items-center gap-md grayscale">
+<div class="w-12 h-12 rounded-full bg-surface-container-high flex items-center justify-center text-2xl">
+                            🚲
+                        </div>
+<div>
+<h4 class="font-label-md text-label-md text-on-surface-variant">Passeio de Bicicleta</h4>
+<div class="flex items-center gap-1 mt-1">
+<span class="material-symbols-outlined text-[16px] fill-icon text-on-surface-variant">monetization_on</span>
+<span class="font-label-sm text-label-sm text-on-surface-variant">100 moedas</span>
+</div>
+</div>
+</div>
+<div class="flex flex-col items-end gap-2">
+<div class="relative inline-block w-10 mr-2 align-middle select-none transition duration-200 ease-in">
+<input class="toggle-checkbox absolute block w-5 h-5 rounded-full bg-white border-4 border-surface-variant appearance-none cursor-pointer z-10 top-[2px] left-0" id="toggle3" name="toggle3" type="checkbox"/>
+<label class="toggle-label block overflow-hidden h-6 rounded-full bg-surface-variant cursor-pointer" for="toggle3"></label>
+</div>
+<button aria-label="Editar" class="text-on-surface-variant p-1">
+<span class="material-symbols-outlined text-[20px]">edit</span>
+</button>
+</div>
+</div>
+</div>
+</section>
+</main>
+<!-- BottomNavBar (Mobile Only) -->
+<!-- Applying Semantic Match: "Recompensas" is active -->
+<nav class="md:hidden fixed bottom-0 left-0 w-full z-50 flex justify-around items-center px-4 py-2 pb-safe bg-surface-container dark:bg-surface-container-lowest border-t border-outline-variant/30 rounded-t-xl transition-all">
+<a aria-label="Início" class="flex flex-col items-center justify-center text-on-surface-variant dark:text-outline-variant px-4 py-1 hover:bg-primary-fixed-dim/20 transition-all rounded-full" href="#">
+<span class="material-symbols-outlined mb-1">home</span>
+<span class="font-label-sm text-label-sm">Início</span>
+</a>
+<a aria-label="Missões" class="flex flex-col items-center justify-center text-on-surface-variant dark:text-outline-variant px-4 py-1 hover:bg-primary-fixed-dim/20 transition-all rounded-full" href="#">
+<span class="material-symbols-outlined mb-1">assignment</span>
+<span class="font-label-sm text-label-sm">Missões</span>
+</a>
+<!-- Active Tab: Recompensas -->
+<a aria-label="Recompensas" class="flex flex-col items-center justify-center bg-primary-container dark:bg-on-primary-container text-on-primary-container dark:text-primary-fixed rounded-full px-4 py-1 hover:bg-primary-fixed-dim/20 transition-all scale-95" href="#">
+<span class="material-symbols-outlined fill-icon mb-1">redeem</span>
+<span class="font-label-sm text-label-sm">Recompensas</span>
+</a>
+<a aria-label="Perfil" class="flex flex-col items-center justify-center text-on-surface-variant dark:text-outline-variant px-4 py-1 hover:bg-primary-fixed-dim/20 transition-all rounded-full" href="#">
+<span class="material-symbols-outlined mb-1">person</span>
+<span class="font-label-sm text-label-sm">Perfil</span>
+</a>
+</nav>
+<script>
+        // Simple toggle logic for visual feedback
+        document.querySelectorAll('.toggle-checkbox').forEach(toggle => {
+            toggle.addEventListener('change', (e) => {
+                const card = e.target.closest('div.group');
+                if(e.target.checked) {
+                    card.classList.remove('bg-surface-container-lowest/50', 'opacity-75');
+                    card.classList.add('bg-surface-container-lowest');
+                    const iconContainer = card.querySelector('.grayscale');
+                    if(iconContainer) iconContainer.classList.remove('grayscale');
+                } else {
+                    card.classList.add('bg-surface-container-lowest/50', 'opacity-75');
+                    card.classList.remove('bg-surface-container-lowest');
+                    card.firstElementChild.classList.add('grayscale');
+                }
+            });
+        });
+    </script>
+</body></html>

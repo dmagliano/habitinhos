@@ -1,0 +1,201 @@
+<!DOCTYPE html>
+
+<html lang="pt-BR"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Detalhes da Missão - Habitinhos</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com" rel="preconnect"/>
+<link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&amp;family=Plus+Jakarta+Sans:wght@700;800&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+          darkMode: "class",
+          theme: {
+            extend: {
+              "colors": {
+                      "on-secondary-fixed": "#001e2b",
+                      "on-background": "#171d1c",
+                      "on-secondary-container": "#446779",
+                      "surface-container-lowest": "#ffffff",
+                      "tertiary-fixed-dim": "#ffb77f",
+                      "on-tertiary-fixed-variant": "#6f3800",
+                      "on-tertiary-fixed": "#2f1500",
+                      "secondary-fixed-dim": "#a7cce0",
+                      "on-error-container": "#93000a",
+                      "background": "#f5fbf8",
+                      "tertiary": "#8e4e11",
+                      "on-primary-fixed-variant": "#00504a",
+                      "on-primary": "#ffffff",
+                      "on-tertiary-container": "#773d00",
+                      "inverse-surface": "#2b3231",
+                      "secondary": "#3f6375",
+                      "error": "#ba1a1a",
+                      "outline": "#6c7a77",
+                      "secondary-fixed": "#c3e8fd",
+                      "surface-container-low": "#eff5f3",
+                      "on-tertiary": "#ffffff",
+                      "on-secondary-fixed-variant": "#274b5c",
+                      "inverse-on-surface": "#ecf2f0",
+                      "surface-dim": "#d5dbd9",
+                      "on-primary-fixed": "#00201d",
+                      "primary-container": "#4fd1c5",
+                      "surface-container-highest": "#dee4e2",
+                      "primary-fixed-dim": "#5adace",
+                      "surface-variant": "#dee4e2",
+                      "inverse-primary": "#5adace",
+                      "on-error": "#ffffff",
+                      "primary-fixed": "#79f7ea",
+                      "primary": "#006a63",
+                      "tertiary-container": "#ffab67",
+                      "on-secondary": "#ffffff",
+                      "surface-container-high": "#e3e9e7",
+                      "secondary-container": "#c0e5fa",
+                      "error-container": "#ffdad6",
+                      "surface": "#f5fbf8",
+                      "on-primary-container": "#005750",
+                      "on-surface": "#171d1c",
+                      "tertiary-fixed": "#ffdcc4",
+                      "surface-tint": "#006a63",
+                      "surface-bright": "#f5fbf8",
+                      "on-surface-variant": "#3c4947",
+                      "outline-variant": "#bbc9c7",
+                      "surface-container": "#e9efed"
+              },
+              "borderRadius": {
+                      "DEFAULT": "0.25rem",
+                      "lg": "0.5rem",
+                      "xl": "0.75rem",
+                      "full": "9999px"
+              },
+              "spacing": {
+                      "margin-mobile": "20px",
+                      "lg": "24px",
+                      "gutter": "16px",
+                      "unit": "4px",
+                      "md": "16px",
+                      "xl": "32px",
+                      "sm": "8px",
+                      "xs": "4px",
+                      "margin-tablet": "48px"
+              },
+              "fontFamily": {
+                      "body-lg": ["Inter"],
+                      "label-sm": ["Inter"],
+                      "label-md": ["Inter"],
+                      "headline-xl": ["Plus Jakarta Sans"],
+                      "headline-lg-mobile": ["Plus Jakarta Sans"],
+                      "headline-lg": ["Plus Jakarta Sans"],
+                      "body-md": ["Inter"]
+              },
+              "fontSize": {
+                      "body-lg": ["18px", {"lineHeight": "28px", "fontWeight": "400"}],
+                      "label-sm": ["12px", {"lineHeight": "16px", "fontWeight": "500"}],
+                      "label-md": ["14px", {"lineHeight": "20px", "letterSpacing": "0.01em", "fontWeight": "600"}],
+                      "headline-xl": ["32px", {"lineHeight": "40px", "letterSpacing": "-0.02em", "fontWeight": "800"}],
+                      "headline-lg-mobile": ["20px", {"lineHeight": "28px", "fontWeight": "700"}],
+                      "headline-lg": ["24px", {"lineHeight": "32px", "fontWeight": "700"}],
+                      "body-md": ["16px", {"lineHeight": "24px", "fontWeight": "400"}]
+              }
+            }
+          }
+        }
+    </script>
+<style>
+        .pb-safe { padding-bottom: env(safe-area-inset-bottom, 20px); }
+        .pt-safe { padding-top: env(safe-area-inset-top, 0px); }
+        .soft-shadow { box-shadow: 0px 4px 20px rgba(45, 55, 72, 0.08); }
+        .celebrate-animation { animation: pop 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards; }
+        @keyframes pop {
+            0% { transform: scale(0.9); opacity: 0; }
+            100% { transform: scale(1); opacity: 1; }
+        }
+    </style>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+</head>
+<body class="bg-background text-on-background min-h-screen flex flex-col font-body-lg antialiased">
+<!-- Minimal Top App Bar for Detail View -->
+<header class="w-full flex items-center px-margin-mobile h-16 pt-safe flex-shrink-0 z-10 sticky top-0 bg-background/80 backdrop-blur-md">
+<button aria-label="Voltar" class="w-12 h-12 flex items-center justify-center rounded-full bg-surface-container-lowest border border-outline-variant text-on-surface-variant hover:bg-surface-container-low transition-colors active:scale-95" onclick="window.history.back()">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 0;">arrow_back</span>
+</button>
+<div class="flex-1"></div>
+</header>
+<!-- Main Canvas -->
+<main class="flex-1 w-full max-w-md mx-auto px-margin-mobile flex flex-col relative pb-safe">
+<!-- Hero Section: Emoji & Titles -->
+<div class="flex flex-col items-center text-center mt-lg mb-xl celebrate-animation">
+<div class="w-32 h-32 rounded-full bg-secondary-container flex items-center justify-center soft-shadow mb-lg">
+<span aria-label="cama" class="text-6xl select-none" role="img">🛏️</span>
+</div>
+<h1 class="font-headline-xl text-headline-xl text-on-background mb-sm">Arrumar a cama</h1>
+<p class="font-body-lg text-body-lg text-on-surface-variant max-w-[280px]">Deixe seu quarto organizado e sua cama bem arrumadinha!</p>
+</div>
+<!-- Bento Grid for Mission Info -->
+<div class="grid grid-cols-2 gap-gutter mb-xl">
+<!-- Reward Card (Spans full width) -->
+<div class="col-span-2 bg-surface-container-lowest rounded-xl p-md soft-shadow border border-surface-container-low flex items-center">
+<div class="w-14 h-14 rounded-full bg-[#F6AD55] flex items-center justify-center mr-md">
+<span class="material-symbols-outlined text-white text-3xl" style="font-variation-settings: 'FILL' 1;">monetization_on</span>
+</div>
+<div>
+<p class="font-label-sm text-label-sm text-on-surface-variant uppercase tracking-wider mb-xs">Recompensa</p>
+<p class="font-headline-lg-mobile text-headline-lg-mobile text-on-background text-[#8e4e11]">10 moedas</p>
+</div>
+</div>
+<!-- Frequency Card -->
+<div class="col-span-1 bg-surface-container-lowest rounded-xl p-md soft-shadow border border-surface-container-low flex flex-col items-center text-center justify-center">
+<div class="w-10 h-10 rounded-full bg-surface-container flex items-center justify-center mb-sm text-secondary">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">event_repeat</span>
+</div>
+<p class="font-label-md text-label-md text-on-background">Todo dia</p>
+</div>
+<!-- Verification Card -->
+<div class="col-span-1 bg-surface-container-lowest rounded-xl p-md soft-shadow border border-surface-container-low flex flex-col items-center text-center justify-center">
+<div class="w-10 h-10 rounded-full bg-surface-container flex items-center justify-center mb-sm text-tertiary">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">gpp_good</span>
+</div>
+<p class="font-label-md text-label-md text-on-background">Requer aprovação</p>
+</div>
+</div>
+<div class="flex-1"></div>
+<!-- Call to Action Area -->
+<div class="mt-auto pt-lg">
+<button class="w-full min-h-[64px] rounded-xl bg-primary-container text-on-primary-container font-headline-lg-mobile text-headline-lg-mobile soft-shadow active:scale-95 active:shadow-none flex items-center justify-center gap-sm mb-md" id="completeBtn">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">check_circle</span>
+                Marcar como concluída
+</button>
+<div class="flex items-center justify-center gap-xs px-md pb-md">
+<span class="material-symbols-outlined text-[16px] text-on-surface-variant">info</span>
+<p class="font-label-sm text-label-sm text-on-surface-variant text-center">
+                    Um responsável vai revisar antes das moedas entrarem.
+                </p>
+</div>
+</div>
+</main>
+<script>
+        // Simple interaction for the primary button
+        const btn = document.getElementById('completeBtn');
+        btn.addEventListener('click', function() {
+            // Visual feedback
+            this.classList.replace('bg-primary-container', 'bg-primary');
+            this.classList.replace('text-on-primary-container', 'text-white');
+            this.innerHTML = `<span class="material-symbols-outlined animate-spin" style="font-variation-settings: 'FILL' 1;">hourglass_empty</span> Aguardando...`;
+            
+            // Simulate processing
+            setTimeout(() => {
+                this.innerHTML = `<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">task_alt</span> Enviado para revisão!`;
+                this.classList.replace('bg-primary', 'bg-surface-container-high');
+                this.classList.replace('text-white', 'text-on-surface');
+                this.classList.add('cursor-not-allowed', 'opacity-80');
+                this.disabled = true;
+            }, 1000);
+        });
+    </script>
+</body></html>

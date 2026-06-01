@@ -1,0 +1,259 @@
+<!DOCTYPE html>
+
+<html lang="pt-BR"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" name="viewport"/>
+<title>Gerenciar Missões - Habitinhos</title>
+<!-- Google Fonts -->
+<link href="https://fonts.googleapis.com" rel="preconnect"/>
+<link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&amp;family=Plus+Jakarta+Sans:wght@700;800&amp;display=swap" rel="stylesheet"/>
+<!-- Material Symbols -->
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<!-- Tailwind CSS -->
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<script id="tailwind-config">
+        tailwind.config = {
+          darkMode: "class",
+          theme: {
+            extend: {
+              "colors": {
+                      "on-secondary-fixed": "#001e2b",
+                      "on-background": "#171d1c",
+                      "on-secondary-container": "#446779",
+                      "surface-container-lowest": "#ffffff",
+                      "tertiary-fixed-dim": "#ffb77f",
+                      "on-tertiary-fixed-variant": "#6f3800",
+                      "on-tertiary-fixed": "#2f1500",
+                      "secondary-fixed-dim": "#a7cce0",
+                      "on-error-container": "#93000a",
+                      "background": "#f5fbf8",
+                      "tertiary": "#8e4e11",
+                      "on-primary-fixed-variant": "#00504a",
+                      "on-primary": "#ffffff",
+                      "on-tertiary-container": "#773d00",
+                      "inverse-surface": "#2b3231",
+                      "secondary": "#3f6375",
+                      "error": "#ba1a1a",
+                      "outline": "#6c7a77",
+                      "secondary-fixed": "#c3e8fd",
+                      "surface-container-low": "#eff5f3",
+                      "on-tertiary": "#ffffff",
+                      "on-secondary-fixed-variant": "#274b5c",
+                      "inverse-on-surface": "#ecf2f0",
+                      "surface-dim": "#d5dbd9",
+                      "on-primary-fixed": "#00201d",
+                      "primary-container": "#4fd1c5",
+                      "surface-container-highest": "#dee4e2",
+                      "primary-fixed-dim": "#5adace",
+                      "surface-variant": "#dee4e2",
+                      "inverse-primary": "#5adace",
+                      "on-error": "#ffffff",
+                      "primary-fixed": "#79f7ea",
+                      "primary": "#006a63",
+                      "tertiary-container": "#ffab67",
+                      "on-secondary": "#ffffff",
+                      "surface-container-high": "#e3e9e7",
+                      "secondary-container": "#c0e5fa",
+                      "error-container": "#ffdad6",
+                      "surface": "#f5fbf8",
+                      "on-primary-container": "#005750",
+                      "on-surface": "#171d1c",
+                      "tertiary-fixed": "#ffdcc4",
+                      "surface-tint": "#006a63",
+                      "surface-bright": "#f5fbf8",
+                      "on-surface-variant": "#3c4947",
+                      "outline-variant": "#bbc9c7",
+                      "surface-container": "#e9efed"
+              },
+              "borderRadius": {
+                      "DEFAULT": "0.25rem",
+                      "lg": "0.5rem",
+                      "xl": "0.75rem",
+                      "full": "9999px"
+              },
+              "spacing": {
+                      "margin-mobile": "20px",
+                      "lg": "24px",
+                      "gutter": "16px",
+                      "unit": "4px",
+                      "md": "16px",
+                      "xl": "32px",
+                      "sm": "8px",
+                      "xs": "4px",
+                      "margin-tablet": "48px"
+              },
+              "fontFamily": {
+                      "body-lg": ["Inter"],
+                      "label-sm": ["Inter"],
+                      "label-md": ["Inter"],
+                      "headline-xl": ["Plus Jakarta Sans"],
+                      "headline-lg-mobile": ["Plus Jakarta Sans"],
+                      "headline-lg": ["Plus Jakarta Sans"],
+                      "body-md": ["Inter"]
+              },
+              "fontSize": {
+                      "body-lg": ["18px", {"lineHeight": "28px", "fontWeight": "400"}],
+                      "label-sm": ["12px", {"lineHeight": "16px", "fontWeight": "500"}],
+                      "label-md": ["14px", {"lineHeight": "20px", "letterSpacing": "0.01em", "fontWeight": "600"}],
+                      "headline-xl": ["32px", {"lineHeight": "40px", "letterSpacing": "-0.02em", "fontWeight": "800"}],
+                      "headline-lg-mobile": ["20px", {"lineHeight": "28px", "fontWeight": "700"}],
+                      "headline-lg": ["24px", {"lineHeight": "32px", "fontWeight": "700"}],
+                      "body-md": ["16px", {"lineHeight": "24px", "fontWeight": "400"}]
+              }
+            }
+          }
+        }
+    </script>
+<style>
+        /* Utility to hide scrollbar but keep functionality */
+        .hide-scrollbar::-webkit-scrollbar {
+            display: none;
+        }
+        .hide-scrollbar {
+            -ms-overflow-style: none;
+            scrollbar-width: none;
+        }
+        .pb-safe { padding-bottom: env(safe-area-inset-bottom, 16px); }
+    </style>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+</head>
+<body class="bg-background text-on-background font-body-lg min-h-screen flex flex-col antialiased selection:bg-primary-container selection:text-on-primary-container">
+<!-- TopAppBar -->
+<header class="flex justify-between items-center px-margin-mobile h-16 w-full max-w-7xl mx-auto bg-background fixed top-0 z-50">
+<div class="w-10 h-10 rounded-full bg-secondary-container flex items-center justify-center text-xl shadow-sm border border-outline-variant/30">
+            👦
+        </div>
+<h1 class="font-headline-lg-mobile text-headline-lg-mobile font-extrabold text-primary tracking-tight">Habitinhos</h1>
+<div class="text-primary flex items-center justify-center p-2 rounded-full hover:bg-surface-container-low transition-colors cursor-pointer">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">monetization_on</span>
+</div>
+</header>
+<!-- Main Content Canvas -->
+<main class="pt-20 pb-32 px-margin-mobile max-w-md mx-auto w-full flex flex-col gap-lg flex-1">
+<!-- Screen Header -->
+<div class="mt-4">
+<h2 class="font-headline-xl text-headline-xl text-on-background mb-unit tracking-tight">Missões</h2>
+<p class="font-body-md text-body-md text-on-surface-variant">Acompanhe e aprove as tarefas da família.</p>
+</div>
+<!-- Filter Chips -->
+<div class="flex gap-sm overflow-x-auto pb-2 hide-scrollbar -mx-margin-mobile px-margin-mobile">
+<button class="px-5 py-2 rounded-full font-label-md text-label-md bg-primary-container text-on-primary-container border border-primary-container shadow-sm transition-transform active:scale-95 whitespace-nowrap">Todas</button>
+<button class="px-5 py-2 rounded-full font-label-md text-label-md bg-surface-container text-on-surface-variant border border-outline-variant hover:bg-surface-container-high transition-colors whitespace-nowrap">Ativas</button>
+<button class="px-5 py-2 rounded-full font-label-md text-label-md bg-surface-container text-on-surface-variant border border-outline-variant hover:bg-surface-container-high transition-colors whitespace-nowrap flex items-center gap-1">
+                Com aprovação
+                <span class="w-2 h-2 rounded-full bg-error ml-1 block"></span>
+</button>
+</div>
+<!-- Mission List -->
+<div class="flex flex-col gap-gutter">
+<!-- Task Card 1: Needs Approval -->
+<div class="bg-surface-container-lowest rounded-xl p-md border border-tertiary-container shadow-sm flex items-center gap-md relative overflow-hidden active:scale-[0.98] transition-transform cursor-pointer">
+<div class="absolute left-0 top-0 bottom-0 w-1.5 bg-tertiary-container"></div>
+<div class="w-12 h-12 rounded-full bg-secondary-container/20 flex items-center justify-center text-2xl shrink-0">
+                    🐶
+                </div>
+<div class="flex-1 min-w-0">
+<h3 class="font-label-md text-label-md text-on-background mb-1 truncate">Passear com o Bob</h3>
+<div class="flex items-center gap-1.5 font-label-sm text-label-sm text-on-surface-variant">
+<span class="w-5 h-5 rounded-full bg-tertiary-container/30 flex items-center justify-center text-[12px] border border-tertiary-container/50">👧</span>
+<span class="truncate">Mia</span>
+</div>
+</div>
+<div class="flex flex-col items-end gap-2 shrink-0 pl-2">
+<div class="flex items-center gap-1 bg-[#F6AD55]/10 text-[#8e4e11] border border-[#F6AD55]/30 px-2.5 py-1 rounded-full font-label-sm text-label-sm font-bold shadow-sm">
+<span class="material-symbols-outlined text-[16px] text-[#F6AD55]" style="font-variation-settings: 'FILL' 1;">monetization_on</span>
+<span>20</span>
+</div>
+<span class="font-label-sm text-label-sm text-on-surface bg-tertiary-container/40 px-2 py-0.5 rounded font-semibold animate-pulse">Revisar</span>
+</div>
+</div>
+<!-- Task Card 2: Active -->
+<div class="bg-surface-container-lowest rounded-xl p-md border border-outline-variant shadow-sm flex items-center gap-md relative overflow-hidden active:scale-[0.98] transition-transform cursor-pointer">
+<div class="absolute left-0 top-0 bottom-0 w-1.5 bg-primary"></div>
+<div class="w-12 h-12 rounded-full bg-secondary-container/20 flex items-center justify-center text-2xl shrink-0">
+                    🛏️
+                </div>
+<div class="flex-1 min-w-0">
+<h3 class="font-label-md text-label-md text-on-background mb-1 truncate">Arrumar a cama</h3>
+<div class="flex items-center gap-1.5 font-label-sm text-label-sm text-on-surface-variant">
+<span class="w-5 h-5 rounded-full bg-secondary-container/50 flex items-center justify-center text-[12px] border border-secondary-container">👦</span>
+<span class="truncate">Leo</span>
+<span class="mx-0.5 opacity-50">•</span>
+<span class="text-primary font-medium">Diária</span>
+</div>
+</div>
+<div class="flex flex-col items-end gap-1 shrink-0 pl-2">
+<div class="flex items-center gap-1 bg-[#F6AD55]/10 text-[#8e4e11] border border-[#F6AD55]/30 px-2.5 py-1 rounded-full font-label-sm text-label-sm font-bold shadow-sm">
+<span class="material-symbols-outlined text-[16px] text-[#F6AD55]" style="font-variation-settings: 'FILL' 1;">monetization_on</span>
+<span>10</span>
+</div>
+</div>
+</div>
+<!-- Task Card 3: Active -->
+<div class="bg-surface-container-lowest rounded-xl p-md border border-outline-variant shadow-sm flex items-center gap-md relative overflow-hidden active:scale-[0.98] transition-transform cursor-pointer">
+<div class="absolute left-0 top-0 bottom-0 w-1.5 bg-primary"></div>
+<div class="w-12 h-12 rounded-full bg-secondary-container/20 flex items-center justify-center text-2xl shrink-0">
+                    🥦
+                </div>
+<div class="flex-1 min-w-0">
+<h3 class="font-label-md text-label-md text-on-background mb-1 truncate">Comer legumes</h3>
+<div class="flex items-center gap-1.5 font-label-sm text-label-sm text-on-surface-variant">
+<span class="w-5 h-5 rounded-full bg-secondary-container/50 flex items-center justify-center text-[12px] border border-secondary-container">👦</span>
+<span class="truncate">Leo</span>
+</div>
+</div>
+<div class="flex flex-col items-end gap-1 shrink-0 pl-2">
+<div class="flex items-center gap-1 bg-[#F6AD55]/10 text-[#8e4e11] border border-[#F6AD55]/30 px-2.5 py-1 rounded-full font-label-sm text-label-sm font-bold shadow-sm">
+<span class="material-symbols-outlined text-[16px] text-[#F6AD55]" style="font-variation-settings: 'FILL' 1;">monetization_on</span>
+<span>15</span>
+</div>
+</div>
+</div>
+<!-- Task Card 4: Completed -->
+<div class="bg-surface-container-lowest/60 rounded-xl p-md border border-outline-variant/50 shadow-sm flex items-center gap-md relative overflow-hidden opacity-75">
+<div class="w-12 h-12 rounded-full bg-surface-container-highest flex items-center justify-center text-2xl shrink-0 grayscale">
+                    📚
+                </div>
+<div class="flex-1 min-w-0">
+<h3 class="font-label-md text-label-md text-on-surface-variant mb-1 line-through truncate">Ler 15 minutos</h3>
+<div class="flex items-center gap-1.5 font-label-sm text-label-sm text-on-surface-variant">
+<span class="w-5 h-5 rounded-full bg-surface-container-high flex items-center justify-center text-[12px]">👧</span>
+<span class="truncate">Mia</span>
+</div>
+</div>
+<div class="flex flex-col items-end gap-1 shrink-0 pl-2">
+<span class="material-symbols-outlined text-primary" style="font-variation-settings: 'FILL' 1;">check_circle</span>
+</div>
+</div>
+</div>
+</main>
+<!-- Floating Action Button (FAB) -->
+<button class="fixed bottom-[96px] right-margin-mobile w-14 h-14 bg-primary-container text-on-primary-container rounded-full flex items-center justify-center shadow-md z-40 hover:bg-primary-fixed-dim transition-transform active:scale-90 active:shadow-sm">
+<span class="material-symbols-outlined text-[28px]">add</span>
+</button>
+<!-- BottomNavBar -->
+<nav class="fixed bottom-0 left-0 w-full z-50 flex justify-around items-center px-4 py-2 pb-safe bg-surface-container rounded-t-xl shadow-lg border-t-0 border-outline-variant">
+<a class="flex flex-col items-center justify-center text-on-surface-variant px-4 py-1 hover:bg-primary-fixed-dim/20 transition-all rounded-lg" href="#">
+<span class="material-symbols-outlined mb-1">home</span>
+<span class="font-label-sm text-label-sm">Início</span>
+</a>
+<a class="flex flex-col items-center justify-center bg-primary-container text-on-primary-container rounded-full px-5 py-1.5 active:scale-90 duration-200 shadow-sm" href="#">
+<span class="material-symbols-outlined mb-1" style="font-variation-settings: 'FILL' 1;">assignment</span>
+<span class="font-label-sm text-label-sm font-bold">Missões</span>
+</a>
+<a class="flex flex-col items-center justify-center text-on-surface-variant px-4 py-1 hover:bg-primary-fixed-dim/20 transition-all rounded-lg" href="#">
+<span class="material-symbols-outlined mb-1">redeem</span>
+<span class="font-label-sm text-label-sm">Recompensas</span>
+</a>
+<a class="flex flex-col items-center justify-center text-on-surface-variant px-4 py-1 hover:bg-primary-fixed-dim/20 transition-all rounded-lg" href="#">
+<span class="material-symbols-outlined mb-1">person</span>
+<span class="font-label-sm text-label-sm">Perfil</span>
+</a>
+</nav>
+</body></html>
