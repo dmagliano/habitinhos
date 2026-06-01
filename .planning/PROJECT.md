@@ -14,7 +14,9 @@ The complete family flow must work end to end: responsible adult creates mission
 
 ### Validated
 
-(None yet — ship to validate)
+- [x] Phase 1 backend foundation: Spring Boot, PostgreSQL/Flyway, auth, JWT-derived family context, child profiles, automatic wallets, tenant isolation, and OpenAPI baseline.
+- [x] Phase 2 mission/coin backend slice: mission CRUD, assignment, child completion, responsible approval/rejection, transactional mission credits, wallet balance endpoint, and OpenAPI coverage.
+- [x] Phase 3 backend reward/redemption slice: responsible reward CRUD, active family reward listing, sufficient-balance redemption, insufficient-balance rejection, wallet debit, `RewardRedemption`/`CoinTransaction` linkage, wallet statement, and OpenAPI coverage.
 
 ### Active
 
@@ -86,4 +88,4 @@ This document evolves at phase transitions and milestone boundaries.
 4. Update Context with current state
 
 ---
-*Last updated: 2026-05-26 after initialization*
+*Last updated: 2026-06-01 after Phase 3 backend reward/redemption verification*

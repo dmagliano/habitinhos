@@ -1,10 +1,11 @@
 ---
 phase: 01
 slug: fundacao-backend
-status: draft
+status: passed
 nyquist_compliant: true
 wave_0_complete: false
 created: 2026-05-26
+verified: 2026-06-01
 ---
 
 # Phase 1 — Validation Strategy
@@ -81,4 +82,4 @@ All tenant, auth, child, and wallet behaviors must have automated verification.
 - [x] Feedback latency < 90s after cache warm-up
 - [x] `nyquist_compliant: true` set in frontmatter
 
-**Approval:** approved 2026-05-26 for planning; execution still must make every row green.
+**Approval:** passed 2026-06-01; every row is green and covered by the full backend test suite.

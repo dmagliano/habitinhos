@@ -8,7 +8,7 @@ Habitinhos will be built as a monorepo MVP in seven phases: backend foundation, 
 
 - [x] **Phase 1: Fundação do backend** - Create Spring Boot backend foundation, PostgreSQL/Flyway setup, authentication, family isolation, children, wallets, and baseline tests.
 - [x] **Phase 2: Domínio de missões e moedas** - Implement missions, assignments, completion, approval/rejection, coin credits, ledger transactions, and transactional tests. (completed 2026-05-30)
-- [ ] **Phase 3: Recompensas e resgates** - Implement rewards, redemptions, sufficient-balance validation, coin debits, ledger transactions, and balance tests.
+- [x] **Phase 3: Recompensas e resgates** - Implement rewards, redemptions, sufficient-balance validation, coin debits, ledger transactions, and balance tests. (completed 2026-06-01)
 - [ ] **Phase 4: Mobile base** - Create Expo app foundation, navigation, API client, login flow, and base visual structure.
 - [ ] **Phase 5: Fluxo da criança** - Build child home, balance, missions, completion feedback, rewards catalog, and redemption flow.
 - [ ] **Phase 6: Fluxo do responsável** - Build dashboard, children, missions, assignments, rewards, approvals, and child detail views.
@@ -80,8 +80,8 @@ Plans:
 
 Plans:
 - [x] 03-01: Reward model, migrations, responsible CRUD endpoints
-- [x] 03-02: RewardRedemption model, redemption endpoint, status handling
-- [ ] 03-03: Wallet debit service, transaction history, insufficient-balance tests
+- [x] 03-02: Wallet debit service, transaction history, reward-redemption ledger support
+- [x] 03-03: Reward redemption endpoint, status handling, insufficient-balance tests
 
 ### Phase 4: Mobile base
 **Goal**: Expo mobile foundation can authenticate against the backend and provide the shared navigation/API structure for both user flows.
@@ -162,7 +162,7 @@ Phases execute in numeric order: 1 → 2 → 3 → 4 → 5 → 6 → 7
 |-------|----------------|--------|-----------|
 | 1. Fundação do backend | 4/4 | Complete | 2026-05-27 |
 | 2. Domínio de missões e moedas | 4/4 | Complete   | 2026-05-30 |
-| 3. Recompensas e resgates | 2/3 | In Progress|  |
+| 3. Recompensas e resgates | 3/3 | Complete    | 2026-06-01 |
 | 4. Mobile base | 0/3 | Not started | - |
 | 5. Fluxo da criança | 0/3 | Not started | - |
 | 6. Fluxo do responsável | 0/4 | Not started | - |

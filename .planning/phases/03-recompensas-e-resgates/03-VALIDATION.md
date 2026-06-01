@@ -1,10 +1,11 @@
 ---
 phase: 03-recompensas-e-resgates
 slug: recompensas-e-resgates
-status: planned
+status: passed
 nyquist_compliant: true
 wave_0_complete: false
 created: 2026-05-29
+verified: 2026-06-01
 ---
 
 # Phase 03 Validation — Recompensas e Resgates
@@ -29,12 +30,12 @@ created: 2026-05-29
 
 | Task ID | Plan | Wave | Requirement | Threat Ref | Secure Behavior | Test Type | Automated Command | Status |
 |---------|------|------|-------------|------------|-----------------|-----------|-------------------|--------|
-| 03-01-01 | 03-01 | 1 | REWD-01, REWD-02 | T-03-01 | Reward cost CHECK > 0, family FK | compile | `./mvnw -DskipTests compile` | Pending |
-| 03-01-02 | 03-01 | 1 | REWD-01, REWD-03 | T-03-04 | Family-scoped reward queries | compile | `./mvnw -DskipTests compile` | Pending |
-| 03-01-03 | 03-01 | 1 | REWD-01, REWD-02, REWD-03, DOCS-01 | T-03-01, T-03-04 | CRUD + tenant isolation + OpenAPI | integration | `./mvnw test` | Pending |
-| 03-02-01 | 03-02 | 2 | WALT-03, WALT-05 | T-03-02, T-03-03 | Pessimistic lock + balance guard + ledger | integration | `./mvnw test` | Pending |
-| 03-03-01 | 03-03 | 3 | REWD-04, REWD-05, REWD-06 | T-03-02, T-03-03 | Redemption + debit + insufficient balance guard | integration | `./mvnw test` | Pending |
-| 03-03-02 | 03-03 | 3 | DOCS-01 | — | Full Phase 3 OpenAPI coverage | integration | `./mvnw test` | Pending |
+| 03-01-01 | 03-01 | 1 | REWD-01, REWD-02 | T-03-01 | Reward cost CHECK > 0, family FK | compile | `./mvnw -DskipTests compile` | Passed |
+| 03-01-02 | 03-01 | 1 | REWD-01, REWD-03 | T-03-04 | Family-scoped reward queries | compile | `./mvnw -DskipTests compile` | Passed |
+| 03-01-03 | 03-01 | 1 | REWD-01, REWD-02, REWD-03, DOCS-01 | T-03-01, T-03-04 | CRUD + tenant isolation + OpenAPI | integration | `./mvnw test` | Passed |
+| 03-02-01 | 03-02 | 2 | WALT-03, WALT-05 | T-03-02, T-03-03 | Pessimistic lock + balance guard + ledger | integration | `./mvnw test` | Passed |
+| 03-03-01 | 03-03 | 3 | REWD-04, REWD-05, REWD-06 | T-03-02, T-03-03 | Redemption + debit + insufficient balance guard | integration | `./mvnw test` | Passed |
+| 03-03-02 | 03-03 | 3 | DOCS-01 | - | Full Phase 3 OpenAPI coverage | integration | `./mvnw test` | Passed |
 
 ## Execution Waves
 
@@ -53,10 +54,10 @@ created: 2026-05-29
 
 ## Validation Sign-Off
 
-- [ ] All automated tests pass
-- [ ] All reward CRUD operations verified
-- [ ] Redemption with sufficient balance succeeds
-- [ ] Redemption with insufficient balance is blocked
-- [ ] Wallet debit and CoinTransaction are consistent
-- [ ] Tenant isolation prevents cross-family access
-- [ ] OpenAPI exposes all Phase 3 endpoints
+- [x] All automated tests pass
+- [x] All reward CRUD operations verified
+- [x] Redemption with sufficient balance succeeds
+- [x] Redemption with insufficient balance is blocked
+- [x] Wallet debit and CoinTransaction are consistent
+- [x] Tenant isolation prevents cross-family access
+- [x] OpenAPI exposes all Phase 3 endpoints

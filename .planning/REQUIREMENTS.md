@@ -7,25 +7,25 @@
 
 ### Authentication and Family
 
-- [ ] **AUTH-01**: Responsible adult can create an account with name, email, and password.
-- [ ] **AUTH-02**: Responsible adult can log in and receive an authenticated session/token.
-- [ ] **AUTH-03**: System creates or associates a `FamilyUnit` for the responsible adult.
-- [ ] **AUTH-04**: Authenticated responsible adult can retrieve `/me` with user and family context.
-- [ ] **AUTH-05**: Backend derives `familyUnitId` from authentication context for protected operations.
-- [ ] **AUTH-06**: Users from one family cannot access data from another family.
+- [x] **AUTH-01**: Responsible adult can create an account with name, email, and password.
+- [x] **AUTH-02**: Responsible adult can log in and receive an authenticated session/token.
+- [x] **AUTH-03**: System creates or associates a `FamilyUnit` for the responsible adult.
+- [x] **AUTH-04**: Authenticated responsible adult can retrieve `/me` with user and family context.
+- [x] **AUTH-05**: Backend derives `familyUnitId` from authentication context for protected operations.
+- [x] **AUTH-06**: Users from one family cannot access data from another family.
 
 ### Children
 
-- [ ] **CHLD-01**: Responsible adult can create a child profile without requiring child email.
-- [ ] **CHLD-02**: System creates a wallet automatically when a child is created.
-- [ ] **CHLD-03**: Responsible adult can list, view, edit, and deactivate children in the family.
-- [ ] **CHLD-04**: Child profile supports optional avatar key and optional hashed access PIN.
+- [x] **CHLD-01**: Responsible adult can create a child profile without requiring child email.
+- [x] **CHLD-02**: System creates a wallet automatically when a child is created.
+- [x] **CHLD-03**: Responsible adult can list, view, edit, and deactivate children in the family.
+- [x] **CHLD-04**: Child profile supports optional avatar key and optional hashed access PIN.
 
 ### Missions
 
-- [ ] **MISS-01**: Responsible adult can create, edit, list, view, and deactivate missions.
-- [ ] **MISS-02**: Mission coin value must be a positive integer.
-- [ ] **MISS-03**: Responsible adult can assign a mission to one or more children.
+- [x] **MISS-01**: Responsible adult can create, edit, list, view, and deactivate missions.
+- [x] **MISS-02**: Mission coin value must be a positive integer.
+- [x] **MISS-03**: Responsible adult can assign a mission to one or more children.
 - [x] **MISS-04**: Child can list only their own assigned pending missions.
 - [x] **MISS-05**: Child can mark their own assigned mission as completed.
 - [x] **MISS-06**: Mission without approval credits coins automatically on completion.
@@ -44,12 +44,12 @@
 
 ### Rewards
 
-- [ ] **REWD-01**: Responsible adult can create, edit, list, view, and deactivate rewards.
-- [ ] **REWD-02**: Reward cost must be a positive integer.
-- [ ] **REWD-03**: Child can list active rewards from their family.
-- [ ] **REWD-04**: Child can redeem a reward when balance is sufficient.
-- [ ] **REWD-05**: System blocks reward redemption when balance is insufficient.
-- [ ] **REWD-06**: Successful MVP redemption can be recorded directly as `REDEEMED`.
+- [x] **REWD-01**: Responsible adult can create, edit, list, view, and deactivate rewards.
+- [x] **REWD-02**: Reward cost must be a positive integer.
+- [x] **REWD-03**: Child can list active rewards from their family.
+- [x] **REWD-04**: Child can redeem a reward when balance is sufficient.
+- [x] **REWD-05**: System blocks reward redemption when balance is insufficient.
+- [x] **REWD-06**: Successful MVP redemption can be recorded directly as `REDEEMED`.
 
 ### Responsible Dashboard
 
@@ -101,11 +101,11 @@
 |-------------|-------|--------|
 | AUTH-01..AUTH-06 | Phase 1 | Complete |
 | CHLD-01..CHLD-04 | Phase 1 | Complete |
-| DOCS-01 | Phases 1, 2, 3 | In progress |
-| MISS-01..MISS-09 | Phase 2 | Pending |
-| WALT-01, WALT-02, WALT-04, WALT-06 | Phase 2 | Pending |
-| REWD-01..REWD-06 | Phase 3 | Pending |
-| WALT-03, WALT-05 | Phase 3 | Pending |
+| DOCS-01 | Phases 1, 2, 3 | Complete |
+| MISS-01..MISS-09 | Phase 2 | Complete |
+| WALT-01, WALT-02, WALT-04, WALT-06 | Phase 2 | Complete |
+| REWD-01..REWD-06 | Phase 3 | Complete |
+| WALT-03, WALT-05 | Phase 3 | Complete |
 | MOBL-01, MOBL-02 | Phase 4 | Pending |
 | AUTH-02, AUTH-04 | Phase 4 | Pending |
 | MOBL-04, MOBL-05 | Phase 5 | Pending |
