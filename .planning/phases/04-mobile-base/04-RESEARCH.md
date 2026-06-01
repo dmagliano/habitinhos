@@ -92,6 +92,26 @@ API errors follow the project error shape from `docs/api-contract.md`:
 | Visual work starts screen-by-screen without tokens | Phase 5/6 inconsistency | Make 04-03 build tokens/components before login/hub/stub screens. |
 | Tests are deferred until after scaffold | Auth regressions become manual-only | Establish `jest-expo`, lint, and typecheck scripts in first mobile plan. |
 
+## Package Legitimacy Audit
+
+Phase 4 installs npm packages. The planner should treat the packages below as
+approved inputs when they are installed through Expo-compatible commands such as
+`npx create-expo-app@latest` and `npx expo install ...`.
+
+| Package | Classification | Evidence | Planning Instruction |
+|---------|----------------|----------|----------------------|
+| `create-expo-app` | VERIFIED | Official Expo scaffold package on npm; repository/homepage point to Expo docs/GitHub. | Use only for initial scaffold, preferably with `--template blank-typescript` and without Expo Router as the primary navigation model. |
+| `expo` | VERIFIED | Official Expo package on npm; includes Expo CLI support and TypeScript declarations. | Use the scaffold-selected compatible version; do not pin manually unless Expo tooling requires it. |
+| `expo-secure-store` | VERIFIED | Official Expo package on npm; docs describe encrypted local key-value storage. | Install with `npx expo install expo-secure-store`; store only the JWT token wrapper value, not broad app state. |
+| `@react-navigation/native` | VERIFIED | Official React Navigation native integration package on npm; docs point to reactnavigation.org. | Use as the root navigation library per project decisions. |
+| `@react-navigation/native-stack` | VERIFIED | Official React Navigation native-stack package on npm. | Use for `Auth`, `FamilyHub`, `ResponsibleStub`, and `ChildStub` stack routes. |
+| `react-native-screens` | VERIFIED | Official dependency used by React Navigation; npm docs recommend `npx expo install react-native-screens` for Expo managed workflow. | Install via `npx expo install` so Expo selects a compatible native version. |
+| `react-native-safe-area-context` | VERIFIED | Widely used React Native safe area package; npm package has TypeScript declarations and React Navigation/Expo ecosystem usage. | Install via `npx expo install`; use for safe-area support if scaffold/components need it. |
+| `jest-expo` | VERIFIED | Official Expo Jest preset package; npm docs recommend `npx expo install jest-expo jest`. | Use as Jest preset for mobile tests. |
+| `jest` | VERIFIED | Official Jest package on npm; required by `jest-expo`. | Install with `jest-expo` through Expo tooling. |
+| `@testing-library/react-native` | VERIFIED | Official React Native Testing Library package by Callstack; npm package has TypeScript declarations. | Use for component and screen tests; avoid brittle snapshot-only tests. |
+| `react-test-renderer` | VERIFIED WITH CAUTION | React package on npm; current package notes deprecation of direct renderer APIs, while RNTL may require a version matching React. | Install only if required by React Native Testing Library peer requirements; match the scaffold's React version exactly and do not write direct renderer tests. |
+
 ## Validation Architecture
 
 Phase 4 validation should mix fast automated checks with manual mobile smoke because this phase creates a new Expo app and user-visible auth flow.
@@ -115,9 +135,11 @@ Recommended validation commands after scaffold exists:
 
 Manual-only checks remain necessary for real backend connectivity, Android local networking, and final visual/touch inspection.
 
-## Open Questions For Planning
+## Open Questions (RESOLVED)
 
-No blocking questions. Planner may choose exact package-manager details and exact local fallback URL, but must preserve the locked route/session/design decisions above.
+No blocking questions remain. Planner may choose exact package-manager details
+and exact local fallback URL, but must preserve the locked route/session/design
+decisions above.
 
 ## Research Complete
 

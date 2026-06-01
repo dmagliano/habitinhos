@@ -32,13 +32,15 @@ created: 2026-06-01
 
 | Task ID | Plan | Wave | Requirement | Threat Ref | Secure Behavior | Test Type | Automated Command | File Exists | Status |
 |---------|------|------|-------------|------------|-----------------|-----------|-------------------|-------------|--------|
-| 04-01-01 | 04-01 | 0 | MOBL-01 | T-04-01 / T-04-02 | Scaffold avoids unreviewed router/auth defaults and establishes auditable scripts | scaffold/static | `cd mobile && npm run lint && npm run typecheck` | ❌ W0 | ⬜ pending |
-| 04-01-02 | 04-01 | 0 | MOBL-01, MOBL-02 | T-04-01 | Test infrastructure can verify React Native components and TypeScript contracts | test infra | `cd mobile && npm test -- --runInBand` | ❌ W0 | ⬜ pending |
-| 04-02-01 | 04-02 | 1 | AUTH-02, AUTH-04 | T-04-03 / T-04-04 | API client injects Bearer token and maps backend/network failures to safe PT-BR messages | unit/integration | `cd mobile && npm test -- --runInBand` | ❌ W0 | ⬜ pending |
-| 04-02-02 | 04-02 | 1 | AUTH-02, AUTH-04 | T-04-05 | Token storage wrapper persists, restores, and clears JWT without exposing raw details to UI | unit | `cd mobile && npm test -- --runInBand` | ❌ W0 | ⬜ pending |
-| 04-02-03 | 04-02 | 1 | MOBL-01, AUTH-04 | T-04-05 / T-04-06 | Invalid or rejected `/me` session clears token and returns to auth branch | component/integration | `cd mobile && npm test -- --runInBand` | ❌ W0 | ⬜ pending |
-| 04-03-01 | 04-03 | 2 | MOBL-02, MOBL-06 | T-04-07 | Base components use centralized tokens, PT-BR labels, accessible touch targets, and no external assets | component/static | `cd mobile && npm test -- --runInBand && npm run lint` | ❌ W0 | ⬜ pending |
-| 04-03-02 | 04-03 | 2 | AUTH-02, AUTH-04, MOBL-02, MOBL-06 | T-04-03 / T-04-07 | Login and authenticated hub/stub screens expose safe auth state transitions without fake domain data | component/integration | `cd mobile && npm test -- --runInBand` | ❌ W0 | ⬜ pending |
+| 04-01-01 | 04-01 | 1 | MOBL-01 | T-04-01 / T-04-02 | Scaffold avoids unreviewed router/auth defaults and establishes auditable scripts | scaffold/static | `cd mobile && npm run lint && npm run typecheck` | ❌ W1 | ⬜ pending |
+| 04-01-02 | 04-01 | 1 | MOBL-01, MOBL-02 | T-04-01 | Test infrastructure can verify React Native components and TypeScript contracts | test infra | `cd mobile && npm test -- --runInBand` | ❌ W1 | ⬜ pending |
+| 04-02-01 | 04-02 | 2 | AUTH-02, AUTH-04 | T-04-03 / T-04-04 | API client injects Bearer token and maps backend/network failures to safe PT-BR messages | unit/integration | `cd mobile && npm test -- --runInBand` | ❌ W1 | ⬜ pending |
+| 04-02-02 | 04-02 | 2 | AUTH-02, AUTH-04 | T-04-05 | Token storage wrapper persists, restores, and clears JWT without exposing raw details to UI | unit | `cd mobile && npm test -- --runInBand` | ❌ W1 | ⬜ pending |
+| 04-02-03 | 04-02 | 2 | MOBL-01, AUTH-04 | T-04-05 / T-04-06 | Invalid or rejected `/me` session clears token and returns to auth branch | component/integration | `cd mobile && npm test -- --runInBand` | ❌ W1 | ⬜ pending |
+| 04-03-01 | 04-03 | 2 | MOBL-02, MOBL-06 | T-04-07 | Base components use centralized tokens, PT-BR labels, accessible touch targets, and no external assets | component/static | `cd mobile && npm test -- --runInBand && npm run lint` | ❌ W1 | ⬜ pending |
+| 04-04-01 | 04-04 | 3 | MOBL-01, AUTH-04 | T-04-05 / T-04-06 | Root navigation renders restore/auth/authenticated branches without bypassing session state | component/integration | `cd mobile && npm test -- --runInBand` | ❌ W1 | ⬜ pending |
+| 04-04-02 | 04-04 | 3 | AUTH-02, MOBL-02, MOBL-06 | T-04-03 / T-04-07 | Login screen submits through AuthProvider and exposes safe PT-BR loading/error states | component/integration | `cd mobile && npm test -- --runInBand` | ❌ W1 | ⬜ pending |
+| 04-04-03 | 04-04 | 3 | AUTH-02, AUTH-04, MOBL-02, MOBL-06 | T-04-03 / T-04-07 | FamilyHub and role stubs support mode switching/logout without fake domain data | component/integration | `cd mobile && npm test -- --runInBand` | ❌ W1 | ⬜ pending |
 
 *Status: ⬜ pending · ✅ green · ❌ red · ⚠️ flaky*
 
@@ -54,9 +56,9 @@ created: 2026-06-01
 
 | Wave | Plans | Dependency |
 |------|-------|------------|
-| 0 | 04-01 | Create mobile scaffold, scripts, and test infrastructure |
-| 1 | 04-02 | Add navigation, API client, env config, token storage, and session restoration |
-| 2 | 04-03 | Add visual tokens, base components, login, family hub, and responsible/child stubs |
+| 1 | 04-01 | Create mobile scaffold, scripts, and test infrastructure |
+| 2 | 04-02, 04-03 | Add API/session foundation and visual tokens/base components in parallel after scaffold |
+| 3 | 04-04 | Add navigation, login, family hub, and responsible/child stubs |
 
 ## Manual-Only Verifications
 
