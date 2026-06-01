@@ -16,7 +16,7 @@ class OpenApiIntegrationTest extends AbstractIntegrationTest {
   private MockMvc mockMvc;
 
   @Test
-  void apiDocsExposePhaseOneAndPhaseTwoMissionEndpoints() throws Exception {
+  void apiDocsExposeBackendPhaseEndpoints() throws Exception {
     mockMvc.perform(get("/v3/api-docs"))
         .andExpect(status().isOk())
         .andExpect(content().string(containsString("\"/auth/register\"")))
@@ -30,6 +30,11 @@ class OpenApiIntegrationTest extends AbstractIntegrationTest {
         .andExpect(content().string(containsString("\"/assigned-missions/{id}/complete\"")))
         .andExpect(content().string(containsString("\"/assigned-missions/pending-approval\"")))
         .andExpect(content().string(containsString("\"/assigned-missions/{id}/approve\"")))
-        .andExpect(content().string(containsString("\"/assigned-missions/{id}/reject\"")));
+        .andExpect(content().string(containsString("\"/assigned-missions/{id}/reject\"")))
+        .andExpect(content().string(containsString("\"/rewards\"")))
+        .andExpect(content().string(containsString("\"/rewards/{id}\"")))
+        .andExpect(content().string(containsString("\"/rewards/{id}/deactivate\"")))
+        .andExpect(content().string(containsString("\"/rewards/{id}/redeem\"")))
+        .andExpect(content().string(containsString("\"/children/{childId}/wallet/transactions\"")));
   }
 }
