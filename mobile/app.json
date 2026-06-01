@@ -13,6 +13,9 @@
         "backgroundColor": "#F5FBF8"
       },
       "predictiveBackGestureEnabled": false
-    }
+    },
+    "plugins": [
+      "expo-secure-store"
+    ]
   }
 }
