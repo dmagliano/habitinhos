@@ -584,8 +584,7 @@ em inglês.
 | Element | Copy |
 |---------|------|
 | Primary CTA | `Nova missão` no dashboard; `Salvar missão`, `Aprovar`, `Salvar criança` e `Salvar recompensa` nos fluxos específicos |
-| Empty state heading | `Nada por aqui ainda` |
-| Empty state body | `Quando a família criar novas informações, elas aparecem aqui.` |
+| Empty states | Usar sempre o empty state específico declarado em cada Screen Contract; novas listas devem declarar heading, helper text e CTA opcional próprios. |
 | Error state | `Não conseguimos carregar agora. Tente novamente.` |
 | Retry CTA | `Tentar novamente` |
 | Network error state | `Não conseguimos conectar ao servidor. Verifique a conexão e tente novamente.` |
@@ -608,6 +607,9 @@ Regras:
 - Evitar prometer moedas antes de `approve` retornar sucesso e wallet refresh
   confirmar atualização.
 - Labels de botões devem conter verbo + objeto quando a ação muda dados.
+- CTAs compactos como `Aprovar`, `Rejeitar` e `Editar` são permitidos quando o
+  `accessibilityLabel` contém ação + objeto; quando houver espaço visível,
+  preferir `Aprovar missão`, `Rejeitar missão` e `Editar criança`.
 
 ## State Contract
 
