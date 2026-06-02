@@ -22,6 +22,9 @@ logging:
   level:
     root: ${LOG_LEVEL_ROOT:INFO}
     br.com.habitinhos: ${LOG_LEVEL_APP:DEBUG}
+    com.zaxxer.hikari: WARN
+    org.hibernate: WARN
+    org.springframework.security: INFO
 
 habitinhos:
   security:
