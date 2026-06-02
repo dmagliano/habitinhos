@@ -155,9 +155,9 @@ Plans:
 
 Plans:
 
-- [ ] 05-01: Child profile selection/access and home with balance
-- [ ] 05-02: Child missions list, detail, completion, and feedback
-- [ ] 05-03: Rewards catalog, redemption, success and insufficient-balance states
+- [ ] 05-01-PLAN.md — Child profile selection/access and home with balance
+- [ ] 05-02-PLAN.md — Child missions list, detail, completion, and feedback
+- [ ] 05-03-PLAN.md — Rewards catalog, redemption, success and insufficient-balance states
 
 ### Phase 6: Fluxo do responsável
 
