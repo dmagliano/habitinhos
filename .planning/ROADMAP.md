@@ -161,7 +161,7 @@ Plans:
 
 **Wave 2** *(blocked on 05-01 completion)*
 
-- [ ] 05-02-PLAN.md — Child profile selection, tabs shell, home/profile, wallet balance, and pending missions
+- [x] 05-02-PLAN.md — Child profile selection, tabs shell, home/profile, wallet balance, and pending missions
 
 **Wave 3** *(blocked on 05-02 completion)*
 
@@ -227,6 +227,6 @@ Phases execute in numeric order: 1 → 2 → 3 → 4 → 5 → 6 → 7
 | 2. Domínio de missões e moedas | 4/4 | Complete   | 2026-05-30 |
 | 3. Recompensas e resgates | 3/3 | Complete    | 2026-06-01 |
 | 4. Mobile base | 4/4 | Complete   | 2026-06-01 |
-| 5. Fluxo da criança | 1/4 | In Progress|  |
+| 5. Fluxo da criança | 2/4 | In Progress|  |
 | 6. Fluxo do responsável | 0/4 | Not started | - |
 | 7. Polimento para demonstração do TCC | 0/3 | Not started | - |
