@@ -1,10 +1,11 @@
 ---
 phase: 04
 slug: mobile-base
-status: draft
+status: audited
 nyquist_compliant: true
-wave_0_complete: false
+wave_0_complete: true
 created: 2026-06-01
+updated: 2026-06-02
 ---
 
 # Phase 04 - Validation Strategy
@@ -32,25 +33,25 @@ created: 2026-06-01
 
 | Task ID | Plan | Wave | Requirement | Threat Ref | Secure Behavior | Test Type | Automated Command | File Exists | Status |
 |---------|------|------|-------------|------------|-----------------|-----------|-------------------|-------------|--------|
-| 04-01-01 | 04-01 | 1 | MOBL-01 | T-04-01 / T-04-02 | Scaffold avoids unreviewed router/auth defaults and establishes auditable scripts | scaffold/static | `cd mobile && npm run lint && npm run typecheck` | ❌ W1 | ⬜ pending |
-| 04-01-02 | 04-01 | 1 | MOBL-01, MOBL-02 | T-04-01 | Test infrastructure can verify React Native components and TypeScript contracts | test infra | `cd mobile && npm test -- --runInBand` | ❌ W1 | ⬜ pending |
-| 04-02-01 | 04-02 | 2 | AUTH-02, AUTH-04 | T-04-03 / T-04-04 | API client injects Bearer token and maps backend/network failures to safe PT-BR messages | unit/integration | `cd mobile && npm test -- --runInBand` | ❌ W1 | ⬜ pending |
-| 04-02-02 | 04-02 | 2 | AUTH-02, AUTH-04 | T-04-05 | Token storage wrapper persists, restores, and clears JWT without exposing raw details to UI | unit | `cd mobile && npm test -- --runInBand` | ❌ W1 | ⬜ pending |
-| 04-02-03 | 04-02 | 2 | MOBL-01, AUTH-04 | T-04-05 / T-04-06 | Invalid or rejected `/me` session clears token and returns to auth branch | component/integration | `cd mobile && npm test -- --runInBand` | ❌ W1 | ⬜ pending |
-| 04-03-01 | 04-03 | 2 | MOBL-02, MOBL-06 | T-04-07 | Base components use centralized tokens, PT-BR labels, accessible touch targets, and no external assets | component/static | `cd mobile && npm test -- --runInBand && npm run lint` | ❌ W1 | ⬜ pending |
-| 04-04-01 | 04-04 | 3 | MOBL-01, AUTH-04 | T-04-05 / T-04-06 | Root navigation renders restore/auth/authenticated branches without bypassing session state | component/integration | `cd mobile && npm test -- --runInBand` | ❌ W1 | ⬜ pending |
-| 04-04-02 | 04-04 | 3 | AUTH-02, MOBL-02, MOBL-06 | T-04-03 / T-04-07 | Login screen submits through AuthProvider and exposes safe PT-BR loading/error states | component/integration | `cd mobile && npm test -- --runInBand` | ❌ W1 | ⬜ pending |
-| 04-04-03 | 04-04 | 3 | AUTH-02, AUTH-04, MOBL-02, MOBL-06 | T-04-03 / T-04-07 | FamilyHub and role stubs support mode switching/logout without fake domain data | component/integration | `cd mobile && npm test -- --runInBand` | ❌ W1 | ⬜ pending |
+| 04-01-01 | 04-01 | 1 | MOBL-01 | T-04-01 / T-04-02 | Scaffold avoids unreviewed router/auth defaults and establishes auditable scripts | scaffold/static | `cd mobile && npm run lint && npm run typecheck` | ✅ | ✅ green |
+| 04-01-02 | 04-01 | 1 | MOBL-01, MOBL-02 | T-04-01 | Test infrastructure can verify React Native components and TypeScript contracts | test infra | `cd mobile && npm test -- app-smoke --runInBand` | ✅ | ✅ green |
+| 04-02-01 | 04-02 | 2 | AUTH-02, AUTH-04 | T-04-03 / T-04-04 | API client injects Bearer token and maps backend/network failures to safe PT-BR messages | unit/integration | `cd mobile && npm test -- api-auth --runInBand` | ✅ | ✅ green |
+| 04-02-02 | 04-02 | 2 | AUTH-02, AUTH-04 | T-04-05 | Token storage wrapper persists, restores, and clears JWT without exposing raw details to UI | unit | `cd mobile && npm test -- token-storage --runInBand` | ✅ | ✅ green |
+| 04-02-03 | 04-02 | 2 | MOBL-01, AUTH-04 | T-04-05 / T-04-06 | Invalid or rejected `/me` session clears token and returns to auth branch | component/integration | `cd mobile && npm test -- auth-context --runInBand` | ✅ | ✅ green |
+| 04-03-01 | 04-03 | 2 | MOBL-02, MOBL-06 | T-04-07 | Base components use centralized tokens, PT-BR labels, accessible touch targets, and no external assets | component/static | `cd mobile && npm test -- base-components --runInBand && npm run lint` | ✅ | ✅ green |
+| 04-04-01 | 04-04 | 3 | MOBL-01, AUTH-04 | T-04-05 / T-04-06 | Root navigation renders restore/auth/authenticated branches without bypassing session state | component/integration | `cd mobile && npm test -- app-smoke --runInBand && npm test -- auth-context --runInBand` | ✅ | ✅ green |
+| 04-04-02 | 04-04 | 3 | AUTH-02, MOBL-02, MOBL-06 | T-04-03 / T-04-07 | Login screen submits through AuthProvider and exposes safe PT-BR loading/error states | component/integration | `cd mobile && npm test -- login-screen --runInBand` | ✅ | ✅ green |
+| 04-04-03 | 04-04 | 3 | AUTH-02, AUTH-04, MOBL-02, MOBL-06 | T-04-03 / T-04-07 | FamilyHub and role stubs support mode switching/logout without fake domain data | component/integration | `cd mobile && npm test -- family-navigation --runInBand` | ✅ | ✅ green |
 
 *Status: ⬜ pending · ✅ green · ❌ red · ⚠️ flaky*
 
 ## Wave 0 Requirements
 
-- [ ] Expo TypeScript app scaffold exists in `mobile/`.
-- [ ] `mobile/package.json` contains non-watch scripts for `lint`, `typecheck`, and `test`.
-- [ ] Jest is configured for Expo/React Native tests without watch-mode defaults.
-- [ ] React Native Testing Library is available for component tests.
-- [ ] First smoke tests cover app render, auth/session reducer or provider, API error mapping, and a base component render.
+- [x] Expo TypeScript app scaffold exists in `mobile/`.
+- [x] `mobile/package.json` contains non-watch scripts for `lint`, `typecheck`, and `test`.
+- [x] Jest is configured for Expo/React Native tests without watch-mode defaults.
+- [x] React Native Testing Library is available for component tests.
+- [x] Smoke/focused tests cover app render, auth/session provider, API error mapping, token storage, login, family navigation, and base component render.
 
 ## Execution Waves
 
@@ -79,4 +80,27 @@ created: 2026-06-01
 - [x] Feedback latency target is less than 60s after mobile dependencies are installed.
 - [x] `nyquist_compliant: true` set in frontmatter.
 
-**Approval:** draft 2026-06-01; final approval requires generated Phase 4 PLAN files to keep these task IDs or update this map.
+**Approval:** audited 2026-06-02; automated Nyquist coverage is green. Manual-only runtime checks remain tracked separately above.
+
+## Validation Audit 2026-06-02
+
+| Metric | Count |
+|--------|-------|
+| Gaps found | 0 |
+| Existing test rows audited | 9 |
+| Rows updated from pending to green | 9 |
+| Tests generated | 0 |
+| Escalated to manual-only | 0 |
+
+### Automated Evidence
+
+- `cd mobile && npm test -- app-smoke --runInBand` - passed, 1 suite / 1 test.
+- `cd mobile && npm test -- api-auth --runInBand` - passed, 1 suite / 4 tests.
+- `cd mobile && npm test -- token-storage --runInBand` - passed, 1 suite / 1 test.
+- `cd mobile && npm test -- auth-context --runInBand` - passed, 1 suite / 4 tests.
+- `cd mobile && npm test -- base-components --runInBand` - passed, 1 suite / 3 tests.
+- `cd mobile && npm test -- login-screen --runInBand` - passed, 1 suite / 3 tests.
+- `cd mobile && npm test -- family-navigation --runInBand` - passed, 1 suite / 2 tests.
+- `cd mobile && npm run typecheck` - passed.
+- `cd mobile && npm run lint` - passed.
+- `cd mobile && npm test -- --runInBand` - passed, 12 suites / 44 tests.
