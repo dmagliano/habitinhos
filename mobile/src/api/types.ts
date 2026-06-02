@@ -29,6 +29,73 @@ export type MeResponse = UserSummary & {
   familyName: string;
 };
 
+export type ChildResponse = {
+  id: string;
+  name: string;
+  age: number;
+  avatarKey: string;
+  active: boolean;
+  createdAt: string;
+  updatedAt: string;
+};
+
+export type WalletResponse = {
+  childId: string;
+  balance: number;
+  createdAt: string;
+  updatedAt: string;
+};
+
+export type AssignedMissionStatus =
+  | 'PENDING'
+  | 'AWAITING_APPROVAL'
+  | 'COMPLETED'
+  | 'REJECTED'
+  | 'CANCELLED';
+
+export type AssignedMissionResponse = {
+  id: string;
+  missionId: string;
+  childId: string;
+  status: AssignedMissionStatus;
+  dueDate: string | null;
+  completedAt: string | null;
+  approvedAt: string | null;
+  rejectedAt: string | null;
+  rejectionReason: string | null;
+  snapshotTitle: string;
+  snapshotDescription: string;
+  snapshotCoinValue: number;
+  snapshotRequiresApproval: boolean;
+  createdAt: string;
+  updatedAt: string;
+};
+
+export type RewardResponse = {
+  id: string;
+  title: string;
+  description: string;
+  cost: number;
+  active: boolean;
+  createdAt: string;
+  updatedAt: string;
+};
+
+export type RewardRedemptionStatus = 'REDEEMED';
+
+export type RewardRedemptionResponse = {
+  id: string;
+  rewardId: string;
+  childId: string;
+  walletId: string;
+  status: RewardRedemptionStatus;
+  snapshotTitle: string;
+  snapshotCost: number;
+  coinTransactionId: string;
+  createdAt: string;
+  updatedAt: string;
+};
+
 export class ApiError extends Error {
   status?: number;
   code?: string;
