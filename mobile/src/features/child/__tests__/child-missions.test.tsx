@@ -221,6 +221,33 @@ describe('ChildMissionDetailScreen', () => {
     expect(goBack).toHaveBeenCalledTimes(1);
   });
 
+  it('keeps completed detail feedback when post-completion refresh fails', async () => {
+    const mission = assignedMission({
+      id: 'assigned-detail',
+      title: 'Guardar mochila',
+      coinValue: 6,
+    });
+    jest.mocked(childService.completeMission).mockResolvedValue({
+      ...mission,
+      status: 'COMPLETED',
+      completedAt: '2026-06-02T10:00:00Z',
+    });
+    jest.mocked(childService.getWallet).mockRejectedValueOnce(new Error('wallet offline'));
+    jest.mocked(childService.listPendingMissions).mockRejectedValueOnce(new Error('missions offline'));
+
+    render(
+      <ChildMissionDetailScreen
+        navigation={{ goBack } as never}
+        route={{ key: 'ChildMissionDetail', name: 'ChildMissionDetail', params: { child, mission } }}
+      />,
+    );
+
+    fireEvent.press(screen.getByRole('button', { name: 'Marcar como concluída' }));
+
+    expect(await screen.findByText('Missão concluída! +6 moedas')).toBeOnTheScreen();
+    expect(screen.queryByText('Não conseguimos atualizar essa missão. Tente novamente.')).toBeNull();
+  });
+
   it('renders a safe not-found state', () => {
     render(
       <ChildMissionDetailScreen

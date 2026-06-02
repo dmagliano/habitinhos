@@ -134,6 +134,29 @@ describe('ChildRewardsScreen', () => {
     expect(screen.getByText('10')).toBeOnTheScreen();
   });
 
+  it('keeps the friendly insufficient-balance message if wallet refresh also fails', async () => {
+    const cinema = reward({ id: 'reward-1', title: 'Cinema em família', cost: 30 });
+
+    mockInitialLoad(wallet(50), [cinema]);
+    jest.mocked(childService.redeemReward).mockRejectedValueOnce(
+      new ApiError({
+        status: 400,
+        code: 'INSUFFICIENT_BALANCE',
+        message: 'INSUFFICIENT_BALANCE',
+        userMessage: 'Saldo insuficiente para resgatar esta recompensa.',
+      }),
+    );
+    jest.mocked(childService.getWallet).mockRejectedValueOnce(new Error('wallet offline'));
+
+    render(<ChildRewardsScreen child={child} />);
+
+    fireEvent.press(await screen.findByRole('button', { name: 'Resgatar recompensa Cinema em família' }));
+    fireEvent.press(screen.getByRole('button', { name: 'Confirmar resgate' }));
+
+    expect(await screen.findByText('Faltam moedas para essa recompensa.')).toBeOnTheScreen();
+    expect(screen.queryByText('INSUFFICIENT_BALANCE')).toBeNull();
+  });
+
   it('shows empty state and generic redemption errors', async () => {
     const cinema = reward({ id: 'reward-1', title: 'Cinema em família', cost: 30 });
 

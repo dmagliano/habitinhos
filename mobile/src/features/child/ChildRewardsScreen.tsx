@@ -91,10 +91,15 @@ export function ChildRewardsScreen({ child }: ChildRewardsScreenProps) {
       setFeedback({ type: 'success' });
     } catch (error) {
       if (error instanceof ApiError && error.code === 'INSUFFICIENT_BALANCE') {
-        const walletResponse = await childService.getWallet(token, child.id);
-        setWallet(walletResponse);
         setSelectedReward(null);
         setFeedback({ type: 'insufficient' });
+
+        try {
+          const walletResponse = await childService.getWallet(token, child.id);
+          setWallet(walletResponse);
+        } catch {
+          // Keep the semantic insufficient-balance message even if the follow-up refresh fails.
+        }
       } else {
         setFeedback({ type: 'error' });
       }

@@ -14,7 +14,7 @@ import { FeedbackBanner } from './components/FeedbackBanner';
 
 type Props = NativeStackScreenProps<RootStackParamList, 'ChildMissionDetail'>;
 type DetailFeedback =
-  | { type: 'completed'; coins: number; balance: number }
+  | { type: 'completed'; coins: number; balance?: number }
   | { type: 'awaiting-approval' }
   | { type: 'error'; message: string }
   | null;
@@ -53,20 +53,27 @@ export function ChildMissionDetailScreen({ navigation, route }: Props) {
 
     try {
       const completedMission = await childService.completeMission(token, mission.id);
-      const [walletResponse] = await Promise.all([
-        childService.getWallet(token, child.id),
-        childService.listPendingMissions(token, child.id),
-      ]);
 
       if (completedMission.status === 'AWAITING_APPROVAL') {
         setFeedback({ type: 'awaiting-approval' });
       } else if (completedMission.status === 'COMPLETED') {
+        let balance: number | undefined;
+
+        try {
+          const walletResponse = await childService.getWallet(token, child.id);
+          balance = walletResponse.balance;
+        } catch {
+          balance = undefined;
+        }
+
         setFeedback({
           type: 'completed',
           coins: completedMission.snapshotCoinValue,
-          balance: walletResponse.balance,
+          balance,
         });
       }
+
+      void childService.listPendingMissions(token, child.id).catch(() => undefined);
     } catch (error) {
       setFeedback({ type: 'error', message: getMissionErrorMessage(error) });
     } finally {
@@ -131,7 +138,11 @@ function DetailFeedbackBanner({ feedback }: { feedback: DetailFeedback }) {
   if (feedback.type === 'completed') {
     return (
       <FeedbackBanner
-        message={`Saldo atualizado: ${feedback.balance} moedas`}
+        message={
+          typeof feedback.balance === 'number'
+            ? `Saldo atualizado: ${feedback.balance} moedas`
+            : undefined
+        }
         title={`Missão concluída! +${feedback.coins} moedas`}
         variant="success"
       />
