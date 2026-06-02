@@ -10,7 +10,7 @@ Habitinhos will be built as a monorepo MVP in seven phases: backend foundation, 
 - [x] **Phase 2: Domínio de missões e moedas** - Implement missions, assignments, completion, approval/rejection, coin credits, ledger transactions, and transactional tests. (completed 2026-05-30)
 - [x] **Phase 3: Recompensas e resgates** - Implement rewards, redemptions, sufficient-balance validation, coin debits, ledger transactions, and balance tests. (completed 2026-06-01)
 - [x] **Phase 4: Mobile base** - Create Expo app foundation, navigation, API client, login flow, and base visual structure. (completed 2026-06-01)
-- [ ] **Phase 5: Fluxo da criança** - Build child home, balance, missions, completion feedback, rewards catalog, and redemption flow.
+- [x] **Phase 5: Fluxo da criança** - Build child home, balance, missions, completion feedback, rewards catalog, and redemption flow. (completed 2026-06-02)
 - [ ] **Phase 6: Fluxo do responsável** - Build dashboard, children, missions, assignments, rewards, approvals, and child detail views.
 - [ ] **Phase 7: Polimento para demonstração do TCC** - Add demo seeds, visual polish, README, architecture docs, presentation script, and final testing.
 
@@ -169,7 +169,7 @@ Plans:
 
 **Wave 4** *(blocked on 05-03 completion)*
 
-- [ ] 05-04-PLAN.md — Rewards catalog, confirmation, redemption, insufficient balance, final validation, and manual smoke
+- [x] 05-04-PLAN.md — Rewards catalog, confirmation, redemption, insufficient balance, final validation, and manual smoke
 
 ### Phase 6: Fluxo do responsável
 
@@ -227,6 +227,6 @@ Phases execute in numeric order: 1 → 2 → 3 → 4 → 5 → 6 → 7
 | 2. Domínio de missões e moedas | 4/4 | Complete   | 2026-05-30 |
 | 3. Recompensas e resgates | 3/3 | Complete    | 2026-06-01 |
 | 4. Mobile base | 4/4 | Complete   | 2026-06-01 |
-| 5. Fluxo da criança | 3/4 | In Progress|  |
+| 5. Fluxo da criança | 4/4 | Complete   | 2026-06-02 |
 | 6. Fluxo do responsável | 0/4 | Not started | - |
 | 7. Polimento para demonstração do TCC | 0/3 | Not started | - |
