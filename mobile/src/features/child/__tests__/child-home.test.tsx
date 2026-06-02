@@ -65,7 +65,7 @@ describe('ChildHomeScreen', () => {
 
     expect(await screen.findByText('Oi, Joaquim!')).toBeOnTheScreen();
     expect(screen.getByText('Você está indo muito bem!')).toBeOnTheScreen();
-    expect(screen.getByText('Seu tesouro')).toBeOnTheScreen();
+    expect(await screen.findByText('Seu tesouro')).toBeOnTheScreen();
     expect(screen.getByText('42 moedas')).toBeOnTheScreen();
     expect(screen.getByText('Missões de hoje')).toBeOnTheScreen();
     expect(screen.getByText('Você tem 4 missões pendentes hoje.')).toBeOnTheScreen();

@@ -4,7 +4,8 @@ import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import { AuthLoadingScreen } from '../features/auth/AuthLoadingScreen';
 import { LoginScreen } from '../features/auth/LoginScreen';
 import { useAuth } from '../features/auth/AuthContext';
-import { ChildStubScreen } from '../features/family/ChildStubScreen';
+import { ChildProfileSelectScreen } from '../features/child/ChildProfileSelectScreen';
+import { ChildTabsScreen } from '../features/child/ChildTabsScreen';
 import { FamilyHubScreen } from '../features/family/FamilyHubScreen';
 import { ResponsibleStubScreen } from '../features/family/ResponsibleStubScreen';
 
@@ -26,7 +27,8 @@ export function RootNavigator() {
           <>
             <Stack.Screen component={FamilyHubScreen} name="FamilyHub" />
             <Stack.Screen component={ResponsibleStubScreen} name="ResponsibleStub" />
-            <Stack.Screen component={ChildStubScreen} name="ChildStub" />
+            <Stack.Screen component={ChildProfileSelectScreen} name="ChildProfileSelect" />
+            <Stack.Screen component={ChildTabsScreen} name="ChildTabs" />
           </>
         ) : (
           <Stack.Screen component={LoginScreen} name="Auth" />

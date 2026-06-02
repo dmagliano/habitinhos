@@ -1,6 +1,9 @@
+import { ChildResponse } from '../api/types';
+
 export type RootStackParamList = {
   Auth: undefined;
   FamilyHub: undefined;
   ResponsibleStub: undefined;
-  ChildStub: undefined;
+  ChildProfileSelect: undefined;
+  ChildTabs: { child: ChildResponse };
 };

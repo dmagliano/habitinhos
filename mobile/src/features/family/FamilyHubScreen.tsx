@@ -29,10 +29,10 @@ export function FamilyHubScreen({ navigation }: Props) {
           onPress={() => navigation.navigate('ResponsibleStub')}
         />
         <RoleCard
-          description="Veja missões e recompensas da família quando a área estiver pronta."
+          description="Escolha um perfil para brincar com as missões da família."
           emoji="⭐"
           label="Sou criança"
-          onPress={() => navigation.navigate('ChildStub')}
+          onPress={() => navigation.navigate('ChildProfileSelect')}
         />
       </View>
 

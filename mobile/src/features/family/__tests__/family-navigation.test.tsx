@@ -1,6 +1,5 @@
 import { fireEvent, render, screen } from '@testing-library/react-native';
 
-import { ChildStubScreen } from '../ChildStubScreen';
 import { FamilyHubScreen } from '../FamilyHubScreen';
 import { ResponsibleStubScreen } from '../ResponsibleStubScreen';
 import { useAuth } from '../../auth/AuthContext';
@@ -33,7 +32,7 @@ describe('family navigation screens', () => {
     });
   });
 
-  it('shows family mode choices and navigates to each stub', () => {
+  it('shows family mode choices and navigates to responsible and child flows', () => {
     render(<FamilyHubScreen navigation={navigation} route={{ key: 'FamilyHub', name: 'FamilyHub' }} />);
 
     fireEvent.press(screen.getByRole('button', { name: 'Sou responsável' }));
@@ -42,24 +41,19 @@ describe('family navigation screens', () => {
 
     expect(screen.getByText('Escolha como quer entrar')).toBeOnTheScreen();
     expect(navigate).toHaveBeenCalledWith('ResponsibleStub');
-    expect(navigate).toHaveBeenCalledWith('ChildStub');
+    expect(navigate).toHaveBeenCalledWith('ChildProfileSelect');
     expect(logout).toHaveBeenCalledTimes(1);
   });
 
-  it('lets responsible and child stubs switch mode and logout without fake data', () => {
+  it('lets responsible stub switch mode and logout without fake data', () => {
     const route = { key: 'ResponsibleStub', name: 'ResponsibleStub' } as never;
 
-    const responsible = render(<ResponsibleStubScreen navigation={navigation} route={route} />);
+    render(<ResponsibleStubScreen navigation={navigation} route={route} />);
 
     expect(screen.getByText('Em breve você vai acompanhar missões, crianças e recompensas por aqui.')).toBeOnTheScreen();
     fireEvent.press(screen.getByRole('button', { name: 'Trocar modo' }));
     expect(navigate).toHaveBeenCalledWith('FamilyHub');
 
-    responsible.unmount();
-
-    render(<ChildStubScreen navigation={navigation} route={{ key: 'ChildStub', name: 'ChildStub' } as never} />);
-
-    expect(screen.getByText('Logo as missões e recompensas da família aparecem aqui.')).toBeOnTheScreen();
     fireEvent.press(screen.getByRole('button', { name: 'Sair da conta' }));
 
     expect(logout).toHaveBeenCalledTimes(1);

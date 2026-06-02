@@ -112,7 +112,7 @@ describe('child navigation flow', () => {
   it('shows empty, error, and retry states without fake child data', async () => {
     jest.mocked(childService.listChildren).mockResolvedValueOnce([]);
 
-    const { rerender } = render(
+    const emptyRender = render(
       <ChildProfileSelectScreen
         navigation={navigation}
         route={{ key: 'ChildProfileSelect', name: 'ChildProfileSelect' }}
@@ -123,9 +123,10 @@ describe('child navigation flow', () => {
     expect(screen.getByText('Peça para um responsável criar um perfil primeiro.')).toBeOnTheScreen();
     expect(screen.queryByText('Joaquim')).toBeNull();
 
+    emptyRender.unmount();
     jest.mocked(childService.listChildren).mockRejectedValueOnce(new Error('offline'));
 
-    rerender(
+    render(
       <ChildProfileSelectScreen
         navigation={navigation}
         route={{ key: 'ChildProfileSelect', name: 'ChildProfileSelect' }}
@@ -158,10 +159,9 @@ describe('child navigation flow', () => {
 
     fireEvent.press(screen.getByRole('button', { name: 'Abrir Perfil' }));
 
-    expect(await screen.findByText('Perfil')).toBeOnTheScreen();
+    expect(await screen.findByRole('button', { name: 'Trocar criança' })).toBeOnTheScreen();
     expect(screen.getByText('Joaquim')).toBeOnTheScreen();
     expect(screen.getByText('Família Silva')).toBeOnTheScreen();
-    expect(screen.getByRole('button', { name: 'Trocar criança' })).toBeOnTheScreen();
     expect(screen.getByRole('button', { name: 'Voltar para família' })).toBeOnTheScreen();
     expect(screen.getByRole('button', { name: 'Sair da conta' })).toBeOnTheScreen();
     expect(screen.queryByText('jwt-token')).toBeNull();
