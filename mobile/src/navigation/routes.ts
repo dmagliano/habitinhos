@@ -1,4 +1,4 @@
-import { ChildResponse } from '../api/types';
+import { AssignedMissionResponse, ChildResponse } from '../api/types';
 
 export type RootStackParamList = {
   Auth: undefined;
@@ -6,4 +6,5 @@ export type RootStackParamList = {
   ResponsibleStub: undefined;
   ChildProfileSelect: undefined;
   ChildTabs: { child: ChildResponse };
+  ChildMissionDetail: { child: ChildResponse; mission: AssignedMissionResponse | null };
 };

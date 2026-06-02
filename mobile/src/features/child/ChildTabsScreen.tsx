@@ -8,6 +8,7 @@ import { colors, spacing, typography } from '../../theme';
 import { useAuth } from '../auth/AuthContext';
 
 import { ChildHomeScreen } from './ChildHomeScreen';
+import { ChildMissionsScreen } from './ChildMissionsScreen';
 import { BottomTabBar } from './components/BottomTabBar';
 
 type ChildTabParamList = {
@@ -41,10 +42,11 @@ export function ChildTabsScreen({ navigation, route }: Props) {
       </Tab.Screen>
       <Tab.Screen name="ChildMissions" options={{ title: 'Missões' }}>
         {() => (
-          <PlaceholderTab
-            body="Na próxima etapa, suas missões aparecem aqui com detalhes e conclusão."
-            emoji="✅"
-            title="Suas missões"
+          <ChildMissionsScreen
+            child={child}
+            onOpenMissionDetail={(mission) =>
+              navigation.navigate('ChildMissionDetail', { child, mission })
+            }
           />
         )}
       </Tab.Screen>

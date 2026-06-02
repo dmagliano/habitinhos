@@ -1,4 +1,4 @@
-import { fireEvent, render, screen, waitFor, act } from '@testing-library/react-native';
+import { act, fireEvent, render, screen } from '@testing-library/react-native';
 
 import { AssignedMissionResponse, ChildResponse, WalletResponse } from '../../../api/types';
 import { useAuth } from '../../auth/AuthContext';
@@ -63,7 +63,7 @@ describe('ChildMissionsScreen', () => {
     render(<ChildMissionsScreen child={child} onOpenMissionDetail={onOpenMissionDetail} />);
 
     expect(await screen.findByText('Suas missões')).toBeOnTheScreen();
-    expect(screen.getByText('12 moedas')).toBeOnTheScreen();
+    expect(await screen.findByText('12 moedas')).toBeOnTheScreen();
     expect(screen.getByText('Você tem 1 missão pendente para hoje.')).toBeOnTheScreen();
     expect(screen.getByText('Arrumar a cama')).toBeOnTheScreen();
     expect(screen.getByText('Deixar o quarto pronto para o dia')).toBeOnTheScreen();
