@@ -1,6 +1,6 @@
 import { fireEvent, render, screen, waitFor } from '@testing-library/react-native';
 
-import { LoginScreen } from '../LoginScreen';
+import { getLoginKeyboardBehavior, LoginScreen } from '../LoginScreen';
 import { useAuth } from '../AuthContext';
 
 jest.mock('../AuthContext', () => ({
@@ -57,5 +57,10 @@ describe('LoginScreen', () => {
 
     expect(screen.getByRole('button', { name: 'Entrando...' })).toBeDisabled();
     expect(screen.getByText('Nao conseguimos conectar ao servidor. Verifique a conexao e tente novamente.')).toBeOnTheScreen();
+  });
+
+  it('uses height keyboard avoidance on Android so fields can slide above the keyboard', () => {
+    expect(getLoginKeyboardBehavior('android')).toBe('height');
+    expect(getLoginKeyboardBehavior('ios')).toBe('padding');
   });
 });

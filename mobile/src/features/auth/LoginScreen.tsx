@@ -1,5 +1,13 @@
 import { useState } from 'react';
-import { KeyboardAvoidingView, Platform, StyleSheet, Text, TextInput, View } from 'react-native';
+import {
+  KeyboardAvoidingView,
+  Platform,
+  StyleSheet,
+  Text,
+  TextInput,
+  View,
+} from 'react-native';
+import type { KeyboardAvoidingViewProps } from 'react-native';
 
 import { AppScreen, Card, PrimaryButton, SecondaryButton, StatusBadge } from '../../components';
 import { colors, radius, spacing, typography } from '../../theme';
@@ -22,59 +30,68 @@ export function LoginScreen() {
   }
 
   return (
-    <AppScreen>
-      <KeyboardAvoidingView behavior={Platform.OS === 'ios' ? 'padding' : undefined} style={styles.keyboard}>
-        <View style={styles.hero}>
-          <Text style={styles.brand}>Habitinhos</Text>
-          <Text style={styles.headline}>Transforme tarefas em pequenas conquistas</Text>
-          <Text style={styles.supporting}>Entre para acompanhar missões, moedas e recompensas da família.</Text>
+    <KeyboardAvoidingView behavior={getLoginKeyboardBehavior(Platform.OS)} style={styles.keyboardAvoider}>
+      <AppScreen>
+        <View style={styles.content}>
+          <View style={styles.hero}>
+            <Text style={styles.brand}>Habitinhos</Text>
+            <Text style={styles.headline}>Transforme tarefas em pequenas conquistas</Text>
+            <Text style={styles.supporting}>Entre para acompanhar missões, moedas e recompensas da família.</Text>
+          </View>
+
+          <Card style={styles.form}>
+            <View style={styles.field}>
+              <Text style={styles.label}>E-mail</Text>
+              <TextInput
+                accessibilityLabel="E-mail"
+                autoCapitalize="none"
+                keyboardType="email-address"
+                onChangeText={setEmail}
+                placeholder="voce@email.com"
+                style={styles.input}
+                value={email}
+              />
+            </View>
+
+            <View style={styles.field}>
+              <Text style={styles.label}>Senha</Text>
+              <TextInput
+                accessibilityLabel="Senha"
+                onChangeText={setPassword}
+                placeholder="Sua senha"
+                secureTextEntry
+                style={styles.input}
+                value={password}
+              />
+            </View>
+
+            {errorMessage ? <Text style={styles.error}>{errorMessage}</Text> : null}
+
+            <PrimaryButton
+              label={isLoading ? 'Entrando...' : 'Entrar na conta'}
+              loading={isLoading}
+              onPress={handleSubmit}
+            />
+
+            {showRetry ? <SecondaryButton label="Tentar novamente" onPress={retryRestore} /> : null}
+          </Card>
+
+          <StatusBadge emoji="🪙" label="Missões, moedas e recompensas em família" variant="selected" />
         </View>
-
-        <Card style={styles.form}>
-          <View style={styles.field}>
-            <Text style={styles.label}>E-mail</Text>
-            <TextInput
-              accessibilityLabel="E-mail"
-              autoCapitalize="none"
-              keyboardType="email-address"
-              onChangeText={setEmail}
-              placeholder="voce@email.com"
-              style={styles.input}
-              value={email}
-            />
-          </View>
-
-          <View style={styles.field}>
-            <Text style={styles.label}>Senha</Text>
-            <TextInput
-              accessibilityLabel="Senha"
-              onChangeText={setPassword}
-              placeholder="Sua senha"
-              secureTextEntry
-              style={styles.input}
-              value={password}
-            />
-          </View>
-
-          {errorMessage ? <Text style={styles.error}>{errorMessage}</Text> : null}
-
-          <PrimaryButton
-            label={isLoading ? 'Entrando...' : 'Entrar na conta'}
-            loading={isLoading}
-            onPress={handleSubmit}
-          />
-
-          {showRetry ? <SecondaryButton label="Tentar novamente" onPress={retryRestore} /> : null}
-        </Card>
-
-        <StatusBadge emoji="🪙" label="Missões, moedas e recompensas em família" variant="selected" />
-      </KeyboardAvoidingView>
-    </AppScreen>
+      </AppScreen>
+    </KeyboardAvoidingView>
   );
 }
 
+export function getLoginKeyboardBehavior(platformOS: string): KeyboardAvoidingViewProps['behavior'] {
+  return platformOS === 'ios' ? 'padding' : 'height';
+}
+
 const styles = StyleSheet.create({
-  keyboard: {
+  keyboardAvoider: {
+    flex: 1,
+  },
+  content: {
     flex: 1,
     gap: spacing.lg,
     justifyContent: 'center',

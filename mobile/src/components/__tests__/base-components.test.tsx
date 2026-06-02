@@ -39,10 +39,12 @@ describe('base components', () => {
       <>
         <StatusBadge emoji="✨" label="Em preparacao" variant="warning" />
         <EmojiAvatar emoji="👨‍👩‍👧" label="Avatar da familia" size="lg" />
+        <EmojiAvatar emoji="⭐" label="Avatar estrela" size="xl" />
       </>,
     );
 
     expect(screen.getByText('Em preparacao')).toBeOnTheScreen();
     expect(screen.getByLabelText('Avatar da familia')).toBeOnTheScreen();
+    expect(screen.getByText('⭐')).toHaveStyle({ lineHeight: 52 });
   });
 });

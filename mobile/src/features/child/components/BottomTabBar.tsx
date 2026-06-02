@@ -1,5 +1,6 @@
 import { BottomTabBarProps } from '@react-navigation/bottom-tabs';
 import { Pressable, StyleSheet, Text, View } from 'react-native';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import { colors, radius, spacing, typography } from '../../../theme';
 
@@ -11,8 +12,11 @@ const tabCopy: Record<string, { emoji: string; label: string }> = {
 };
 
 export function BottomTabBar({ descriptors, navigation, state }: BottomTabBarProps) {
+  const insets = useSafeAreaInsets();
+  const bottomPadding = Math.max(insets.bottom + spacing.sm, spacing.lg);
+
   return (
-    <View style={styles.container}>
+    <View style={[styles.container, { paddingBottom: bottomPadding }]}>
       {state.routes.map((route, index) => {
         const isFocused = state.index === index;
         const copy = tabCopy[route.name];
@@ -40,7 +44,9 @@ export function BottomTabBar({ descriptors, navigation, state }: BottomTabBarPro
             style={[styles.item, isFocused && styles.itemActive]}
           >
             <Text style={styles.emoji}>{copy?.emoji ?? '⭐'}</Text>
-            <Text style={[styles.label, isFocused && styles.labelActive]}>{label}</Text>
+            <Text numberOfLines={1} style={[styles.label, isFocused && styles.labelActive]}>
+              {label}
+            </Text>
           </Pressable>
         );
       })}
@@ -55,7 +61,6 @@ const styles = StyleSheet.create({
     borderTopWidth: 1,
     flexDirection: 'row',
     gap: spacing.xs,
-    paddingBottom: spacing.md,
     paddingHorizontal: spacing.sm,
     paddingTop: spacing.sm,
   },
@@ -79,6 +84,8 @@ const styles = StyleSheet.create({
   label: {
     ...typography.label,
     color: colors.tabInactive,
+    fontSize: 13,
+    lineHeight: 18,
     textAlign: 'center',
   },
   labelActive: {

@@ -156,6 +156,7 @@ describe('child navigation flow', () => {
     expect(screen.getByRole('button', { name: 'Abrir Missões' })).toBeOnTheScreen();
     expect(screen.getByRole('button', { name: 'Abrir Recompensas' })).toBeOnTheScreen();
     expect(screen.getByRole('button', { name: 'Abrir Perfil' })).toBeOnTheScreen();
+    expect(screen.getByText('Recompensas').props.numberOfLines).toBe(1);
 
     fireEvent.press(screen.getByRole('button', { name: 'Abrir Perfil' }));
 
