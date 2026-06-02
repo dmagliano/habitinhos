@@ -3,7 +3,7 @@ gsd_state_version: 1.0
 milestone: v1.0
 milestone_name: milestone
 status: verifying
-last_updated: "2026-06-02T14:06:16.607Z"
+last_updated: "2026-06-02T14:13:22.521Z"
 last_activity: 2026-06-02
 progress:
   total_phases: 7
@@ -26,7 +26,7 @@ See: .planning/PROJECT.md (updated 2026-06-01)
 
 Phase: 05 (fluxo-da-crian-a) — EXECUTING
 Plan: 4 of 4
-Status: Phase complete — ready for verification
+Status: Automated verification complete — manual Expo smoke pending
 Last activity: 2026-06-02
 
 Progress: [██████████] 100%
@@ -77,7 +77,7 @@ Decisions are logged in PROJECT.md Key Decisions table and .planning/DECISIONS.m
 
 ### Pending Todos
 
-None yet.
+- Phase 05 manual Expo smoke remains pending in `.planning/phases/05-fluxo-da-crian-a/05-HUMAN-UAT.md`.
 
 ### Blockers/Concerns
 
@@ -91,9 +91,9 @@ None yet.
 
 ## Session Continuity
 
-Last session: 2026-06-02T14:06:13.623Z
-Stopped at: Completed 05-04-PLAN.md
-Resume file: None
+Last session: 2026-06-02T14:13:22.388Z
+Stopped at: Phase 05 automated verification complete; manual Expo smoke pending
+Resume file: .planning/phases/05-fluxo-da-crian-a/05-HUMAN-UAT.md
 
 ## Quick Tasks Completed
 
