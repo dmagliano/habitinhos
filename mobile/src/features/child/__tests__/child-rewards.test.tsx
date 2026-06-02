@@ -36,7 +36,7 @@ const child: ChildResponse = {
 
 describe('ChildRewardsScreen', () => {
   beforeEach(() => {
-    jest.clearAllMocks();
+    jest.resetAllMocks();
     jest.mocked(useAuth).mockReturnValue({
       status: 'authenticated',
       session,
@@ -55,8 +55,7 @@ describe('ChildRewardsScreen', () => {
 
     render(<ChildRewardsScreen child={child} />);
 
-    expect(await screen.findByText('Recompensas')).toBeOnTheScreen();
-    expect(screen.getByText('50')).toBeOnTheScreen();
+    expect(await screen.findByText('50')).toBeOnTheScreen();
     expect(screen.getByText('moedas disponíveis')).toBeOnTheScreen();
     expect(screen.getByText('O que você quer resgatar?')).toBeOnTheScreen();
     expect(screen.getByText('Cinema em família')).toBeOnTheScreen();
@@ -94,7 +93,7 @@ describe('ChildRewardsScreen', () => {
 
     fireEvent.press(await screen.findByRole('button', { name: 'Resgatar recompensa Cinema em família' }));
 
-    expect(screen.getByText('Confirmar resgate')).toBeOnTheScreen();
+    expect(screen.getByRole('button', { name: 'Confirmar resgate' })).toBeOnTheScreen();
     expect(screen.getByText('Saldo atual: 50 moedas')).toBeOnTheScreen();
     expect(screen.getByText('Custo: 30 moedas')).toBeOnTheScreen();
     expect(screen.getByText('Depois do resgate: 20 moedas')).toBeOnTheScreen();

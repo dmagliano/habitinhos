@@ -9,6 +9,7 @@ import { useAuth } from '../auth/AuthContext';
 
 import { ChildHomeScreen } from './ChildHomeScreen';
 import { ChildMissionsScreen } from './ChildMissionsScreen';
+import { ChildRewardsScreen } from './ChildRewardsScreen';
 import { BottomTabBar } from './components/BottomTabBar';
 
 type ChildTabParamList = {
@@ -51,13 +52,7 @@ export function ChildTabsScreen({ navigation, route }: Props) {
         )}
       </Tab.Screen>
       <Tab.Screen name="ChildRewards" options={{ title: 'Recompensas' }}>
-        {() => (
-          <PlaceholderTab
-            body="As recompensas da família entram aqui depois da tela de missões."
-            emoji="🎁"
-            title="Recompensas"
-          />
-        )}
+        {() => <ChildRewardsScreen child={child} />}
       </Tab.Screen>
       <Tab.Screen name="ChildProfile" options={{ title: 'Perfil' }}>
         {() => (
@@ -72,18 +67,6 @@ export function ChildTabsScreen({ navigation, route }: Props) {
         )}
       </Tab.Screen>
     </Tab.Navigator>
-  );
-}
-
-function PlaceholderTab({ body, emoji, title }: { body: string; emoji: string; title: string }) {
-  return (
-    <AppScreen>
-      <AppHeader emoji={emoji} title={title} />
-      <Card style={styles.placeholderCard}>
-        <Text style={styles.placeholderTitle}>Tudo no tempo certo</Text>
-        <Text style={styles.placeholderBody}>{body}</Text>
-      </Card>
-    </AppScreen>
   );
 }
 
@@ -146,17 +129,6 @@ function getAvatarEmoji(avatarKey: string | null | undefined): string {
 }
 
 const styles = StyleSheet.create({
-  placeholderCard: {
-    gap: spacing.sm,
-  },
-  placeholderTitle: {
-    ...typography.heading,
-    color: colors.textPrimary,
-  },
-  placeholderBody: {
-    ...typography.body,
-    color: colors.textSecondary,
-  },
   profileCard: {
     gap: spacing.md,
     marginBottom: spacing.lg,
