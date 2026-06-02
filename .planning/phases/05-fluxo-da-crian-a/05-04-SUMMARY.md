@@ -27,6 +27,8 @@ key-files:
     - mobile/src/features/child/__tests__/child-rewards.test.tsx
   modified:
     - mobile/src/features/child/ChildTabsScreen.tsx
+    - mobile/src/features/child/ChildMissionDetailScreen.tsx
+    - mobile/src/features/child/__tests__/child-missions.test.tsx
 
 key-decisions:
   - "Reward affordability is a child-facing affordance only; backend redemption remains authoritative."
@@ -54,7 +56,7 @@ completed: 2026-06-02T14:05:09Z
 - **Started:** 2026-06-02T13:57:31Z
 - **Completed:** 2026-06-02T14:05:09Z
 - **Tasks:** 3
-- **Files modified:** 5
+- **Files modified:** 7
 
 ## Accomplishments
 
@@ -68,13 +70,16 @@ completed: 2026-06-02T14:05:09Z
 
 1. **Task 1/2 RED: Reward catalog and redemption tests** - `45cefa0` (`test`)
 2. **Task 1/2 GREEN: Reward catalog, card, progress, confirmation, and redemption** - `664bcdc` (`feat`)
+3. **Code review follow-up: Preserve child feedback when refresh fails** - `6df9bf4` (`fix`)
 
 ## Files Created/Modified
 
 - `mobile/src/features/child/ChildTabsScreen.tsx` - renders the real reward screen in the `Recompensas` tab.
+- `mobile/src/features/child/ChildMissionDetailScreen.tsx` - keeps completed mission feedback visible if post-completion refresh fails.
 - `mobile/src/features/child/ChildRewardsScreen.tsx` - wallet/reward loading, confirmation, redemption, feedback, and refetch flow.
 - `mobile/src/features/child/components/RewardCard.tsx` - reward cost, affordability, disabled state, missing coins, and redeem CTA.
 - `mobile/src/features/child/components/ProgressBar.tsx` - clamped accessible progress indicator for reward affordability.
+- `mobile/src/features/child/__tests__/child-missions.test.tsx` - mission detail refresh-failure regression coverage.
 - `mobile/src/features/child/__tests__/child-rewards.test.tsx` - reward catalog, confirmation, success, insufficient-balance, and error coverage.
 
 ## Decisions Made
@@ -85,10 +90,18 @@ completed: 2026-06-02T14:05:09Z
 
 ## Deviations from Plan
 
-None - plan executed exactly as written.
+### Auto-fixed Issues
 
-**Total deviations:** 0 auto-fixed.
-**Impact on plan:** No scope changes.
+**1. Post-mutation refresh failures could mask already-completed child feedback**
+- **Found during:** Final code review gate
+- **Issue:** A follow-up wallet/list refresh failure after a successful mission completion or insufficient-balance redemption could replace the intended child-facing feedback with an error or no message.
+- **Fix:** Preserved semantic success/insufficient feedback first, made non-essential refresh failures non-blocking, and added focused regression tests.
+- **Files modified:** `ChildMissionDetailScreen.tsx`, `ChildRewardsScreen.tsx`, `child-missions.test.tsx`, `child-rewards.test.tsx`
+- **Verification:** `child-missions`, `child-rewards`, `typecheck`, `lint`, and full mobile Jest passed.
+- **Committed in:** `6df9bf4`
+
+**Total deviations:** 1 auto-fixed review finding.
+**Impact on plan:** No scope expansion; this hardens the existing Phase 5 feedback/refetch behavior.
 
 ## Issues Encountered
 
@@ -104,11 +117,11 @@ None - no external service configuration required by the implementation itself.
 - `cd mobile && npm test -- child-service --runInBand` - passed, 1 suite / 6 tests.
 - `cd mobile && npm test -- child-navigation --runInBand` - passed, 1 suite / 4 tests.
 - `cd mobile && npm test -- child-home --runInBand` - passed, 1 suite / 3 tests.
-- `cd mobile && npm test -- child-missions --runInBand` - passed, 1 suite / 6 tests.
-- `cd mobile && npm test -- child-rewards --runInBand` - passed, 1 suite / 5 tests.
+- `cd mobile && npm test -- child-missions --runInBand` - passed, 1 suite / 7 tests.
+- `cd mobile && npm test -- child-rewards --runInBand` - passed, 1 suite / 6 tests.
 - `cd mobile && npm run typecheck` - passed.
 - `cd mobile && npm run lint` - passed.
-- `cd mobile && npm test -- --runInBand` - passed, 12 suites / 42 tests.
+- `cd mobile && npm test -- --runInBand` - passed, 12 suites / 44 tests.
 - `cd backend && ./mvnw test` - passed, 40 tests / 0 failures / 0 errors / 0 skipped.
 - Manual Expo smoke - blocked/not run; requires Expo/mobile runtime or device and real backend data.
 
