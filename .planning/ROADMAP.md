@@ -151,13 +151,25 @@ Plans:
   6. Screens consume backend data rather than mock-only state.
   7. Child screens follow `docs/design/mobile-design-contract.md` and the Phase 5 references in `docs/design/phase-design-map.md`.
 
-**Plans**: 3 plans
+**Plans**: 4 plans
 
 Plans:
 
-- [ ] 05-01-PLAN.md — Child profile selection/access and home with balance
-- [ ] 05-02-PLAN.md — Child missions list, detail, completion, and feedback
-- [ ] 05-03-PLAN.md — Rewards catalog, redemption, success and insufficient-balance states
+**Wave 1**
+
+- [ ] 05-01-PLAN.md — Child API contracts, service layer, bottom-tabs dependency, and service tests
+
+**Wave 2** *(blocked on 05-01 completion)*
+
+- [ ] 05-02-PLAN.md — Child profile selection, tabs shell, home/profile, wallet balance, and pending missions
+
+**Wave 3** *(blocked on 05-02 completion)*
+
+- [ ] 05-03-PLAN.md — Missions list, detail, completion, backend-tied feedback, and mission tests
+
+**Wave 4** *(blocked on 05-03 completion)*
+
+- [ ] 05-04-PLAN.md — Rewards catalog, confirmation, redemption, insufficient balance, final validation, and manual smoke
 
 ### Phase 6: Fluxo do responsável
 
@@ -215,6 +227,6 @@ Phases execute in numeric order: 1 → 2 → 3 → 4 → 5 → 6 → 7
 | 2. Domínio de missões e moedas | 4/4 | Complete   | 2026-05-30 |
 | 3. Recompensas e resgates | 3/3 | Complete    | 2026-06-01 |
 | 4. Mobile base | 4/4 | Complete   | 2026-06-01 |
-| 5. Fluxo da criança | 0/3 | Not started | - |
+| 5. Fluxo da criança | 0/4 | Not started | - |
 | 6. Fluxo do responsável | 0/4 | Not started | - |
 | 7. Polimento para demonstração do TCC | 0/3 | Not started | - |
