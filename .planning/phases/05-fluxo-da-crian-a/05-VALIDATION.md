@@ -20,7 +20,7 @@ created: 2026-06-02
 | **Framework** | Mobile: Jest 29.7.0, `jest-expo`, `@testing-library/react-native`; Backend: Spring Boot Test + MockMvc + Testcontainers |
 | **Config file** | `mobile/package.json`, `mobile/jest.setup.ts`, `backend/pom.xml` |
 | **Quick run command** | `cd mobile && npm test -- child --runInBand` |
-| **Full suite command** | `cd mobile && npm test -- --runInBand`; `cd mobile && npm run typecheck`; `cd backend && ./mvnw test` |
+| **Full suite command** | `cd mobile && npm test -- --runInBand`; `cd mobile && npm run typecheck`; `cd mobile && npm run lint`; `cd backend && ./mvnw test` |
 | **Estimated runtime** | Mobile targeted: ~20-45 seconds; full mobile+backend: ~2-5 minutes |
 
 ---
@@ -28,9 +28,9 @@ created: 2026-06-02
 ## Sampling Rate
 
 - **After every task commit:** Run `cd mobile && npm test -- child --runInBand` once Wave 0 tests exist.
-- **After every mobile implementation task:** Run `cd mobile && npm run typecheck`.
+- **After every mobile implementation task:** Run `cd mobile && npm run typecheck` and `cd mobile && npm run lint`.
 - **After every plan wave:** Run `cd mobile && npm test -- --runInBand`.
-- **Before `$gsd-verify-work`:** Run `cd mobile && npm test -- --runInBand`, `cd mobile && npm run typecheck`, and `cd backend && ./mvnw test`.
+- **Before `$gsd-verify-work`:** Run `cd mobile && npm test -- --runInBand`, `cd mobile && npm run typecheck`, `cd mobile && npm run lint`, and `cd backend && ./mvnw test`.
 - **Max feedback latency:** 5 minutes for full phase validation.
 
 ---

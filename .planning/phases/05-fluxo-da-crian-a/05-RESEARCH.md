@@ -530,22 +530,19 @@ Source: `findBy*` waits for async UI updates in RNTL. [CITED: https://callstack.
 
 **If this table is empty:** All claims in this research were verified or cited; no user confirmation needed.
 
-## Open Questions
+## Open Questions (RESOLVED)
 
-1. **Should Phase 5 update `docs/api-contract.md` to match the current reward redemption route?**
-   - What we know: backend code, OpenAPI test, and UI-SPEC use `POST /rewards/{id}/redeem` with `{ childId }`. [VERIFIED: RewardController.java; OpenApiIntegrationTest.java; 05-UI-SPEC.md]
-   - What's unclear: whether documentation cleanup belongs inside Phase 5 or Phase 7 docs polish. [CITED: .planning/ROADMAP.md]
-   - Recommendation: Plan mobile against current backend route now; add a small docs/contract reconciliation task only if the planner needs contract consistency for Phase 5 acceptance. [VERIFIED: current backend route]
+1. **RESOLVED: Phase 5 mobile uses the current backend redemption route.**
+   - Final decision: implement mobile reward redemption against `POST /rewards/{id}/redeem` with request body `{ childId }`. [VERIFIED: RewardController.java; OpenApiIntegrationTest.java; 05-UI-SPEC.md]
+   - Documentation note: `docs/api-contract.md` still mentions a child-scoped redemption route; treat that as stale for Phase 5 implementation and leave documentation cleanup to a later docs/reconciliation task unless execution directly changes docs. [CITED: docs/api-contract.md; .planning/ROADMAP.md]
 
-2. **Should the backend add a child-scoped redemption endpoint instead of using the existing route?**
-   - What we know: current route is tested and works transactionally. [VERIFIED: RewardRedemptionIntegrationTest.java]
-   - What's unclear: whether product/API style prefers `/children/{childId}/reward-redemptions`. [CITED: docs/api-contract.md]
-   - Recommendation: Do not add a new backend endpoint unless the planner explicitly scopes it; Phase 5 can satisfy requirements with the real existing endpoint. [VERIFIED: backend implementation]
+2. **RESOLVED: Phase 5 does not add a child-scoped redemption backend endpoint.**
+   - Final decision: do not add `/children/{childId}/reward-redemptions` or any new backend redemption endpoint in Phase 5. The existing route is tested, transactional, and sufficient for REWD-04/REWD-05. [VERIFIED: RewardRedemptionIntegrationTest.java; backend implementation]
+   - Planning consequence: reward work remains mobile-only and must call `childService.redeemReward(token, rewardId, childId)` using the current backend route. [VERIFIED: RewardController.java]
 
-3. **How will demo data be created for manual mobile validation?**
-   - What we know: Phase 7 owns demo seeds/documented setup, while Phase 5 requires real API data. [CITED: .planning/ROADMAP.md]
-   - What's unclear: whether local manual validation during Phase 5 will create data through Swagger/backend calls or wait for Phase 6 responsible screens. [CITED: .planning/ROADMAP.md]
-   - Recommendation: Planner should include manual setup instructions or backend test fixtures for at least one child, wallet balance, mission, and reward; do not add mock fallback. [CITED: 05-CONTEXT.md]
+3. **RESOLVED: Phase 5 manual validation uses real API data created manually until Phase 7 demo seeds.**
+   - Final decision: Phase 5 validation must use real data created through existing backend/Swagger/API flows; Phase 5 must not add mock/offline fallback data and must not wait for Phase 7 demo seeds. [CITED: 05-CONTEXT.md; .planning/ROADMAP.md]
+   - Planning consequence: the phase-final plan must schedule an explicit manual Expo smoke step: start backend/PostgreSQL, run Expo/mobile, log in, enter `Sou criança`, select a real child, verify balance, complete missions if data exists, redeem an affordable reward, and verify an unaffordable reward shows missing coins. [CITED: 05-VALIDATION.md]
 
 ## Environment Availability
 
