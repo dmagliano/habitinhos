@@ -1,5 +1,6 @@
 package br.com.habitinhos.dashboard.dto;
 
+import br.com.habitinhos.rewards.RewardRedemptionStatus;
 import java.time.Instant;
 import java.util.List;
 import java.util.UUID;
@@ -43,6 +44,8 @@ public record ResponsibleDashboardResponse(
       String childName,
       String rewardTitle,
       int rewardCost,
+      RewardRedemptionStatus status,
+      Instant deliveredAt,
       Instant redeemedAt) {
   }
 }

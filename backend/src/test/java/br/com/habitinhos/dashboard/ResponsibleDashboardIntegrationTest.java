@@ -2,6 +2,7 @@ package br.com.habitinhos.dashboard;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.patch;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -132,6 +133,8 @@ class ResponsibleDashboardIntegrationTest extends AbstractIntegrationTest {
         .andExpect(jsonPath("$.recentRedemptions[0].rewardCost").value(6))
         .andExpect(jsonPath("$.recentRedemptions[0].childId").value(childA.toString()))
         .andExpect(jsonPath("$.recentRedemptions[0].childName").value("Lia"))
+        .andExpect(jsonPath("$.recentRedemptions[0].status").value("REDEEMED"))
+        .andExpect(jsonPath("$.recentRedemptions[0].deliveredAt").isEmpty())
         .andExpect(jsonPath("$.familyUnitId").doesNotExist())
         .andReturn()
         .getResponse()
@@ -143,6 +146,46 @@ class ResponsibleDashboardIntegrationTest extends AbstractIntegrationTest {
         .doesNotContain("Recompensa externa")
         .doesNotContain(userA.getFamilyUnitId().toString());
     assertThat(pending).isNotNull();
+  }
+
+  @Test
+  void responsibleDashboardProjectsDeliveredRedemptionMetadata() throws Exception {
+    String familyAToken = registerToken("responsavel.a@example.com", "Familia A");
+    String familyBToken = registerToken("responsavel.b@example.com", "Familia B");
+    UUID childA = createChild(familyAToken, new ChildRequest("Lia", 8, "star", null));
+    UUID childB = createChild(familyBToken, new ChildRequest("Noah", 7, "rocket", null));
+    AppUser userA = appUserRepository.findByEmailIgnoreCase("responsavel.a@example.com").orElseThrow();
+    AppUser userB = appUserRepository.findByEmailIgnoreCase("responsavel.b@example.com").orElseThrow();
+    creditWallet(childA, userA.getFamilyUnitId(), 20);
+    creditWallet(childB, userB.getFamilyUnitId(), 20);
+
+    UUID deliveredRedemption = redeemReward(familyAToken, childA, "Cinema", 10);
+    redeemReward(familyBToken, childB, "Recompensa externa", 5);
+    String deliveredResponse = mockMvc.perform(patch("/reward-redemptions/{id}/delivered", deliveredRedemption)
+            .header("Authorization", "Bearer " + familyAToken))
+        .andExpect(status().isOk())
+        .andReturn()
+        .getResponse()
+        .getContentAsString();
+    String deliveredAt = objectMapper.readTree(deliveredResponse).get("deliveredAt").asText();
+
+    String response = mockMvc.perform(get("/dashboard/responsible")
+            .header("Authorization", "Bearer " + familyAToken))
+        .andExpect(status().isOk())
+        .andExpect(jsonPath("$.recentRedemptions.length()").value(1))
+        .andExpect(jsonPath("$.recentRedemptions[0].id").value(deliveredRedemption.toString()))
+        .andExpect(jsonPath("$.recentRedemptions[0].rewardTitle").value("Cinema"))
+        .andExpect(jsonPath("$.recentRedemptions[0].status").value("DELIVERED"))
+        .andExpect(jsonPath("$.recentRedemptions[0].deliveredAt").value(deliveredAt))
+        .andExpect(jsonPath("$.recentRedemptions[0].redeemedAt").exists())
+        .andReturn()
+        .getResponse()
+        .getContentAsString();
+
+    assertThat(response)
+        .doesNotContain("Noah")
+        .doesNotContain("Recompensa externa")
+        .doesNotContain(userA.getFamilyUnitId().toString());
   }
 
   private String registerToken(String email, String familyName) throws Exception {
@@ -224,13 +267,17 @@ class ResponsibleDashboardIntegrationTest extends AbstractIntegrationTest {
     walletRepository.saveAndFlush(wallet);
   }
 
-  private void redeemReward(String token, UUID childId, String title, int cost) throws Exception {
+  private UUID redeemReward(String token, UUID childId, String title, int cost) throws Exception {
     UUID rewardId = createReward(token, new CreateRewardRequest(title, "Prêmio combinado", cost));
-    mockMvc.perform(post("/rewards/{id}/redeem", rewardId)
+    String response = mockMvc.perform(post("/rewards/{id}/redeem", rewardId)
             .header("Authorization", "Bearer " + token)
             .contentType(MediaType.APPLICATION_JSON)
             .content(objectMapper.writeValueAsString(new RedeemRewardRequest(childId))))
-        .andExpect(status().isCreated());
+        .andExpect(status().isCreated())
+        .andReturn()
+        .getResponse()
+        .getContentAsString();
+    return UUID.fromString(objectMapper.readTree(response).get("id").asText());
   }
 
   private UUID createReward(String token, CreateRewardRequest request) throws Exception {

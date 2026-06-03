@@ -163,6 +163,8 @@ public class ResponsibleDashboardService {
         child == null ? "Criança inativa" : child.getName(),
         redemption.getSnapshotTitle(),
         redemption.getSnapshotCost(),
+        redemption.getStatus(),
+        redemption.getDeliveredAt(),
         redemption.getCreatedAt());
   }
 
