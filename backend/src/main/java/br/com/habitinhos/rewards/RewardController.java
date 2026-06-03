@@ -19,6 +19,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -45,10 +46,13 @@ public class RewardController {
   }
 
   @GetMapping
-  public List<RewardResponse> listActive() {
+  public List<RewardResponse> list(@RequestParam(defaultValue = "false") boolean includeInactive) {
     var currentUser = currentUserProvider.getCurrentUser();
-    log.debug("List rewards request: familyUnitId={}", currentUser.familyUnitId());
-    return rewardService.listActive(currentUser);
+    log.debug(
+        "List rewards request: familyUnitId={} includeInactive={}",
+        currentUser.familyUnitId(),
+        includeInactive);
+    return rewardService.list(currentUser, includeInactive);
   }
 
   @GetMapping("/{id}")

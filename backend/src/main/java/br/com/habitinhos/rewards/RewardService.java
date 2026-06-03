@@ -61,12 +61,19 @@ public class RewardService {
   }
 
   @Transactional(readOnly = true)
-  public List<RewardResponse> listActive(CurrentUser currentUser) {
-    List<RewardResponse> rewards = rewardRepository.findAllByFamilyUnitIdAndActiveTrueOrderByCreatedAtAsc(currentUser.familyUnitId())
+  public List<RewardResponse> list(CurrentUser currentUser, boolean includeInactive) {
+    var rewardEntities = includeInactive
+        ? rewardRepository.findAllByFamilyUnitIdOrderByActiveDescCreatedAtAsc(currentUser.familyUnitId())
+        : rewardRepository.findAllByFamilyUnitIdAndActiveTrueOrderByCreatedAtAsc(currentUser.familyUnitId());
+    List<RewardResponse> rewards = rewardEntities
         .stream()
         .map(this::toResponse)
         .toList();
-    log.debug("Rewards listed: familyUnitId={} count={}", currentUser.familyUnitId(), rewards.size());
+    log.debug(
+        "Rewards listed: familyUnitId={} includeInactive={} count={}",
+        currentUser.familyUnitId(),
+        includeInactive,
+        rewards.size());
     return rewards;
   }
 
