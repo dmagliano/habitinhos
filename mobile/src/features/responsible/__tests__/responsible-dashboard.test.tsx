@@ -118,6 +118,23 @@ describe('responsible dashboard screens', () => {
     expect(screen.queryByText('jwt-token')).toBeNull();
   });
 
+  it('opens approvals and focuses recent redemptions from dashboard affordances', async () => {
+    jest.mocked(responsibleService.getDashboard).mockResolvedValue(dashboardFixture);
+
+    render(<ResponsibleHomeScreen navigation={navigation} />);
+
+    expect(await screen.findByText('Cinema em família')).toBeOnTheScreen();
+
+    fireEvent.press(screen.getByRole('button', { name: 'Abrir aprovações' }));
+    expect(navigate).toHaveBeenCalledWith('ResponsibleApprovals');
+
+    fireEvent.press(screen.getByRole('button', { name: 'Ver resgates recentes' }));
+
+    expect(screen.getByTestId('recent-redemptions-section-focused')).toBeOnTheScreen();
+    expect(screen.getByText('Cinema em família')).toBeOnTheScreen();
+    expect(responsibleService.getDashboard).toHaveBeenCalledWith('jwt-token');
+  });
+
   it('renders empty and error states without fake dashboard data', async () => {
     jest.mocked(responsibleService.getDashboard).mockResolvedValueOnce({
       children: [],
