@@ -37,6 +37,7 @@ describe('responsible navigation flow', () => {
       session,
       errorMessage: null,
       login: jest.fn(),
+      register: jest.fn(),
       logout,
       retryRestore: jest.fn(),
     });

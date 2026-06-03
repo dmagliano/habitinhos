@@ -1,34 +1,144 @@
+import { useState } from 'react';
+import {
+  KeyboardAvoidingView,
+  Platform,
+  StyleSheet,
+  Text,
+  TextInput,
+  View,
+} from 'react-native';
+import type { KeyboardAvoidingViewProps } from 'react-native';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
-import { StyleSheet, Text, View } from 'react-native';
 
-import { AppScreen, Card, SecondaryButton } from '../../components';
+import { AppScreen, Card, PrimaryButton, SecondaryButton } from '../../components';
 import { RootStackParamList } from '../../navigation/routes';
-import { colors, spacing, typography } from '../../theme';
+import { colors, radius, spacing, typography } from '../../theme';
+
+import { useAuth } from './AuthContext';
 
 type Props = NativeStackScreenProps<RootStackParamList, 'AuthRegister'>;
 
 export function RegisterScreen({ navigation }: Props) {
+  const { errorMessage, register, status } = useAuth();
+  const [name, setName] = useState('');
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
+  const [familyName, setFamilyName] = useState('');
+  const isLoading = status === 'loading';
+
+  async function handleSubmit() {
+    if (isLoading) {
+      return;
+    }
+
+    await register({
+      name: name.trim(),
+      email: email.trim(),
+      password,
+      familyName: familyName.trim(),
+    });
+  }
+
   return (
-    <AppScreen>
-      <View style={styles.content}>
-        <Card style={styles.card}>
-          <Text style={styles.title}>Criar conta</Text>
-          <Text style={styles.copy}>Informe seus dados para criar a família no Habitinhos.</Text>
-          <SecondaryButton label="Já tenho conta" onPress={() => navigation.navigate('AuthLogin')} />
-        </Card>
-      </View>
-    </AppScreen>
+    <KeyboardAvoidingView behavior={getRegisterKeyboardBehavior(Platform.OS)} style={styles.keyboardAvoider}>
+      <AppScreen>
+        <View style={styles.content}>
+          <Card style={styles.form}>
+            <View style={styles.hero}>
+              <Text style={styles.title}>Criar conta</Text>
+              <Text style={styles.copy}>Informe seus dados para criar a família no Habitinhos.</Text>
+            </View>
+
+            <View style={styles.field}>
+              <Text style={styles.label}>Nome</Text>
+              <TextInput
+                accessibilityLabel="Nome"
+                autoCapitalize="words"
+                onChangeText={setName}
+                placeholder="Seu nome"
+                placeholderTextColor={colors.textMuted}
+                style={styles.input}
+                value={name}
+              />
+            </View>
+
+            <View style={styles.field}>
+              <Text style={styles.label}>E-mail</Text>
+              <TextInput
+                accessibilityLabel="E-mail"
+                autoCapitalize="none"
+                keyboardType="email-address"
+                onChangeText={setEmail}
+                placeholder="voce@email.com"
+                placeholderTextColor={colors.textMuted}
+                style={styles.input}
+                value={email}
+              />
+            </View>
+
+            <View style={styles.field}>
+              <Text style={styles.label}>Senha</Text>
+              <TextInput
+                accessibilityLabel="Senha"
+                onChangeText={setPassword}
+                placeholder="Crie uma senha"
+                placeholderTextColor={colors.textMuted}
+                secureTextEntry
+                style={styles.input}
+                value={password}
+              />
+            </View>
+
+            <View style={styles.field}>
+              <Text style={styles.label}>Nome da família</Text>
+              <TextInput
+                accessibilityLabel="Nome da família"
+                autoCapitalize="words"
+                onChangeText={setFamilyName}
+                placeholder="Família Silva"
+                placeholderTextColor={colors.textMuted}
+                style={styles.input}
+                value={familyName}
+              />
+            </View>
+
+            {errorMessage ? <Text style={styles.error}>{errorMessage}</Text> : null}
+
+            <PrimaryButton
+              label={isLoading ? 'Criando conta...' : 'Criar conta'}
+              loading={isLoading}
+              onPress={handleSubmit}
+            />
+            <SecondaryButton
+              disabled={isLoading}
+              label="Já tenho conta"
+              onPress={() => navigation.navigate('AuthLogin')}
+            />
+          </Card>
+        </View>
+      </AppScreen>
+    </KeyboardAvoidingView>
   );
 }
 
+export function getRegisterKeyboardBehavior(platformOS: string): KeyboardAvoidingViewProps['behavior'] {
+  return platformOS === 'ios' ? 'padding' : 'height';
+}
+
 const styles = StyleSheet.create({
+  keyboardAvoider: {
+    flex: 1,
+  },
   content: {
     flex: 1,
     justifyContent: 'center',
     paddingVertical: spacing.xl,
   },
-  card: {
+  form: {
     gap: spacing.md,
+  },
+  hero: {
+    gap: spacing.sm,
   },
   title: {
     ...typography.display,
@@ -37,5 +147,26 @@ const styles = StyleSheet.create({
   copy: {
     ...typography.body,
     color: colors.textSecondary,
+  },
+  field: {
+    gap: spacing.xs,
+  },
+  label: {
+    ...typography.label,
+    color: colors.textSecondary,
+  },
+  input: {
+    ...typography.body,
+    backgroundColor: colors.surface,
+    borderColor: colors.border,
+    borderRadius: radius.md,
+    borderWidth: 1,
+    color: colors.textPrimary,
+    minHeight: 48,
+    paddingHorizontal: spacing.md,
+  },
+  error: {
+    ...typography.body,
+    color: colors.error,
   },
 });

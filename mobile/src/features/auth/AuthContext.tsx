@@ -1,6 +1,6 @@
 import { createContext, PropsWithChildren, useCallback, useContext, useEffect, useMemo, useState } from 'react';
 
-import { ApiError } from '../../api/types';
+import { ApiError, RegisterRequest } from '../../api/types';
 import { tokenStorage } from '../../storage/tokenStorage';
 
 import { authService } from './authService';
@@ -11,6 +11,7 @@ type AuthContextValue = {
   session: AuthSession | null;
   errorMessage: string | null;
   login: (email: string, password: string, rememberSession: boolean) => Promise<void>;
+  register: (body: RegisterRequest) => Promise<void>;
   logout: () => Promise<void>;
   retryRestore: () => Promise<void>;
 };
@@ -85,6 +86,22 @@ export function AuthProvider({ children }: PropsWithChildren) {
     }
   }, []);
 
+  const register = useCallback(async (body: RegisterRequest) => {
+    setStatus('loading');
+    setErrorMessage(null);
+
+    try {
+      const registeredSession = await authService.register(body);
+      await tokenStorage.setToken(registeredSession.token);
+      setSession(registeredSession);
+      setStatus('authenticated');
+    } catch (error) {
+      setSession(null);
+      setErrorMessage(getUserMessage(error));
+      setStatus('unauthenticated');
+    }
+  }, []);
+
   const logout = useCallback(async () => {
     await tokenStorage.clearToken();
     setSession(null);
@@ -98,10 +115,11 @@ export function AuthProvider({ children }: PropsWithChildren) {
       session,
       errorMessage,
       login,
+      register,
       logout,
       retryRestore: () => restoreSession(),
     }),
-    [errorMessage, login, logout, restoreSession, session, status],
+    [errorMessage, login, logout, register, restoreSession, session, status],
   );
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;

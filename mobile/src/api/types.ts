@@ -24,6 +24,13 @@ export type AuthResponse = {
   family: FamilySummary;
 };
 
+export type RegisterRequest = {
+  name: string;
+  email: string;
+  password: string;
+  familyName: string;
+};
+
 export type MeResponse = UserSummary & {
   familyId: string;
   familyName: string;

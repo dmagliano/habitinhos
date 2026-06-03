@@ -1,5 +1,5 @@
 import { apiRequest } from '../../api/client';
-import { AuthResponse, MeResponse } from '../../api/types';
+import { AuthResponse, MeResponse, RegisterRequest } from '../../api/types';
 
 import { AuthSession } from './authTypes';
 
@@ -13,6 +13,19 @@ export const authService = {
     const response = await apiRequest<AuthResponse>('/auth/login', {
       method: 'POST',
       body: { email, password },
+    });
+
+    return {
+      token: response.token,
+      user: response.user,
+      family: response.family,
+    };
+  },
+
+  async register(body: RegisterRequest): Promise<AuthSession> {
+    const response = await apiRequest<AuthResponse>('/auth/register', {
+      method: 'POST',
+      body,
     });
 
     return {

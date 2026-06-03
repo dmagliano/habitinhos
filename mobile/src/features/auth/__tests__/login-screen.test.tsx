@@ -168,7 +168,7 @@ describe('RegisterScreen', () => {
   it('renders the required registration fields and submits the account request', async () => {
     render(<RegisterScreen navigation={{ navigate } as never} route={{ key: 'AuthRegister', name: 'AuthRegister' }} />);
 
-    expect(screen.getByText('Criar conta')).toBeOnTheScreen();
+    expect(screen.getByRole('button', { name: 'Criar conta' })).toBeOnTheScreen();
     fireEvent.changeText(screen.getByLabelText('Nome'), 'Dani');
     fireEvent.changeText(screen.getByLabelText('E-mail'), 'dani@example.com');
     fireEvent.changeText(screen.getByLabelText('Senha'), 'secret');
