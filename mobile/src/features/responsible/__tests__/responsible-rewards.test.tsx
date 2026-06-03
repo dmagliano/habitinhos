@@ -72,8 +72,8 @@ describe('ResponsibleRewardsScreen', () => {
 
     await waitFor(() => expect(responsibleService.listRewards).toHaveBeenCalledWith('jwt-token', true));
 
-    const activeCard = screen.getByTestId('manage-reward-reward-active');
-    const inactiveCard = screen.getByTestId('manage-reward-reward-inactive');
+    const activeCard = await screen.findByTestId('manage-reward-reward-active');
+    const inactiveCard = await screen.findByTestId('manage-reward-reward-inactive');
 
     expect(within(activeCard).getByText('Cinema em família')).toBeOnTheScreen();
     expect(within(activeCard).getByText('Ativa')).toBeOnTheScreen();

@@ -78,8 +78,8 @@ describe('ResponsibleChildrenScreen', () => {
 
     await waitFor(() => expect(responsibleService.listChildren).toHaveBeenCalledWith('jwt-token', true));
 
-    const activeCard = screen.getByTestId('manage-child-child-active');
-    const inactiveCard = screen.getByTestId('manage-child-child-inactive');
+    const activeCard = await screen.findByTestId('manage-child-child-active');
+    const inactiveCard = await screen.findByTestId('manage-child-child-inactive');
 
     expect(within(activeCard).getByText('Lia')).toBeOnTheScreen();
     expect(within(activeCard).getByText('Ativa')).toBeOnTheScreen();

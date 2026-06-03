@@ -96,8 +96,8 @@ describe('ResponsibleMissionsScreen', () => {
     await waitFor(() => expect(responsibleService.listMissions).toHaveBeenCalledWith('jwt-token', true));
     expect(responsibleService.listPendingApprovals).toHaveBeenCalledWith('jwt-token');
 
-    const activeCard = screen.getByTestId('manage-mission-mission-active');
-    const inactiveCard = screen.getByTestId('manage-mission-mission-inactive');
+    const activeCard = await screen.findByTestId('manage-mission-mission-active');
+    const inactiveCard = await screen.findByTestId('manage-mission-mission-inactive');
 
     expect(within(activeCard).getByText('Guardar brinquedos')).toBeOnTheScreen();
     expect(within(activeCard).getByText('Ativa')).toBeOnTheScreen();
