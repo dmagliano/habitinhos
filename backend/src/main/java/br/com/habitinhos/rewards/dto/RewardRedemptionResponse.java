@@ -13,6 +13,7 @@ public record RewardRedemptionResponse(
     String snapshotTitle,
     int snapshotCost,
     UUID coinTransactionId,
+    Instant deliveredAt,
     Instant createdAt,
     Instant updatedAt) {
 }
