@@ -17,6 +17,7 @@ export function CoinValueControl({ error, onChange, value }: CoinValueControlPro
         keyboardType="number-pad"
         onChangeText={onChange}
         placeholder="1"
+        placeholderTextColor={colors.textMuted}
         style={styles.input}
         value={value}
       />

@@ -165,6 +165,7 @@ export function ResponsibleChildFormScreen({ navigation, route }: Props) {
                   autoCapitalize="words"
                   onChangeText={setName}
                   placeholder="Nome da criança"
+                  placeholderTextColor={colors.textMuted}
                   style={styles.input}
                   value={name}
                 />
@@ -178,6 +179,7 @@ export function ResponsibleChildFormScreen({ navigation, route }: Props) {
                   keyboardType="number-pad"
                   onChangeText={setAge}
                   placeholder="Idade"
+                  placeholderTextColor={colors.textMuted}
                   style={styles.input}
                   value={age}
                 />

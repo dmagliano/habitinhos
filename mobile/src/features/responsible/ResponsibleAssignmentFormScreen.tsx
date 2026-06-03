@@ -133,6 +133,7 @@ export function ResponsibleAssignmentFormScreen({ navigation, route }: Props) {
                 accessibilityLabel="Data limite opcional"
                 onChangeText={setDueDate}
                 placeholder="2026-06-10"
+                placeholderTextColor={colors.textMuted}
                 style={styles.input}
                 value={dueDate}
               />

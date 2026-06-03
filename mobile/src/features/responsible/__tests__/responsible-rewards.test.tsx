@@ -1,6 +1,7 @@
 import { fireEvent, render, screen, waitFor, within } from '@testing-library/react-native';
 
 import { RewardResponse } from '../../../api/types';
+import { colors } from '../../../theme';
 import { useAuth } from '../../auth/AuthContext';
 import { ResponsibleRewardFormScreen } from '../ResponsibleRewardFormScreen';
 import { ResponsibleRewardsScreen } from '../ResponsibleRewardsScreen';
@@ -133,6 +134,11 @@ describe('ResponsibleRewardFormScreen', () => {
         navigation={navigation}
         route={{ key: 'ResponsibleRewardForm', name: 'ResponsibleRewardForm', params: undefined }}
       />,
+    );
+
+    expect(screen.getByPlaceholderText('Cinema em família').props.placeholderTextColor).toBe(colors.textMuted);
+    expect(screen.getByPlaceholderText('Explique o combinado da recompensa').props.placeholderTextColor).toBe(
+      colors.textMuted,
     );
 
     fireEvent.changeText(screen.getByLabelText('Nome da recompensa'), 'Piquenique');

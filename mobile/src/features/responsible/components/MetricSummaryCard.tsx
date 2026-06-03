@@ -1,4 +1,4 @@
-import { StyleSheet, Text } from 'react-native';
+import { StyleSheet, Text, View } from 'react-native';
 
 import { Card } from '../../../components';
 import { colors, spacing, typography } from '../../../theme';
@@ -12,8 +12,10 @@ type MetricSummaryCardProps = {
 export function MetricSummaryCard({ helper, label, value }: MetricSummaryCardProps) {
   return (
     <Card style={styles.card} variant="soft">
-      <Text style={styles.value}>{value}</Text>
-      <Text style={styles.label}>{label}</Text>
+      <View style={styles.row}>
+        <Text style={styles.value}>{value}</Text>
+        <Text style={styles.label}>{label}</Text>
+      </View>
       {helper ? <Text style={styles.helper}>{helper}</Text> : null}
     </Card>
   );
@@ -21,15 +23,22 @@ export function MetricSummaryCard({ helper, label, value }: MetricSummaryCardPro
 
 const styles = StyleSheet.create({
   card: {
-    flex: 1,
+    flexBasis: '47%',
+    flexGrow: 1,
     gap: spacing.xs,
-    minHeight: 104,
+    minHeight: 88,
+  },
+  row: {
+    alignItems: 'center',
+    flexDirection: 'row',
+    gap: spacing.sm,
   },
   value: {
-    ...typography.heading,
+    ...typography.display,
     color: colors.primaryDark,
   },
   label: {
+    flex: 1,
     ...typography.label,
     color: colors.textPrimary,
   },

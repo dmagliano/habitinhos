@@ -130,9 +130,9 @@ export function ResponsibleHomeScreen({ navigation }: ResponsibleHomeScreenProps
 
           <SectionTitle title="Ações rápidas" />
           <View style={styles.quickActions}>
-            <PrimaryButton label="Nova missão" onPress={openMissionForm} />
-            <PrimaryButton label="Nova recompensa" onPress={openRewardForm} />
-            <PrimaryButton label="Nova criança" onPress={openChildForm} />
+            <PrimaryButton label="Nova Missão" onPress={openMissionForm} />
+            <PrimaryButton label="Cadastrar Recompensa" onPress={openRewardForm} />
+            <PrimaryButton label="Cadastrar Criança" onPress={openChildForm} />
           </View>
 
           {dashboard.pendingApprovalCount > 0 ? (
@@ -182,13 +182,10 @@ function getMetrics(dashboard: ResponsibleDashboardResponse | null): { label: st
   const redemptions = dashboard?.recentRedemptions.length ?? 0;
 
   return [
-    { label: 'Crianças', value: `${children} ${children === 1 ? 'criança' : 'crianças'}` },
-    { label: 'Aprovações', value: `${approvals} ${approvals === 1 ? 'aprovação' : 'aprovações'}` },
-    {
-      label: 'Missões abertas',
-      value: `${openMissions} ${openMissions === 1 ? 'missão aberta' : 'missões abertas'}`,
-    },
-    { label: 'Resgates recentes', value: `${redemptions} ${redemptions === 1 ? 'resgate' : 'resgates'}` },
+    { label: 'Crianças', value: String(children) },
+    { label: 'Aprovações', value: String(approvals) },
+    { label: 'Missões abertas', value: String(openMissions) },
+    { label: 'Resgates recentes', value: String(redemptions) },
   ];
 }
 

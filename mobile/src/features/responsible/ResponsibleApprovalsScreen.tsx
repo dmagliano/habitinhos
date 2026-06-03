@@ -184,6 +184,7 @@ export function ResponsibleApprovalsScreen({ navigation }: Props) {
               multiline
               onChangeText={setRejectReason}
               placeholder="Motivo opcional"
+              placeholderTextColor={colors.textMuted}
               style={[styles.input, styles.textArea]}
               value={rejectReason}
             />

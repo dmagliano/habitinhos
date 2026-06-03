@@ -48,6 +48,7 @@ export function LoginScreen() {
                 keyboardType="email-address"
                 onChangeText={setEmail}
                 placeholder="voce@email.com"
+                placeholderTextColor={colors.textMuted}
                 style={styles.input}
                 value={email}
               />
@@ -59,6 +60,7 @@ export function LoginScreen() {
                 accessibilityLabel="Senha"
                 onChangeText={setPassword}
                 placeholder="Sua senha"
+                placeholderTextColor={colors.textMuted}
                 secureTextEntry
                 style={styles.input}
                 value={password}

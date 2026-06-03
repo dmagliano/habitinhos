@@ -30,12 +30,11 @@ export function RewardCard({ balance, redeeming = false, reward, onSelect }: Rew
 
       <View style={styles.meta}>
         <CoinBadge amount={reward.cost} />
-        <Text style={styles.cost}>Custa {reward.cost} moedas</Text>
+        {!canRedeem ? <StatusBadge emoji="🪙" label={`Faltam ${missingCoins} moedas`} variant="warning" /> : null}
       </View>
 
       {!canRedeem ? (
         <View style={styles.progressPanel}>
-          <StatusBadge emoji="🪙" label={`Faltam ${missingCoins} moedas`} variant="warning" />
           <ProgressBar
             accessibilityLabel={`${balance} de ${reward.cost} moedas`}
             value={progress}
@@ -83,10 +82,6 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     flexWrap: 'wrap',
     gap: spacing.sm,
-  },
-  cost: {
-    ...typography.label,
-    color: colors.accentDark,
   },
   progressPanel: {
     gap: spacing.sm,

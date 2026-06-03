@@ -60,7 +60,8 @@ describe('ChildRewardsScreen', () => {
     expect(screen.getByText('O que você quer resgatar?')).toBeOnTheScreen();
     expect(screen.getByText('Cinema em família')).toBeOnTheScreen();
     expect(screen.getByText('Bicicleta nova')).toBeOnTheScreen();
-    expect(screen.getByText('Custa 30 moedas')).toBeOnTheScreen();
+    expect(screen.getByText('30 moedas')).toBeOnTheScreen();
+    expect(screen.queryByText('Custa 30 moedas')).toBeNull();
 
     expect(screen.getByRole('button', { name: 'Resgatar recompensa Cinema em família' })).not.toBeDisabled();
     expect(screen.getByRole('button', { name: 'Resgatar recompensa Bicicleta nova' })).toBeDisabled();

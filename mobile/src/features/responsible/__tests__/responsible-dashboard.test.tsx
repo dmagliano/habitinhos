@@ -88,10 +88,11 @@ describe('responsible dashboard screens', () => {
     render(<ResponsibleHomeScreen navigation={navigation} />);
 
     expect(screen.getByText('Olá, responsável')).toBeOnTheScreen();
-    expect(await screen.findByText('1 criança')).toBeOnTheScreen();
-    expect(screen.getByText('1 aprovação')).toBeOnTheScreen();
-    expect(screen.getByText('4 missões abertas')).toBeOnTheScreen();
-    expect(screen.getByText('1 resgate')).toBeOnTheScreen();
+    expect(await screen.findByText('Crianças')).toBeOnTheScreen();
+    expect(screen.getAllByText('Aprovações').length).toBeGreaterThan(0);
+    expect(screen.getByText('Missões abertas')).toBeOnTheScreen();
+    expect(screen.getAllByText('Resgates recentes').length).toBeGreaterThan(0);
+    expect(screen.getByText('4')).toBeOnTheScreen();
 
     const childCard = screen.getByTestId('child-summary-child-1');
     expect(within(childCard).getByText('Lia')).toBeOnTheScreen();
@@ -99,9 +100,9 @@ describe('responsible dashboard screens', () => {
     expect(within(childCard).getByText('24 moedas')).toBeOnTheScreen();
     expect(within(childCard).getByRole('button', { name: 'Ver detalhes de Lia' })).toBeOnTheScreen();
 
-    expect(screen.getByRole('button', { name: 'Nova missão' })).toBeOnTheScreen();
-    expect(screen.getByRole('button', { name: 'Nova recompensa' })).toBeOnTheScreen();
-    expect(screen.getAllByRole('button', { name: 'Nova criança' }).length).toBeGreaterThan(0);
+    expect(screen.getByRole('button', { name: 'Nova Missão' })).toBeOnTheScreen();
+    expect(screen.getByRole('button', { name: 'Cadastrar Recompensa' })).toBeOnTheScreen();
+    expect(screen.getByRole('button', { name: 'Cadastrar Criança' })).toBeOnTheScreen();
     expect(screen.getByText('1 missão aguardando aprovação')).toBeOnTheScreen();
     expect(screen.getByRole('button', { name: 'Abrir aprovações' })).toBeOnTheScreen();
     expect(screen.getByText('Cinema em família')).toBeOnTheScreen();
@@ -109,7 +110,7 @@ describe('responsible dashboard screens', () => {
 
     fireEvent.press(within(childCard).getByRole('button', { name: 'Ver detalhes de Lia' }));
     expect(navigate).toHaveBeenCalledWith('ResponsibleChildDetail', { childId: 'child-1' });
-    fireEvent.press(screen.getByRole('button', { name: 'Nova recompensa' }));
+    fireEvent.press(screen.getByRole('button', { name: 'Cadastrar Recompensa' }));
     expect(navigate).toHaveBeenCalledWith('ResponsibleRewardForm');
     expect(responsibleService.getDashboard).toHaveBeenCalledWith('jwt-token');
     expect(screen.queryByText('family-1')).toBeNull();

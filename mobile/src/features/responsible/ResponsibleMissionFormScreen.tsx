@@ -234,6 +234,7 @@ export function ResponsibleMissionFormScreen({ navigation, route }: Props) {
                 accessibilityLabel="Data limite opcional"
                 onChangeText={setDueDate}
                 placeholder="2026-06-10"
+                placeholderTextColor={colors.textMuted}
                 style={styles.input}
                 value={dueDate}
               />
@@ -302,6 +303,7 @@ function MissionDetailsForm({
             autoCapitalize="sentences"
             onChangeText={onChangeTitle}
             placeholder="Arrumar a cama"
+            placeholderTextColor={colors.textMuted}
             style={styles.input}
             value={title}
           />
@@ -315,6 +317,7 @@ function MissionDetailsForm({
             multiline
             onChangeText={onChangeDescription}
             placeholder="Detalhe o combinado da família"
+            placeholderTextColor={colors.textMuted}
             style={[styles.input, styles.textArea]}
             value={description}
           />

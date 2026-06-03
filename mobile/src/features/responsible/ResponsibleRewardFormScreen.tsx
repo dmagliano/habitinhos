@@ -165,6 +165,7 @@ export function ResponsibleRewardFormScreen({ navigation, route }: Props) {
                   autoCapitalize="sentences"
                   onChangeText={setTitle}
                   placeholder="Cinema em família"
+                  placeholderTextColor={colors.textMuted}
                   style={styles.input}
                   value={title}
                 />
@@ -178,6 +179,7 @@ export function ResponsibleRewardFormScreen({ navigation, route }: Props) {
                   multiline
                   onChangeText={setDescription}
                   placeholder="Explique o combinado da recompensa"
+                  placeholderTextColor={colors.textMuted}
                   style={[styles.input, styles.textArea]}
                   value={description}
                 />

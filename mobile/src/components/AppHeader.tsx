@@ -24,22 +24,18 @@ export function AppHeader({ title, subtitle, greeting, emoji, action }: AppHeade
           {subtitle ? <Text style={styles.subtitle}>{subtitle}</Text> : null}
         </View>
       </View>
-      {action ? <View style={styles.action}>{action}</View> : null}
+      {action ? <View style={[styles.action, emoji ? styles.actionWithAvatar : null]}>{action}</View> : null}
     </View>
   );
 }
 
 const styles = StyleSheet.create({
   container: {
-    alignItems: 'center',
-    flexDirection: 'row',
     gap: spacing.md,
-    justifyContent: 'space-between',
     paddingVertical: spacing.lg,
   },
   identity: {
     alignItems: 'center',
-    flex: 1,
     flexDirection: 'row',
     gap: spacing.md,
   },
@@ -60,7 +56,11 @@ const styles = StyleSheet.create({
     color: colors.textSecondary,
   },
   action: {
+    alignSelf: 'flex-start',
     minHeight: 44,
     minWidth: 44,
+  },
+  actionWithAvatar: {
+    marginLeft: 44 + spacing.md,
   },
 });
