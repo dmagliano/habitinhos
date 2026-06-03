@@ -47,11 +47,12 @@ describe('LoginScreen', () => {
   it('toggles the remember-session checkbox and submits the checked state', async () => {
     render(<LoginScreen />);
 
-    const rememberCheckbox = screen.getByRole('checkbox', { name: 'Mantenha-me conectado' });
-    expect(rememberCheckbox).toHaveAccessibilityState({ checked: false });
+    let rememberCheckbox = screen.getByRole('checkbox', { name: 'Mantenha-me conectado' });
+    expect(rememberCheckbox.props.accessibilityState).toEqual(expect.objectContaining({ checked: false }));
 
     fireEvent.press(rememberCheckbox);
-    expect(rememberCheckbox).toHaveAccessibilityState({ checked: true });
+    rememberCheckbox = screen.getByRole('checkbox', { name: 'Mantenha-me conectado' });
+    expect(rememberCheckbox.props.accessibilityState).toEqual(expect.objectContaining({ checked: true }));
 
     fireEvent.changeText(screen.getByLabelText('E-mail'), 'dani@example.com');
     fireEvent.changeText(screen.getByLabelText('Senha'), 'secret');

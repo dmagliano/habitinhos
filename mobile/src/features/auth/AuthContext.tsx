@@ -10,7 +10,7 @@ type AuthContextValue = {
   status: AuthStatus;
   session: AuthSession | null;
   errorMessage: string | null;
-  login: (email: string, password: string) => Promise<void>;
+  login: (email: string, password: string, rememberSession: boolean) => Promise<void>;
   logout: () => Promise<void>;
   retryRestore: () => Promise<void>;
 };
@@ -67,13 +67,15 @@ export function AuthProvider({ children }: PropsWithChildren) {
     return () => clearTimeout(restoreTimeout);
   }, [restoreSession]);
 
-  const login = useCallback(async (email: string, password: string) => {
+  const login = useCallback(async (email: string, password: string, rememberSession: boolean) => {
     setStatus('loading');
     setErrorMessage(null);
 
     try {
       const loggedSession = await authService.login(email, password);
-      await tokenStorage.setToken(loggedSession.token);
+      if (rememberSession) {
+        await tokenStorage.setToken(loggedSession.token);
+      }
       setSession(loggedSession);
       setStatus('authenticated');
     } catch (error) {
