@@ -13,6 +13,7 @@ jest.mock('../../auth/AuthContext', () => ({
 jest.mock('../responsibleService', () => ({
   responsibleService: {
     getDashboard: jest.fn(),
+    markRedemptionDelivered: jest.fn(),
   },
 }));
 
@@ -64,6 +65,8 @@ const dashboardFixture: ResponsibleDashboardResponse = {
       childName: 'Lia',
       rewardTitle: 'Cinema em família',
       rewardCost: 20,
+      status: 'REDEEMED',
+      deliveredAt: null,
       redeemedAt: '2026-06-02T11:00:00Z',
     },
   ],
@@ -108,6 +111,8 @@ describe('responsible dashboard screens', () => {
     expect(screen.getByRole('button', { name: 'Abrir aprovações' })).toBeOnTheScreen();
     expect(screen.getByText('Cinema em família')).toBeOnTheScreen();
     expect(screen.getByText('Lia · 20 moedas')).toBeOnTheScreen();
+    const deliveredCheckbox = screen.getByRole('checkbox', { name: 'Marcar Cinema em família como entregue' });
+    expect(deliveredCheckbox.props.accessibilityState).toEqual({ checked: false });
 
     fireEvent.press(within(childCard).getByRole('button', { name: 'Ver detalhes de Lia' }));
     expect(navigate).toHaveBeenCalledWith('ResponsibleChildDetail', { childId: 'child-1' });
@@ -161,6 +166,55 @@ describe('responsible dashboard screens', () => {
     await waitFor(() => expect(responsibleService.getDashboard).toHaveBeenCalledTimes(3));
     await screen.findByText('Cinema em família');
     expect(screen.getAllByText('Lia').length).toBeGreaterThan(0);
+  });
+
+  it('marks recent redemption delivered and renders persisted delivered date', async () => {
+    jest.mocked(responsibleService.getDashboard).mockResolvedValue(dashboardFixture);
+    jest.mocked(responsibleService.markRedemptionDelivered).mockResolvedValue({
+      id: 'redemption-1',
+      rewardId: 'reward-1',
+      childId: 'child-1',
+      walletId: 'wallet-1',
+      status: 'DELIVERED',
+      snapshotTitle: 'Cinema em família',
+      snapshotCost: 20,
+      coinTransactionId: 'coin-1',
+      deliveredAt: '2026-06-03T12:00:00Z',
+      createdAt: '2026-06-02T11:00:00Z',
+      updatedAt: '2026-06-03T12:00:00Z',
+    });
+
+    render(<ResponsibleHomeScreen navigation={navigation} />);
+
+    const deliveredCheckbox = await screen.findByRole('checkbox', {
+      name: 'Marcar Cinema em família como entregue',
+    });
+
+    fireEvent.press(deliveredCheckbox);
+
+    await waitFor(() => {
+      expect(responsibleService.markRedemptionDelivered).toHaveBeenCalledWith('jwt-token', 'redemption-1');
+    });
+    expect(await screen.findByText('Entregue em: 03/06/2026')).toBeOnTheScreen();
+    expect(screen.getByRole('checkbox', { name: 'Cinema em família entregue' }).props.accessibilityState).toEqual({
+      checked: true,
+    });
+    expect(screen.getByText('Lia · 20 moedas')).toBeOnTheScreen();
+  });
+
+  it('restores previous redemption state when delivery mutation fails', async () => {
+    jest.mocked(responsibleService.getDashboard).mockResolvedValue(dashboardFixture);
+    jest.mocked(responsibleService.markRedemptionDelivered).mockRejectedValue(new Error('offline'));
+
+    render(<ResponsibleHomeScreen navigation={navigation} />);
+
+    fireEvent.press(await screen.findByRole('checkbox', { name: 'Marcar Cinema em família como entregue' }));
+
+    expect(await screen.findByText('Não conseguimos marcar como entregue. Tente novamente.')).toBeOnTheScreen();
+    expect(screen.getByRole('checkbox', { name: 'Marcar Cinema em família como entregue' }).props.accessibilityState).toEqual({
+      checked: false,
+    });
+    expect(screen.queryByText(/Entregue em:/)).toBeNull();
   });
 
   it('renders child detail summary for the selected backend child id', async () => {

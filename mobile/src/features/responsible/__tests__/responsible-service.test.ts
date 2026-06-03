@@ -383,6 +383,38 @@ describe('responsibleService', () => {
     expect(JSON.stringify(fetchMock.mock.calls)).not.toContain('familyUnitId');
     expect(JSON.stringify(fetchMock.mock.calls)).not.toContain('DELETE');
   });
+
+  it('marks reward redemption delivered without client family authorization', async () => {
+    const deliveredRedemption = {
+      id: 'redemption-1',
+      rewardId: 'reward-1',
+      childId: 'child-1',
+      walletId: 'wallet-1',
+      status: 'DELIVERED',
+      snapshotTitle: 'Cinema em família',
+      snapshotCost: 20,
+      coinTransactionId: 'coin-1',
+      deliveredAt: '2026-06-03T12:00:00Z',
+      createdAt: '2026-06-02T10:00:00Z',
+      updatedAt: '2026-06-03T12:00:00Z',
+    };
+
+    fetchMock.mockResolvedValueOnce(createResponse(200, deliveredRedemption));
+
+    await expect(responsibleService.markRedemptionDelivered('jwt-token', 'redemption-1')).resolves.toEqual(
+      deliveredRedemption,
+    );
+
+    expect(fetchMock).toHaveBeenCalledWith(
+      'http://10.0.2.2:8080/reward-redemptions/redemption-1/delivered',
+      expect.objectContaining({
+        method: 'PATCH',
+        headers: expect.objectContaining({ Authorization: 'Bearer jwt-token' }),
+        body: undefined,
+      }),
+    );
+    expect(JSON.stringify(fetchMock.mock.calls)).not.toContain('familyUnitId');
+  });
 });
 
 function createResponse(status: number, body: unknown): Response {
