@@ -114,6 +114,23 @@ export type MissionResponse = {
   updatedAt: string;
 };
 
+export type MissionRequest = {
+  title: string;
+  description: string;
+  coinValue: number;
+  requiresApproval: boolean;
+  recurrenceType: MissionResponse['recurrenceType'];
+};
+
+export type AssignMissionRequest = {
+  childIds: string[];
+  dueDate?: string | null;
+};
+
+export type RejectAssignedMissionRequest = {
+  reason?: string;
+};
+
 export type ResponsibleDashboardMissionCounts = Record<AssignedMissionStatus, number>;
 
 export type ResponsibleDashboardChildSummary = {
