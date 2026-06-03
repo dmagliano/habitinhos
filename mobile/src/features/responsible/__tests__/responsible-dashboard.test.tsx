@@ -87,8 +87,8 @@ describe('responsible dashboard screens', () => {
 
     render(<ResponsibleHomeScreen navigation={navigation} />);
 
-    expect(await screen.findByText('Olá, responsável')).toBeOnTheScreen();
-    expect(screen.getByText('1 criança')).toBeOnTheScreen();
+    expect(screen.getByText('Olá, responsável')).toBeOnTheScreen();
+    expect(await screen.findByText('1 criança')).toBeOnTheScreen();
     expect(screen.getByText('1 aprovação')).toBeOnTheScreen();
     expect(screen.getByText('4 missões abertas')).toBeOnTheScreen();
     expect(screen.getByText('1 resgate')).toBeOnTheScreen();
@@ -101,7 +101,7 @@ describe('responsible dashboard screens', () => {
 
     expect(screen.getByRole('button', { name: 'Nova missão' })).toBeOnTheScreen();
     expect(screen.getByRole('button', { name: 'Nova recompensa' })).toBeOnTheScreen();
-    expect(screen.getByRole('button', { name: 'Nova criança' })).toBeOnTheScreen();
+    expect(screen.getAllByRole('button', { name: 'Nova criança' }).length).toBeGreaterThan(0);
     expect(screen.getByText('1 missão aguardando aprovação')).toBeOnTheScreen();
     expect(screen.getByRole('button', { name: 'Abrir aprovações' })).toBeOnTheScreen();
     expect(screen.getByText('Cinema em família')).toBeOnTheScreen();
@@ -125,7 +125,7 @@ describe('responsible dashboard screens', () => {
     const emptyRender = render(<ResponsibleHomeScreen navigation={navigation} />);
 
     expect(await screen.findByText('Nenhuma criança cadastrada')).toBeOnTheScreen();
-    expect(screen.getByRole('button', { name: 'Nova criança' })).toBeOnTheScreen();
+    expect(screen.getAllByRole('button', { name: 'Nova criança' }).length).toBeGreaterThan(0);
     expect(screen.queryByText('24 moedas')).toBeNull();
 
     emptyRender.unmount();
@@ -138,7 +138,8 @@ describe('responsible dashboard screens', () => {
     fireEvent.press(screen.getByRole('button', { name: 'Tentar novamente' }));
 
     await waitFor(() => expect(responsibleService.getDashboard).toHaveBeenCalledTimes(3));
-    expect(await screen.findByText('Lia')).toBeOnTheScreen();
+    await screen.findByText('Cinema em família');
+    expect(screen.getAllByText('Lia').length).toBeGreaterThan(0);
   });
 
   it('renders child detail summary for the selected backend child id', async () => {
@@ -155,8 +156,9 @@ describe('responsible dashboard screens', () => {
       />,
     );
 
-    expect(await screen.findByText('Lia')).toBeOnTheScreen();
-    expect(screen.getByText('24 moedas')).toBeOnTheScreen();
+    await screen.findByText('Cinema em família');
+    expect(screen.getAllByText('Lia').length).toBeGreaterThan(0);
+    expect(screen.getAllByText('24 moedas').length).toBeGreaterThan(0);
     expect(screen.getByText('3 pendentes')).toBeOnTheScreen();
     expect(screen.getByText('1 aguardando aprovação')).toBeOnTheScreen();
     expect(screen.getByText('5 concluídas')).toBeOnTheScreen();

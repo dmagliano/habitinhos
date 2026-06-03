@@ -8,6 +8,8 @@ import { RootStackParamList } from '../../navigation/routes';
 import { colors, radius, spacing, typography } from '../../theme';
 import { useAuth } from '../auth/AuthContext';
 
+import { ResponsibleHomeScreen } from './ResponsibleHomeScreen';
+
 type ResponsibleTabParamList = {
   ResponsibleHome: undefined;
   ResponsibleMissions: undefined;
@@ -31,10 +33,10 @@ export function ResponsibleTabsScreen({ navigation }: Props) {
     >
       <Tab.Screen name="ResponsibleHome" options={{ title: 'Início' }}>
         {() => (
-          <PlaceholderTab
-            emoji="🧭"
-            helper="O painel com crianças, missões, aprovações e resgates será carregado pela API."
-            title="Área do responsável"
+          <ResponsibleHomeScreen
+            navigation={{
+              navigate: (route, params) => navigation.navigate(route, params),
+            }}
           />
         )}
       </Tab.Screen>

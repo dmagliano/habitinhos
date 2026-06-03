@@ -9,10 +9,11 @@ type CardProps = PropsWithChildren<{
   variant?: CardVariant;
   onPress?: () => void;
   accessibilityLabel?: string;
+  testID?: string;
   style?: ViewStyle;
 }>;
 
-export function Card({ children, variant = 'default', onPress, accessibilityLabel, style }: CardProps) {
+export function Card({ children, variant = 'default', onPress, accessibilityLabel, style, testID }: CardProps) {
   if (onPress) {
     return (
       <Pressable
@@ -20,13 +21,14 @@ export function Card({ children, variant = 'default', onPress, accessibilityLabe
         accessibilityRole="button"
         onPress={onPress}
         style={({ pressed }) => [styles.base, styles[variant], pressed && styles.pressed, style]}
+        testID={testID}
       >
         {children}
       </Pressable>
     );
   }
 
-  return <View style={[styles.base, styles[variant], style]}>{children}</View>;
+  return <View style={[styles.base, styles[variant], style]} testID={testID}>{children}</View>;
 }
 
 const styles = StyleSheet.create({
