@@ -1,6 +1,7 @@
 package br.com.habitinhos.rewards;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.patch;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -136,6 +137,92 @@ class RewardRedemptionIntegrationTest extends AbstractIntegrationTest {
     assertThat(coinTransactionRepository.findAll()).isEmpty();
   }
 
+  @Test
+  void responsibleCanMarkRedemptionDeliveredWithTimestamp() throws Exception {
+    String token = registerToken("responsavel@example.com", "Familia Demo");
+    UUID childId = createChild(token, new ChildRequest("Lia", 8, "star", null));
+    UUID rewardId = createReward(token, new CreateRewardRequest("Cinema", "Sessão de sábado", 10));
+    AppUser user = appUserRepository.findByEmailIgnoreCase("responsavel@example.com").orElseThrow();
+    creditWallet(childId, user.getFamilyUnitId(), 15);
+    UUID redemptionId = redeemReward(token, rewardId, childId);
+
+    mockMvc.perform(patch("/reward-redemptions/{id}/delivered", redemptionId)
+            .header("Authorization", "Bearer " + token))
+        .andExpect(status().isOk())
+        .andExpect(jsonPath("$.id").value(redemptionId.toString()))
+        .andExpect(jsonPath("$.status").value("DELIVERED"))
+        .andExpect(jsonPath("$.deliveredAt").exists())
+        .andExpect(jsonPath("$.familyUnitId").doesNotExist());
+
+    RewardRedemption redemption = rewardRedemptionRepository.findById(redemptionId).orElseThrow();
+    assertThat(redemption.getStatus()).isEqualTo(RewardRedemptionStatus.DELIVERED);
+    assertThat(redemption.getDeliveredAt()).isNotNull();
+  }
+
+  @Test
+  void markDeliveredIsIdempotentAndPreservesOriginalTimestamp() throws Exception {
+    String token = registerToken("responsavel@example.com", "Familia Demo");
+    UUID childId = createChild(token, new ChildRequest("Lia", 8, "star", null));
+    UUID rewardId = createReward(token, new CreateRewardRequest("Cinema", "Sessão de sábado", 10));
+    AppUser user = appUserRepository.findByEmailIgnoreCase("responsavel@example.com").orElseThrow();
+    creditWallet(childId, user.getFamilyUnitId(), 15);
+    UUID redemptionId = redeemReward(token, rewardId, childId);
+
+    String firstResponse = mockMvc.perform(patch("/reward-redemptions/{id}/delivered", redemptionId)
+            .header("Authorization", "Bearer " + token))
+        .andExpect(status().isOk())
+        .andReturn()
+        .getResponse()
+        .getContentAsString();
+    String firstDeliveredAt = objectMapper.readTree(firstResponse).get("deliveredAt").asText();
+
+    mockMvc.perform(patch("/reward-redemptions/{id}/delivered", redemptionId)
+            .header("Authorization", "Bearer " + token))
+        .andExpect(status().isOk())
+        .andExpect(jsonPath("$.status").value("DELIVERED"))
+        .andExpect(jsonPath("$.deliveredAt").value(firstDeliveredAt));
+  }
+
+  @Test
+  void markDeliveredBlocksCrossFamilyResponsible() throws Exception {
+    String familyAToken = registerToken("responsavel.a@example.com", "Familia A");
+    String familyBToken = registerToken("responsavel.b@example.com", "Familia B");
+    UUID childA = createChild(familyAToken, new ChildRequest("Lia", 8, "star", null));
+    UUID rewardA = createReward(familyAToken, new CreateRewardRequest("Cinema", "Sessão A", 10));
+    AppUser userA = appUserRepository.findByEmailIgnoreCase("responsavel.a@example.com").orElseThrow();
+    creditWallet(childA, userA.getFamilyUnitId(), 15);
+    UUID redemptionA = redeemReward(familyAToken, rewardA, childA);
+
+    mockMvc.perform(patch("/reward-redemptions/{id}/delivered", redemptionA)
+            .header("Authorization", "Bearer " + familyBToken))
+        .andExpect(status().isNotFound())
+        .andExpect(jsonPath("$.code").value("REWARD_REDEMPTION_NOT_FOUND"));
+  }
+
+  @Test
+  void markDeliveredDoesNotChangeWalletBalanceOrCreateLedgerTransaction() throws Exception {
+    String token = registerToken("responsavel@example.com", "Familia Demo");
+    UUID childId = createChild(token, new ChildRequest("Lia", 8, "star", null));
+    UUID rewardId = createReward(token, new CreateRewardRequest("Cinema", "Sessão de sábado", 10));
+    AppUser user = appUserRepository.findByEmailIgnoreCase("responsavel@example.com").orElseThrow();
+    creditWallet(childId, user.getFamilyUnitId(), 15);
+    UUID redemptionId = redeemReward(token, rewardId, childId);
+    Wallet walletBefore = walletRepository.findByChildIdAndFamilyUnitId(childId, user.getFamilyUnitId())
+        .orElseThrow();
+    int balanceBefore = walletBefore.getBalance();
+    long transactionCountBefore = coinTransactionRepository.count();
+
+    mockMvc.perform(patch("/reward-redemptions/{id}/delivered", redemptionId)
+            .header("Authorization", "Bearer " + token))
+        .andExpect(status().isOk())
+        .andExpect(jsonPath("$.status").value("DELIVERED"));
+
+    Wallet walletAfter = walletRepository.findByChildIdAndFamilyUnitId(childId, user.getFamilyUnitId())
+        .orElseThrow();
+    assertThat(walletAfter.getBalance()).isEqualTo(balanceBefore);
+    assertThat(coinTransactionRepository.count()).isEqualTo(transactionCountBefore);
+  }
+
   private String registerToken(String email, String familyName) throws Exception {
     String response = mockMvc.perform(post("/auth/register")
             .contentType(MediaType.APPLICATION_JSON)
@@ -166,6 +253,19 @@ class RewardRedemptionIntegrationTest extends AbstractIntegrationTest {
             .header("Authorization", "Bearer " + token)
             .contentType(MediaType.APPLICATION_JSON)
             .content(objectMapper.writeValueAsString(request)))
+        .andExpect(status().isCreated())
+        .andReturn()
+        .getResponse()
+        .getContentAsString();
+    JsonNode json = objectMapper.readTree(response);
+    return UUID.fromString(json.get("id").asText());
+  }
+
+  private UUID redeemReward(String token, UUID rewardId, UUID childId) throws Exception {
+    String response = mockMvc.perform(post("/rewards/{id}/redeem", rewardId)
+            .header("Authorization", "Bearer " + token)
+            .contentType(MediaType.APPLICATION_JSON)
+            .content(objectMapper.writeValueAsString(new RedeemRewardRequest(childId))))
         .andExpect(status().isCreated())
         .andReturn()
         .getResponse()
