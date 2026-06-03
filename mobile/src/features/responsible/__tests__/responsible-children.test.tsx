@@ -3,6 +3,7 @@ import { fireEvent, render, screen, waitFor, within } from '@testing-library/rea
 import { ChildResponse } from '../../../api/types';
 import { useAuth } from '../../auth/AuthContext';
 import { ResponsibleChildrenScreen } from '../ResponsibleChildrenScreen';
+import { ResponsibleChildFormScreen } from '../ResponsibleChildFormScreen';
 import { responsibleService } from '../responsibleService';
 
 jest.mock('../../auth/AuthContext', () => ({
@@ -11,13 +12,17 @@ jest.mock('../../auth/AuthContext', () => ({
 
 jest.mock('../responsibleService', () => ({
   responsibleService: {
+    createChild: jest.fn(),
+    getChild: jest.fn(),
     listChildren: jest.fn(),
+    updateChild: jest.fn(),
   },
 }));
 
 const navigate = jest.fn();
 
 const navigation = {
+  goBack: jest.fn(),
   navigate,
 } as never;
 
@@ -105,5 +110,88 @@ describe('ResponsibleChildrenScreen', () => {
     expect(await screen.findByText('Nenhuma criança cadastrada')).toBeOnTheScreen();
     expect(screen.getAllByRole('button', { name: 'Nova criança' }).length).toBeGreaterThan(0);
     expect(screen.queryByText('Lia')).toBeNull();
+  });
+
+  it('creates a child with local form data and returns to the management list', async () => {
+    jest.mocked(responsibleService.createChild).mockResolvedValue({
+      ...activeChild,
+      id: 'child-new',
+      name: 'Bia',
+      age: 6,
+      avatarKey: 'cat',
+    });
+
+    render(
+      <ResponsibleChildFormScreen
+        navigation={navigation}
+        route={{ key: 'ResponsibleChildForm', name: 'ResponsibleChildForm', params: undefined }}
+      />,
+    );
+
+    fireEvent.changeText(screen.getByLabelText('Nome'), 'Bia');
+    fireEvent.changeText(screen.getByLabelText('Idade'), '6');
+    fireEvent.press(screen.getByRole('button', { name: 'Escolher avatar Gato' }));
+    fireEvent.press(screen.getByRole('button', { name: 'Salvar criança' }));
+
+    await waitFor(() =>
+      expect(responsibleService.createChild).toHaveBeenCalledWith('jwt-token', {
+        name: 'Bia',
+        age: 6,
+        avatarKey: 'cat',
+      }),
+    );
+    expect(navigate).toHaveBeenCalledWith('ResponsibleChildren', { feedback: 'child-created' });
+  });
+
+  it('loads and updates an existing child while disabling duplicate saves', async () => {
+    let resolveUpdate: (child: ChildResponse) => void = () => undefined;
+    const updatePromise = new Promise<ChildResponse>((resolve) => {
+      resolveUpdate = resolve;
+    });
+
+    jest.mocked(responsibleService.getChild).mockResolvedValue(activeChild);
+    jest.mocked(responsibleService.updateChild).mockReturnValue(updatePromise);
+
+    render(
+      <ResponsibleChildFormScreen
+        navigation={navigation}
+        route={{ key: 'ResponsibleChildForm', name: 'ResponsibleChildForm', params: { childId: 'child-active' } }}
+      />,
+    );
+
+    expect(await screen.findByDisplayValue('Lia')).toBeOnTheScreen();
+    fireEvent.changeText(screen.getByLabelText('Nome'), 'Lia Atualizada');
+    fireEvent.changeText(screen.getByLabelText('Idade'), '9');
+    fireEvent.press(screen.getByRole('button', { name: 'Salvar criança' }));
+
+    expect(screen.getByRole('button', { name: 'Salvando criança' })).toBeDisabled();
+    fireEvent.press(screen.getByRole('button', { name: 'Salvando criança' }));
+    expect(responsibleService.updateChild).toHaveBeenCalledTimes(1);
+
+    resolveUpdate({ ...activeChild, name: 'Lia Atualizada', age: 9 });
+
+    await waitFor(() =>
+      expect(navigate).toHaveBeenCalledWith('ResponsibleChildDetail', {
+        childId: 'child-active',
+        feedback: 'child-updated',
+      }),
+    );
+  });
+
+  it('validates required name and positive age before submitting', async () => {
+    render(
+      <ResponsibleChildFormScreen
+        navigation={navigation}
+        route={{ key: 'ResponsibleChildForm', name: 'ResponsibleChildForm', params: undefined }}
+      />,
+    );
+
+    fireEvent.changeText(screen.getByLabelText('Nome'), ' ');
+    fireEvent.changeText(screen.getByLabelText('Idade'), '0');
+    fireEvent.press(screen.getByRole('button', { name: 'Salvar criança' }));
+
+    expect(await screen.findByText('Informe o nome da criança.')).toBeOnTheScreen();
+    expect(screen.getByText('Informe uma idade maior que zero.')).toBeOnTheScreen();
+    expect(responsibleService.createChild).not.toHaveBeenCalled();
   });
 });

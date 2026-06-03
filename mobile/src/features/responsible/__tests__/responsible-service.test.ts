@@ -59,6 +59,59 @@ describe('responsibleService', () => {
     expect(JSON.stringify(fetchMock.mock.calls)).not.toContain('familyUnitId');
   });
 
+  it('gets, creates, and updates children without client family authorization', async () => {
+    const child = {
+      id: 'child-1',
+      name: 'Lia',
+      age: 8,
+      avatarKey: 'fox',
+      active: true,
+      createdAt: '2026-06-01T10:00:00Z',
+      updatedAt: '2026-06-01T10:00:00Z',
+    };
+
+    fetchMock
+      .mockResolvedValueOnce(createResponse(200, child))
+      .mockResolvedValueOnce(createResponse(201, child))
+      .mockResolvedValueOnce(createResponse(200, { ...child, name: 'Lia Atualizada' }));
+
+    await responsibleService.getChild('jwt-token', 'child-1');
+    await responsibleService.createChild('jwt-token', { name: 'Lia', age: 8, avatarKey: 'fox' });
+    await responsibleService.updateChild('jwt-token', 'child-1', {
+      name: 'Lia Atualizada',
+      age: 9,
+      avatarKey: 'cat',
+    });
+
+    expect(fetchMock).toHaveBeenNthCalledWith(
+      1,
+      'http://10.0.2.2:8080/children/child-1',
+      expect.objectContaining({
+        method: 'GET',
+        headers: expect.objectContaining({ Authorization: 'Bearer jwt-token' }),
+      }),
+    );
+    expect(fetchMock).toHaveBeenNthCalledWith(
+      2,
+      'http://10.0.2.2:8080/children',
+      expect.objectContaining({
+        method: 'POST',
+        headers: expect.objectContaining({ Authorization: 'Bearer jwt-token' }),
+        body: JSON.stringify({ name: 'Lia', age: 8, avatarKey: 'fox' }),
+      }),
+    );
+    expect(fetchMock).toHaveBeenNthCalledWith(
+      3,
+      'http://10.0.2.2:8080/children/child-1',
+      expect.objectContaining({
+        method: 'PUT',
+        headers: expect.objectContaining({ Authorization: 'Bearer jwt-token' }),
+        body: JSON.stringify({ name: 'Lia Atualizada', age: 9, avatarKey: 'cat' }),
+      }),
+    );
+    expect(JSON.stringify(fetchMock.mock.calls)).not.toContain('familyUnitId');
+  });
+
   it('lists missions and rewards with includeInactive only when requested', async () => {
     fetchMock
       .mockResolvedValueOnce(createResponse(200, []))
