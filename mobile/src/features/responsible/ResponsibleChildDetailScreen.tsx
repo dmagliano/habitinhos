@@ -14,7 +14,7 @@ import { EmptyState } from './components/EmptyState';
 type Props = NativeStackScreenProps<RootStackParamList, 'ResponsibleChildDetail'>;
 type LoadState = 'loading' | 'ready' | 'error';
 
-export function ResponsibleChildDetailScreen({ route }: Props) {
+export function ResponsibleChildDetailScreen({ navigation, route }: Props) {
   const { session } = useAuth();
   const token = session?.token ?? null;
   const childId = route.params.childId;
@@ -117,7 +117,11 @@ export function ResponsibleChildDetailScreen({ route }: Props) {
             </View>
           )}
 
-          <SecondaryButton label="Editar criança" onPress={() => undefined} style={styles.editButton} />
+          <SecondaryButton
+            label="Editar criança"
+            onPress={() => navigation.navigate('ResponsibleChildForm', { childId })}
+            style={styles.editButton}
+          />
         </>
       ) : null}
     </AppScreen>

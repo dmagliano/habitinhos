@@ -8,6 +8,7 @@ import { RootStackParamList } from '../../navigation/routes';
 import { colors, radius, spacing, typography } from '../../theme';
 import { useAuth } from '../auth/AuthContext';
 
+import { ConfirmActionSheet } from './components/ConfirmActionSheet';
 import { EmojiPicker } from './components/EmojiPicker';
 import { ResponsibleFormSection } from './components/ResponsibleFormSection';
 import { responsibleService } from './responsibleService';
@@ -31,6 +32,8 @@ export function ResponsibleChildFormScreen({ navigation, route }: Props) {
   const [errors, setErrors] = useState<FormErrors>({});
   const [loadState, setLoadState] = useState<LoadState>(isEditMode ? 'loading' : 'ready');
   const [submitting, setSubmitting] = useState(false);
+  const [confirmDeactivateVisible, setConfirmDeactivateVisible] = useState(false);
+  const [deactivating, setDeactivating] = useState(false);
 
   const title = isEditMode ? 'Editar criança' : 'Nova criança';
   const parsedAge = useMemo(() => Number.parseInt(age, 10), [age]);
@@ -47,6 +50,7 @@ export function ResponsibleChildFormScreen({ navigation, route }: Props) {
       setName(child.name);
       setAge(String(child.age));
       setAvatarKey(child.avatarKey);
+      setConfirmDeactivateVisible(false);
       setLoadState('ready');
     } catch {
       setLoadState('error');
@@ -106,6 +110,23 @@ export function ResponsibleChildFormScreen({ navigation, route }: Props) {
       setErrors({ name: 'Não conseguimos salvar agora. Tente novamente.' });
     } finally {
       setSubmitting(false);
+    }
+  };
+
+  const handleDeactivate = async () => {
+    if (deactivating || !token || !childId) {
+      return;
+    }
+
+    setDeactivating(true);
+
+    try {
+      await responsibleService.deactivateChild(token, childId);
+      navigation.navigate('ResponsibleChildren', { feedback: 'child-deactivated' });
+    } catch {
+      setErrors({ name: 'Não conseguimos desativar agora. Tente novamente.' });
+    } finally {
+      setDeactivating(false);
     }
   };
 
@@ -174,7 +195,30 @@ export function ResponsibleChildFormScreen({ navigation, route }: Props) {
               loading={submitting}
               onPress={handleSubmit}
             />
+
+            {isEditMode ? (
+              <SecondaryButton
+                destructive
+                disabled={deactivating}
+                label="Desativar criança"
+                onPress={() => setConfirmDeactivateVisible(true)}
+              />
+            ) : null}
           </Card>
+        ) : null}
+
+        {loadState === 'ready' && confirmDeactivateVisible ? (
+          <ConfirmActionSheet
+            body="O histórico, as moedas e as missões anteriores continuam guardados. A criança não aparece para novas atribuições."
+            cancelLabel="Cancelar"
+            confirmAccessibilityLabel={`Confirmar desativação de ${name || 'criança'}`}
+            confirmLabel="Desativar"
+            loading={deactivating}
+            loadingLabel="Desativando criança"
+            onCancel={() => setConfirmDeactivateVisible(false)}
+            onConfirm={handleDeactivate}
+            title="Desativar criança?"
+          />
         ) : null}
       </AppScreen>
     </KeyboardAvoidingView>

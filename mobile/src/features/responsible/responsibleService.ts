@@ -40,6 +40,13 @@ export const responsibleService = {
     });
   },
 
+  async deactivateChild(token: string, childId: string): Promise<ChildResponse> {
+    return apiRequest<ChildResponse>(`/children/${childId}/deactivate`, {
+      method: 'PATCH',
+      token,
+    });
+  },
+
   async listMissions(token: string, includeInactive = false): Promise<MissionResponse[]> {
     return apiRequest<MissionResponse[]>(includeInactivePath('/missions', includeInactive), { token });
   },
