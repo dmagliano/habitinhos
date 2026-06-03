@@ -60,7 +60,7 @@ export function ChildTabsScreen({ navigation, route }: Props) {
             childName={child.name}
             familyName={session?.family.name}
             avatarKey={child.avatarKey}
-            onBackToFamily={() => navigation.navigate('FamilyHub')}
+            onManageFamily={() => navigation.navigate('ResponsibleTabs', { activeChild: child })}
             onLogout={logout}
             onSwitchChild={() => navigation.navigate('ChildProfileSelect')}
           />
@@ -74,14 +74,14 @@ function ProfileTab({
   avatarKey,
   childName,
   familyName,
-  onBackToFamily,
+  onManageFamily,
   onLogout,
   onSwitchChild,
 }: {
   avatarKey: string;
   childName: string;
   familyName?: string;
-  onBackToFamily: () => void;
+  onManageFamily: () => void;
   onLogout: () => void | Promise<void>;
   onSwitchChild: () => void;
 }) {
@@ -101,7 +101,7 @@ function ProfileTab({
 
       <View style={styles.profileActions}>
         <SecondaryButton label="Trocar criança" onPress={onSwitchChild} />
-        <SecondaryButton label="Voltar para família" onPress={onBackToFamily} />
+        <SecondaryButton label="Gerenciar família" onPress={onManageFamily} />
         <SecondaryButton destructive label="Sair da conta" onPress={onLogout} />
       </View>
     </AppScreen>

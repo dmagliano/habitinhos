@@ -5,11 +5,16 @@ import { colors, spacing, typography } from '../../theme';
 import { useAuth } from '../auth/AuthContext';
 
 type ResponsibleProfileScreenProps = {
-  onBackToFamily: () => void;
+  hasActiveChild?: boolean;
   onLogout: () => void | Promise<void>;
+  onReturnToChild: () => void;
 };
 
-export function ResponsibleProfileScreen({ onBackToFamily, onLogout }: ResponsibleProfileScreenProps) {
+export function ResponsibleProfileScreen({
+  hasActiveChild = false,
+  onLogout,
+  onReturnToChild,
+}: ResponsibleProfileScreenProps) {
   const { session } = useAuth();
   const familyName = session?.family.name ?? 'Família';
   const responsibleName = session?.user.name ?? 'Responsável';
@@ -28,11 +33,14 @@ export function ResponsibleProfileScreen({ onBackToFamily, onLogout }: Responsib
       <Card style={styles.profileCard}>
         <Text style={styles.cardLabel}>Família ativa</Text>
         <Text style={styles.profileTitle}>{familyName}</Text>
-        <Text style={styles.profileText}>Você está usando o modo responsável.</Text>
+        <Text style={styles.profileText}>Você está gerenciando a família.</Text>
       </Card>
 
       <View style={styles.profileActions}>
-        <SecondaryButton label="Trocar modo" onPress={onBackToFamily} />
+        <SecondaryButton
+          label={hasActiveChild ? 'Voltar para o modo criança' : 'Escolher criança'}
+          onPress={onReturnToChild}
+        />
         <SecondaryButton destructive label="Sair da conta" onPress={onLogout} />
       </View>
     </AppScreen>

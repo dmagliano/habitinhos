@@ -23,8 +23,9 @@ type Props = NativeStackScreenProps<RootStackParamList, 'ResponsibleTabs'>;
 
 const Tab = createBottomTabNavigator<ResponsibleTabParamList>();
 
-export function ResponsibleTabsScreen({ navigation }: Props) {
+export function ResponsibleTabsScreen({ navigation, route }: Props) {
   const { logout } = useAuth();
+  const activeChild = route.params?.activeChild;
 
   return (
     <Tab.Navigator
@@ -83,7 +84,15 @@ export function ResponsibleTabsScreen({ navigation }: Props) {
       <Tab.Screen name="ResponsibleProfile" options={{ title: 'Perfil' }}>
         {() => (
           <ResponsibleProfileScreen
-            onBackToFamily={() => navigation.navigate('FamilyHub')}
+            hasActiveChild={Boolean(activeChild)}
+            onReturnToChild={() => {
+              if (activeChild) {
+                navigation.navigate('ChildTabs', { child: activeChild });
+                return;
+              }
+
+              navigation.navigate('ChildProfileSelect');
+            }}
             onLogout={logout}
           />
         )}
