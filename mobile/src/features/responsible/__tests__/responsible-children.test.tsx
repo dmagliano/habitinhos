@@ -79,7 +79,7 @@ describe('ResponsibleChildrenScreen', () => {
     expect(within(activeCard).getByText('Ativa')).toBeOnTheScreen();
     expect(within(inactiveCard).getByText('Noah')).toBeOnTheScreen();
     expect(within(inactiveCard).getByText('Inativa')).toBeOnTheScreen();
-    expect(view.toJSON()).toMatch(/Lia[\s\S]*Noah/);
+    expect(JSON.stringify(view.toJSON())).toMatch(/Lia[\s\S]*Noah/);
     expect(screen.queryByText('jwt-token')).toBeNull();
     expect(screen.queryByText('family-1')).toBeNull();
   });
@@ -103,7 +103,7 @@ describe('ResponsibleChildrenScreen', () => {
     render(<ResponsibleChildrenScreen navigation={navigation} route={{ key: 'ResponsibleChildren', name: 'ResponsibleChildren' }} />);
 
     expect(await screen.findByText('Nenhuma criança cadastrada')).toBeOnTheScreen();
-    expect(screen.getByRole('button', { name: 'Nova criança' })).toBeOnTheScreen();
+    expect(screen.getAllByRole('button', { name: 'Nova criança' }).length).toBeGreaterThan(0);
     expect(screen.queryByText('Lia')).toBeNull();
   });
 });

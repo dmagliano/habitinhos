@@ -14,7 +14,7 @@ import { MetricSummaryCard } from './components/MetricSummaryCard';
 
 type ResponsibleHomeScreenProps = {
   navigation?: {
-    navigate: (route: 'ResponsibleChildDetail', params: { childId: string }) => void;
+    navigate: (route: 'ResponsibleChildDetail' | 'ResponsibleChildForm', params?: { childId: string }) => void;
   };
 };
 
@@ -58,6 +58,9 @@ export function ResponsibleHomeScreen({ navigation }: ResponsibleHomeScreenProps
   const openChildDetail = (childId: string) => {
     navigation?.navigate('ResponsibleChildDetail', { childId });
   };
+  const openChildForm = () => {
+    navigation?.navigate('ResponsibleChildForm');
+  };
 
   return (
     <AppScreen>
@@ -97,7 +100,7 @@ export function ResponsibleHomeScreen({ navigation }: ResponsibleHomeScreenProps
               actionLabel="Nova criança"
               body="Cadastre uma criança para organizar missões, moedas e recompensas da família."
               emoji="⭐"
-              onAction={() => undefined}
+              onAction={openChildForm}
               title="Nenhuma criança cadastrada"
             />
           ) : (
@@ -112,7 +115,7 @@ export function ResponsibleHomeScreen({ navigation }: ResponsibleHomeScreenProps
           <View style={styles.quickActions}>
             <PrimaryButton label="Nova missão" onPress={() => undefined} />
             <PrimaryButton label="Nova recompensa" onPress={() => undefined} />
-            <PrimaryButton label="Nova criança" onPress={() => undefined} />
+            <PrimaryButton label="Nova criança" onPress={openChildForm} />
           </View>
 
           {dashboard.pendingApprovalCount > 0 ? (

@@ -35,7 +35,16 @@ export function ResponsibleTabsScreen({ navigation }: Props) {
         {() => (
           <ResponsibleHomeScreen
             navigation={{
-              navigate: (route, params) => navigation.navigate(route, params),
+              navigate: (route, params) => {
+                if (route === 'ResponsibleChildDetail' && params) {
+                  navigation.navigate(route, params);
+                  return;
+                }
+
+                if (route === 'ResponsibleChildForm') {
+                  navigation.navigate(route);
+                }
+              },
             }}
           />
         )}
