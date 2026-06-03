@@ -91,7 +91,7 @@ describe('RootNavigator auth entry', () => {
     jest.clearAllMocks();
   });
 
-  it('renders the welcome entry before any login-only form for unauthenticated users', async () => {
+  it('renders the welcome entry before any login-only form for unauthenticated users', () => {
     jest.mocked(useAuth).mockReturnValue({
       status: 'unauthenticated',
       session: null,
@@ -103,7 +103,7 @@ describe('RootNavigator auth entry', () => {
 
     render(<RootNavigator />);
 
-    expect(await screen.findByText('Habitinhos')).toBeOnTheScreen();
+    expect(screen.getByText('Habitinhos')).toBeOnTheScreen();
     expect(screen.getByRole('button', { name: 'Login' })).toBeOnTheScreen();
     expect(screen.getByRole('button', { name: 'Registro' })).toBeOnTheScreen();
     expect(screen.queryByLabelText('E-mail')).not.toBeOnTheScreen();

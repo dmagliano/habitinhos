@@ -1,7 +1,9 @@
 import { AssignedMissionResponse, ChildResponse } from '../api/types';
 
 export type RootStackParamList = {
-  Auth: undefined;
+  AuthWelcome: undefined;
+  AuthLogin: undefined;
+  AuthRegister: undefined;
   FamilyHub: undefined;
   ResponsibleTabs: undefined;
   ResponsibleChildren: { feedback?: 'child-created' | 'child-deactivated' } | undefined;

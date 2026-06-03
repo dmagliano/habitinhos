@@ -2,8 +2,10 @@ import { NavigationContainer } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 
 import { AuthLoadingScreen } from '../features/auth/AuthLoadingScreen';
+import { AuthWelcomeScreen } from '../features/auth/AuthWelcomeScreen';
 import { LoginScreen } from '../features/auth/LoginScreen';
 import { useAuth } from '../features/auth/AuthContext';
+import { RegisterScreen } from '../features/auth/RegisterScreen';
 import { ChildMissionDetailScreen } from '../features/child/ChildMissionDetailScreen';
 import { ChildProfileSelectScreen } from '../features/child/ChildProfileSelectScreen';
 import { ChildTabsScreen } from '../features/child/ChildTabsScreen';
@@ -47,7 +49,11 @@ export function RootNavigator() {
             <Stack.Screen component={ChildMissionDetailScreen} name="ChildMissionDetail" />
           </>
         ) : (
-          <Stack.Screen component={LoginScreen} name="Auth" />
+          <>
+            <Stack.Screen component={AuthWelcomeScreen} name="AuthWelcome" />
+            <Stack.Screen component={LoginScreen} name="AuthLogin" />
+            <Stack.Screen component={RegisterScreen} name="AuthRegister" />
+          </>
         )}
       </Stack.Navigator>
     </NavigationContainer>
