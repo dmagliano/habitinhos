@@ -13,6 +13,7 @@
 - [x] **AUTH-04**: Authenticated responsible adult can retrieve `/me` with user and family context.
 - [x] **AUTH-05**: Backend derives `familyUnitId` from authentication context for protected operations.
 - [x] **AUTH-06**: Users from one family cannot access data from another family.
+- [ ] **AUTH-07**: Mobile unauthenticated entry shows a welcome screen with login and registration options, and session persistence is controlled by an explicit "mantenha-me conectado" choice.
 
 ### Children
 
@@ -50,6 +51,7 @@
 - [x] **REWD-04**: Child can redeem a reward when balance is sufficient.
 - [x] **REWD-05**: System blocks reward redemption when balance is insufficient.
 - [x] **REWD-06**: Successful MVP redemption can be recorded directly as `REDEEMED`.
+- [ ] **REWD-07**: Responsible adult can mark a redeemed reward as delivered, preserving a delivered timestamp in the redemption history.
 
 ### Responsible Dashboard
 
@@ -57,6 +59,7 @@
 - [x] **DASH-02**: Dashboard shows balance by child.
 - [x] **DASH-03**: Dashboard shows pending, awaiting approval, and completed missions.
 - [x] **DASH-04**: Dashboard shows recent reward redemptions.
+- [ ] **DASH-05**: Responsible dashboard approval and recent-redemption affordances navigate to the corresponding actionable screen or section.
 
 ### Mobile App
 
@@ -66,6 +69,7 @@
 - [ ] **MOBL-04**: Child flow includes profile selection/access, home with balance, missions, completion feedback, reward catalog, redemption feedback, and insufficient balance message.
 - [ ] **MOBL-05**: Mobile app consumes the real backend API for the demo flow.
 - [ ] **MOBL-06**: Mobile screens from Phase 4 onward follow `docs/design/mobile-design-contract.md`, use `docs/design/phase-design-map.md` for visual references, and do not copy Stitch HTML/CSS exports.
+- [ ] **MOBL-07**: Authenticated entry can open directly into the child flow without a mandatory "sou responsável/sou criança" hub, while the child profile exposes "Gerenciar família" and the responsible area exposes a clear return path to child mode.
 
 ### Documentation and Demo
 
@@ -101,23 +105,27 @@
 | Requirement | Phase | Status |
 |-------------|-------|--------|
 | AUTH-01..AUTH-06 | Phase 1 | Complete |
+| AUTH-07 | Phase 06.1 | Pending |
 | CHLD-01..CHLD-04 | Phase 1 | Complete |
 | DOCS-01 | Phases 1, 2, 3 | Complete |
 | MISS-01..MISS-09 | Phase 2 | Complete |
 | WALT-01, WALT-02, WALT-04, WALT-06 | Phase 2 | Complete |
 | REWD-01..REWD-06 | Phase 3 | Complete |
+| REWD-07 | Phase 06.1 | Pending |
 | WALT-03, WALT-05 | Phase 3 | Complete |
 | MOBL-01, MOBL-02 | Phase 4 | Complete |
 | AUTH-02, AUTH-04 | Phase 4 | Complete |
 | MOBL-04, MOBL-05 | Phase 5 | Pending |
 | CHLD-03, MISS-04..MISS-05, REWD-03..REWD-05, WALT-01 | Phase 5 | Pending |
 | MOBL-03, DASH-01..DASH-04 | Phase 6 | Complete |
-| MOBL-06 | Phases 4, 5, 6, 7 | Pending |
+| DASH-05 | Phase 06.1 | Pending |
+| MOBL-06 | Phases 4, 5, 6, 06.1, 7 | Pending |
+| MOBL-07 | Phase 06.1 | Pending |
 | DOCS-02..DOCS-04 | Phase 7 | Pending |
 
 **Coverage:**
-- v1 requirements: 42 total
-- Mapped to phases: 42
+- v1 requirements: 46 total
+- Mapped to phases: 46
 - Unmapped: 0
 
 ---

@@ -3,14 +3,14 @@ gsd_state_version: 1.0
 milestone: v1.0
 milestone_name: milestone
 status: executing
-last_updated: "2026-06-03T03:19:54.000Z"
-last_activity: 2026-06-03
+last_updated: "2026-06-03T13:26:38.364Z"
+last_activity: 2026-06-03 -- Phase 06.1 planning complete
 progress:
-  total_phases: 7
+  total_phases: 8
   completed_phases: 6
-  total_plans: 28
+  total_plans: 26
   completed_plans: 23
-  percent: 82
+  percent: 75
 ---
 
 # Project State
@@ -20,14 +20,14 @@ progress:
 See: .planning/PROJECT.md (updated 2026-06-01)
 
 **Core value:** The complete family flow must work end to end with family isolation, wallet integrity, and coin history.
-**Current focus:** Phase 07 — polimento-para-demonstração-do-tcc
+**Current focus:** Phase 06.1 — ajustes pós-UAT dos fluxos de entrada, troca de modo e entrega de resgates
 
 ## Current Position
 
-Phase: 07 (polimento-para-demonstração-do-tcc) — READY
+Phase: 06.1 (ajustes-pós-UAT-dos-fluxos-de-entrada-troca-de-modo-e-entrega-de-resgates) — PLANNED
 Plan: 0 of 3
-Status: Ready to plan
-Last activity: 2026-06-03 - Completed quick task 260603-08s: Apply Phase 6 UI testing fixes for responsible and child mobile screens
+Status: Ready to execute
+Last activity: 2026-06-03 -- Phase 06.1 planning complete
 
 Progress: [░░░░░░░░░░] 0%
 
@@ -53,7 +53,7 @@ Progress: [░░░░░░░░░░] 0%
 **Recent Trend:**
 
 - Last 5 plans: 05-04, 06-01, 06-02, 06-03, 06-04
-- Trend: Phase 6 complete; Phase 7 ready to discuss/plan
+- Trend: Phase 6 complete; inserted Phase 06.1 is planned and ready to execute
 
 | Phase 02 P03 | 10 min | 3 tasks | 12 files |
 | Phase 02 P02 | 12 min | 3 tasks | 9 files |
@@ -69,6 +69,10 @@ Progress: [░░░░░░░░░░] 0%
 | Phase 06 P04 | 142min | 4 tasks | 19 files |
 
 ## Accumulated Context
+
+### Roadmap Evolution
+
+- Phase 06.1 inserted after Phase 6: Ajustes pós-UAT dos fluxos de entrada, troca de modo e entrega de resgates (URGENT)
 
 ### Decisions
 
@@ -98,9 +102,9 @@ None yet.
 
 ## Session Continuity
 
-Last session: 2026-06-03T02:33:57.000Z
-Stopped at: Completed 06-04-PLAN.md and Phase 06
-Resume file: None
+Last session: 2026-06-03T13:26:38.269Z
+Stopped at: Phase 06.1 planning complete
+Resume file: .planning/phases/06.1-ajustes-p-s-uat-dos-fluxos-de-entrada-troca-de-modo-e-entreg/06.1-01-PLAN.md
 
 ## Quick Tasks Completed
 

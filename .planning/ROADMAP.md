@@ -12,6 +12,7 @@ Habitinhos will be built as a monorepo MVP in seven phases: backend foundation, 
 - [x] **Phase 4: Mobile base** - Create Expo app foundation, navigation, API client, login flow, and base visual structure. (completed 2026-06-01)
 - [x] **Phase 5: Fluxo da criança** - Build child home, balance, missions, completion feedback, rewards catalog, and redemption flow. (completed 2026-06-02)
 - [x] **Phase 6: Fluxo do responsável** - Build dashboard, children, missions, assignments, rewards, approvals, and child detail views. (completed 2026-06-03)
+- [ ] **Phase 06.1: Ajustes pós-UAT dos fluxos de entrada, troca de modo e entrega de resgates** - Refine unauthenticated entry, login/register/session persistence, child-first mode switching, dashboard links, and delivered reward redemptions. (INSERTED)
 - [ ] **Phase 7: Polimento para demonstração do TCC** - Add demo seeds, visual polish, README, architecture docs, presentation script, and final testing.
 
 ## Phase Details
@@ -203,10 +204,40 @@ Plans:
 
 - [x] 06-04: Reward management screens
 
+### Phase 06.1: Ajustes pós-UAT dos fluxos de entrada, troca de modo e entrega de resgates (INSERTED)
+
+**Goal:** The post-Phase-6 app entry and family-mode flow are demo-ready, with opt-in session persistence, direct child-mode access, responsible management switching, actionable dashboard links, and delivered reward-redemption tracking.
+**Requirements**: AUTH-07, MOBL-05, MOBL-06, MOBL-07, DASH-05, REWD-07
+**Depends on:** Phase 6
+**Success Criteria** (what must be TRUE):
+
+  1. When unauthenticated, the app shows a welcome entry with clear Login and Registro options instead of opening directly into a login-only form.
+  2. Login and registration are both available from the mobile entry flow and consume the real backend auth endpoints.
+  3. The login flow includes an explicit "mantenha-me conectado" option, and token persistence follows that choice.
+  4. After entering child mode, the app no longer shows the mandatory "Sou responsável" / "Sou criança" hub; the child profile exposes a "Gerenciar família" action to enter responsible management.
+  5. The responsible area exposes a clear "Voltar para o modo criança" path when a child context is known.
+  6. The dashboard approval card opens the pending approvals screen, and the recent-redemptions metric/card opens or scrolls to recent redemptions.
+  7. Recent redemption cards show an "Entregue" checkbox; marking it persists the delivered state, greys the card text, and displays `Entregue em: {data}`.
+
+**Plans:** 3 plans
+
+Plans:
+**Wave 1**
+
+- [ ] 06.1-01: Entrada deslogada, registro e manter sessao conectado
+
+**Wave 2** *(blocked on 06.1-01 completion)*
+
+- [ ] 06.1-02: Troca de modo child-first e atalhos do dashboard
+
+**Wave 3** *(blocked on 06.1-02 completion)*
+
+- [ ] 06.1-03: Persistencia e UI de entrega de resgates
+
 ### Phase 7: Polimento para demonstração do TCC
 
 **Goal**: The MVP is demo-ready with repeatable data, documentation, visual polish, and final verification.
-**Depends on**: Phase 6
+**Depends on**: Phase 06.1
 **Requirements**: DOCS-02, DOCS-03, DOCS-04
 **Success Criteria** (what must be TRUE):
 
@@ -228,7 +259,7 @@ Plans:
 ## Progress
 
 **Execution Order:**
-Phases execute in numeric order: 1 → 2 → 3 → 4 → 5 → 6 → 7
+Phases execute in numeric order: 1 → 2 → 3 → 4 → 5 → 6 → 06.1 → 7
 
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
@@ -238,4 +269,5 @@ Phases execute in numeric order: 1 → 2 → 3 → 4 → 5 → 6 → 7
 | 4. Mobile base | 4/4 | Complete   | 2026-06-01 |
 | 5. Fluxo da criança | 4/4 | Complete   | 2026-06-02 |
 | 6. Fluxo do responsável | 4/4 | Complete | 2026-06-03 |
+| 06.1 Ajustes pós-UAT dos fluxos de entrada, troca de modo e entrega de resgates | 0/3 | Planned | - |
 | 7. Polimento para demonstração do TCC | 0/3 | Not started | - |
