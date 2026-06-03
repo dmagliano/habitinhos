@@ -14,7 +14,10 @@ import { MetricSummaryCard } from './components/MetricSummaryCard';
 
 type ResponsibleHomeScreenProps = {
   navigation?: {
-    navigate: (route: 'ResponsibleChildDetail' | 'ResponsibleChildForm', params?: { childId: string }) => void;
+    navigate: (
+      route: 'ResponsibleApprovals' | 'ResponsibleChildDetail' | 'ResponsibleChildForm' | 'ResponsibleMissionForm',
+      params?: { childId: string },
+    ) => void;
   };
 };
 
@@ -60,6 +63,12 @@ export function ResponsibleHomeScreen({ navigation }: ResponsibleHomeScreenProps
   };
   const openChildForm = () => {
     navigation?.navigate('ResponsibleChildForm');
+  };
+  const openMissionForm = () => {
+    navigation?.navigate('ResponsibleMissionForm');
+  };
+  const openApprovals = () => {
+    navigation?.navigate('ResponsibleApprovals');
   };
 
   return (
@@ -113,7 +122,7 @@ export function ResponsibleHomeScreen({ navigation }: ResponsibleHomeScreenProps
 
           <SectionTitle title="Ações rápidas" />
           <View style={styles.quickActions}>
-            <PrimaryButton label="Nova missão" onPress={() => undefined} />
+            <PrimaryButton label="Nova missão" onPress={openMissionForm} />
             <PrimaryButton label="Nova recompensa" onPress={() => undefined} />
             <PrimaryButton label="Nova criança" onPress={openChildForm} />
           </View>
@@ -121,7 +130,7 @@ export function ResponsibleHomeScreen({ navigation }: ResponsibleHomeScreenProps
           {dashboard.pendingApprovalCount > 0 ? (
             <>
               <SectionTitle title="Aprovações" />
-              <ApprovalCard count={dashboard.pendingApprovalCount} onOpenApprovals={() => undefined} />
+              <ApprovalCard count={dashboard.pendingApprovalCount} onOpenApprovals={openApprovals} />
             </>
           ) : null}
 

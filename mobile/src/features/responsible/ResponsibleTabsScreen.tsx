@@ -9,6 +9,7 @@ import { colors, radius, spacing, typography } from '../../theme';
 import { useAuth } from '../auth/AuthContext';
 
 import { ResponsibleHomeScreen } from './ResponsibleHomeScreen';
+import { ResponsibleMissionsScreen } from './ResponsibleMissionsScreen';
 
 type ResponsibleTabParamList = {
   ResponsibleHome: undefined;
@@ -44,6 +45,14 @@ export function ResponsibleTabsScreen({ navigation }: Props) {
                 if (route === 'ResponsibleChildForm') {
                   navigation.navigate(route);
                 }
+
+                if (route === 'ResponsibleMissionForm') {
+                  navigation.navigate(route);
+                }
+
+                if (route === 'ResponsibleApprovals') {
+                  navigation.navigate(route);
+                }
               },
             }}
           />
@@ -51,10 +60,11 @@ export function ResponsibleTabsScreen({ navigation }: Props) {
       </Tab.Screen>
       <Tab.Screen name="ResponsibleMissions" options={{ title: 'Missões' }}>
         {() => (
-          <PlaceholderTab
-            emoji="📋"
-            helper="Gerenciamento de missões e aprovações entra nas próximas etapas desta fase."
-            title="Missões"
+          <ResponsibleMissionsScreen
+            onAssignMission={(missionId) => navigation.navigate('ResponsibleAssignmentForm', { missionId })}
+            onCreateMission={() => navigation.navigate('ResponsibleMissionForm')}
+            onEditMission={(missionId) => navigation.navigate('ResponsibleMissionForm', { missionId })}
+            onOpenApprovals={() => navigation.navigate('ResponsibleApprovals')}
           />
         )}
       </Tab.Screen>

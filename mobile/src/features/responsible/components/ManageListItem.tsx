@@ -9,11 +9,18 @@ type ManageListItemProps = {
   metadata: string;
   avatarKey?: string | null;
   active: boolean;
-  onEdit: () => void;
+  onEdit?: () => void;
+  actions?: {
+    label: string;
+    accessibilityLabel?: string;
+    destructive?: boolean;
+    onPress: () => void;
+  }[];
   testID?: string;
 };
 
 export function ManageListItem({
+  actions = [],
   active,
   avatarKey,
   id,
@@ -33,7 +40,20 @@ export function ManageListItem({
         <StatusBadge label={active ? 'Ativa' : 'Inativa'} variant={active ? 'success' : 'pending'} />
       </View>
 
-      <SecondaryButton accessibilityLabel={`Editar ${title}`} label="Editar" onPress={onEdit} />
+      {onEdit || actions.length > 0 ? (
+        <View style={styles.actions}>
+          {onEdit ? <SecondaryButton accessibilityLabel={`Editar ${title}`} label="Editar" onPress={onEdit} /> : null}
+          {actions.map((action) => (
+            <SecondaryButton
+              accessibilityLabel={action.accessibilityLabel ?? action.label}
+              destructive={action.destructive}
+              key={action.label}
+              label={action.label}
+              onPress={action.onPress}
+            />
+          ))}
+        </View>
+      ) : null}
     </Card>
   );
 }
@@ -61,6 +81,9 @@ function getAvatarEmoji(avatarKey: string | null | undefined): string {
 const styles = StyleSheet.create({
   card: {
     gap: spacing.md,
+  },
+  actions: {
+    gap: spacing.sm,
   },
   copy: {
     flex: 1,

@@ -11,6 +11,9 @@ import { FamilyHubScreen } from '../features/family/FamilyHubScreen';
 import { ResponsibleChildDetailScreen } from '../features/responsible/ResponsibleChildDetailScreen';
 import { ResponsibleChildFormScreen } from '../features/responsible/ResponsibleChildFormScreen';
 import { ResponsibleChildrenScreen } from '../features/responsible/ResponsibleChildrenScreen';
+import { ResponsibleApprovalsScreen } from '../features/responsible/ResponsibleApprovalsScreen';
+import { ResponsibleAssignmentFormScreen } from '../features/responsible/ResponsibleAssignmentFormScreen';
+import { ResponsibleMissionFormScreen } from '../features/responsible/ResponsibleMissionFormScreen';
 import { ResponsibleTabsScreen } from '../features/responsible/ResponsibleTabsScreen';
 
 import { RootStackParamList } from './routes';
@@ -34,6 +37,9 @@ export function RootNavigator() {
             <Stack.Screen component={ResponsibleChildrenScreen} name="ResponsibleChildren" />
             <Stack.Screen component={ResponsibleChildFormScreen} name="ResponsibleChildForm" />
             <Stack.Screen component={ResponsibleChildDetailScreen} name="ResponsibleChildDetail" />
+            <Stack.Screen component={ResponsibleMissionFormScreen} name="ResponsibleMissionForm" />
+            <Stack.Screen component={ResponsibleAssignmentFormScreen} name="ResponsibleAssignmentForm" />
+            <Stack.Screen component={ResponsibleApprovalsScreen} name="ResponsibleApprovals" />
             <Stack.Screen component={ChildProfileSelectScreen} name="ChildProfileSelect" />
             <Stack.Screen component={ChildTabsScreen} name="ChildTabs" />
             <Stack.Screen component={ChildMissionDetailScreen} name="ChildMissionDetail" />
