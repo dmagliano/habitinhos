@@ -96,6 +96,55 @@ export type RewardRedemptionResponse = {
   updatedAt: string;
 };
 
+export type MissionResponse = {
+  id: string;
+  title: string;
+  description: string;
+  coinValue: number;
+  requiresApproval: boolean;
+  recurrenceType: 'ONCE' | 'DAILY' | 'WEEKLY' | 'CUSTOM';
+  active: boolean;
+  createdAt: string;
+  updatedAt: string;
+};
+
+export type ResponsibleDashboardMissionCounts = Record<AssignedMissionStatus, number>;
+
+export type ResponsibleDashboardChildSummary = {
+  id: string;
+  name: string;
+  age: number;
+  avatarKey: string;
+  balance: number;
+  missionCounts: ResponsibleDashboardMissionCounts;
+};
+
+export type ResponsibleDashboardApproval = {
+  id: string;
+  childId: string;
+  childName: string;
+  missionTitle: string;
+  coinValue: number;
+  completedAt: string | null;
+};
+
+export type ResponsibleDashboardRedemption = {
+  id: string;
+  rewardId: string;
+  childId: string;
+  childName: string;
+  rewardTitle: string;
+  rewardCost: number;
+  redeemedAt: string;
+};
+
+export type ResponsibleDashboardResponse = {
+  children: ResponsibleDashboardChildSummary[];
+  pendingApprovalCount: number;
+  approvalPreview: ResponsibleDashboardApproval[];
+  recentRedemptions: ResponsibleDashboardRedemption[];
+};
+
 export class ApiError extends Error {
   status?: number;
   code?: string;

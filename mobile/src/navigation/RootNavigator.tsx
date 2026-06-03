@@ -8,7 +8,7 @@ import { ChildMissionDetailScreen } from '../features/child/ChildMissionDetailSc
 import { ChildProfileSelectScreen } from '../features/child/ChildProfileSelectScreen';
 import { ChildTabsScreen } from '../features/child/ChildTabsScreen';
 import { FamilyHubScreen } from '../features/family/FamilyHubScreen';
-import { ResponsibleStubScreen } from '../features/family/ResponsibleStubScreen';
+import { ResponsibleTabsScreen } from '../features/responsible/ResponsibleTabsScreen';
 
 import { RootStackParamList } from './routes';
 
@@ -27,7 +27,7 @@ export function RootNavigator() {
         {session && status === 'authenticated' ? (
           <>
             <Stack.Screen component={FamilyHubScreen} name="FamilyHub" />
-            <Stack.Screen component={ResponsibleStubScreen} name="ResponsibleStub" />
+            <Stack.Screen component={ResponsibleTabsScreen} name="ResponsibleTabs" />
             <Stack.Screen component={ChildProfileSelectScreen} name="ChildProfileSelect" />
             <Stack.Screen component={ChildTabsScreen} name="ChildTabs" />
             <Stack.Screen component={ChildMissionDetailScreen} name="ChildMissionDetail" />

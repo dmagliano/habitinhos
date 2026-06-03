@@ -23,10 +23,10 @@ export function FamilyHubScreen({ navigation }: Props) {
 
       <View style={styles.options}>
         <RoleCard
-          description="Acompanhe missões, crianças e recompensas quando a área estiver pronta."
+          description="Acompanhe crianças, missões, moedas e recompensas da família."
           emoji="🧭"
           label="Sou responsável"
-          onPress={() => navigation.navigate('ResponsibleStub')}
+          onPress={() => navigation.navigate('ResponsibleTabs')}
         />
         <RoleCard
           description="Escolha um perfil para brincar com as missões da família."

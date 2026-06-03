@@ -1,7 +1,6 @@
 import { fireEvent, render, screen } from '@testing-library/react-native';
 
 import { FamilyHubScreen } from '../FamilyHubScreen';
-import { ResponsibleStubScreen } from '../ResponsibleStubScreen';
 import { useAuth } from '../../auth/AuthContext';
 
 jest.mock('../../auth/AuthContext', () => ({
@@ -40,23 +39,8 @@ describe('family navigation screens', () => {
     fireEvent.press(screen.getByRole('button', { name: 'Sair da conta' }));
 
     expect(screen.getByText('Escolha como quer entrar')).toBeOnTheScreen();
-    expect(navigate).toHaveBeenCalledWith('ResponsibleStub');
+    expect(navigate).toHaveBeenCalledWith('ResponsibleTabs');
     expect(navigate).toHaveBeenCalledWith('ChildProfileSelect');
     expect(logout).toHaveBeenCalledTimes(1);
-  });
-
-  it('lets responsible stub switch mode and logout without fake data', () => {
-    const route = { key: 'ResponsibleStub', name: 'ResponsibleStub' } as never;
-
-    render(<ResponsibleStubScreen navigation={navigation} route={route} />);
-
-    expect(screen.getByText('Em breve você vai acompanhar missões, crianças e recompensas por aqui.')).toBeOnTheScreen();
-    fireEvent.press(screen.getByRole('button', { name: 'Trocar modo' }));
-    expect(navigate).toHaveBeenCalledWith('FamilyHub');
-
-    fireEvent.press(screen.getByRole('button', { name: 'Sair da conta' }));
-
-    expect(logout).toHaveBeenCalledTimes(1);
-    expect(screen.queryByText(/saldo/i)).toBeNull();
   });
 });
