@@ -109,6 +109,8 @@ describe('responsible dashboard screens', () => {
 
     fireEvent.press(within(childCard).getByRole('button', { name: 'Ver detalhes de Lia' }));
     expect(navigate).toHaveBeenCalledWith('ResponsibleChildDetail', { childId: 'child-1' });
+    fireEvent.press(screen.getByRole('button', { name: 'Nova recompensa' }));
+    expect(navigate).toHaveBeenCalledWith('ResponsibleRewardForm');
     expect(responsibleService.getDashboard).toHaveBeenCalledWith('jwt-token');
     expect(screen.queryByText('family-1')).toBeNull();
     expect(screen.queryByText('jwt-token')).toBeNull();

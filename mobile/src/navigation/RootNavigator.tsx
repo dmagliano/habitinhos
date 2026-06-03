@@ -14,6 +14,7 @@ import { ResponsibleChildrenScreen } from '../features/responsible/ResponsibleCh
 import { ResponsibleApprovalsScreen } from '../features/responsible/ResponsibleApprovalsScreen';
 import { ResponsibleAssignmentFormScreen } from '../features/responsible/ResponsibleAssignmentFormScreen';
 import { ResponsibleMissionFormScreen } from '../features/responsible/ResponsibleMissionFormScreen';
+import { ResponsibleRewardFormScreen } from '../features/responsible/ResponsibleRewardFormScreen';
 import { ResponsibleTabsScreen } from '../features/responsible/ResponsibleTabsScreen';
 
 import { RootStackParamList } from './routes';
@@ -40,6 +41,7 @@ export function RootNavigator() {
             <Stack.Screen component={ResponsibleMissionFormScreen} name="ResponsibleMissionForm" />
             <Stack.Screen component={ResponsibleAssignmentFormScreen} name="ResponsibleAssignmentForm" />
             <Stack.Screen component={ResponsibleApprovalsScreen} name="ResponsibleApprovals" />
+            <Stack.Screen component={ResponsibleRewardFormScreen} name="ResponsibleRewardForm" />
             <Stack.Screen component={ChildProfileSelectScreen} name="ChildProfileSelect" />
             <Stack.Screen component={ChildTabsScreen} name="ChildTabs" />
             <Stack.Screen component={ChildMissionDetailScreen} name="ChildMissionDetail" />

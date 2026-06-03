@@ -323,6 +323,66 @@ describe('responsibleService', () => {
     );
     expect(JSON.stringify(fetchMock.mock.calls)).not.toContain('familyUnitId');
   });
+
+  it('gets, creates, updates, and deactivates rewards with backend DTO fields', async () => {
+    const reward = {
+      id: 'reward-1',
+      title: 'Cinema em família',
+      description: 'Sessão de sábado',
+      cost: 20,
+      active: true,
+      createdAt: '2026-06-01T10:00:00Z',
+      updatedAt: '2026-06-01T10:00:00Z',
+    };
+    const rewardBody = {
+      title: 'Cinema em família',
+      description: 'Sessão de sábado',
+      cost: 20,
+    };
+
+    fetchMock
+      .mockResolvedValueOnce(createResponse(200, reward))
+      .mockResolvedValueOnce(createResponse(201, reward))
+      .mockResolvedValueOnce(createResponse(200, { ...reward, title: 'Parque' }))
+      .mockResolvedValueOnce(createResponse(200, { ...reward, active: false }));
+
+    await responsibleService.getReward('jwt-token', 'reward-1');
+    await responsibleService.createReward('jwt-token', rewardBody);
+    await responsibleService.updateReward('jwt-token', 'reward-1', { ...rewardBody, title: 'Parque' });
+    await responsibleService.deactivateReward('jwt-token', 'reward-1');
+
+    expect(fetchMock).toHaveBeenNthCalledWith(
+      1,
+      'http://10.0.2.2:8080/rewards/reward-1',
+      expect.objectContaining({
+        method: 'GET',
+        headers: expect.objectContaining({ Authorization: 'Bearer jwt-token' }),
+      }),
+    );
+    expect(fetchMock).toHaveBeenNthCalledWith(
+      2,
+      'http://10.0.2.2:8080/rewards',
+      expect.objectContaining({
+        method: 'POST',
+        body: JSON.stringify(rewardBody),
+      }),
+    );
+    expect(fetchMock).toHaveBeenNthCalledWith(
+      3,
+      'http://10.0.2.2:8080/rewards/reward-1',
+      expect.objectContaining({
+        method: 'PUT',
+        body: JSON.stringify({ ...rewardBody, title: 'Parque' }),
+      }),
+    );
+    expect(fetchMock).toHaveBeenNthCalledWith(
+      4,
+      'http://10.0.2.2:8080/rewards/reward-1/deactivate',
+      expect.objectContaining({ method: 'PATCH' }),
+    );
+    expect(JSON.stringify(fetchMock.mock.calls)).not.toContain('familyUnitId');
+    expect(JSON.stringify(fetchMock.mock.calls)).not.toContain('DELETE');
+  });
 });
 
 function createResponse(status: number, body: unknown): Response {

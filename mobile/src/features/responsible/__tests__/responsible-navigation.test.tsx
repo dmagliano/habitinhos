@@ -4,9 +4,16 @@ import { fireEvent, render, screen } from '@testing-library/react-native';
 import { useAuth } from '../../auth/AuthContext';
 import { FamilyHubScreen } from '../../family/FamilyHubScreen';
 import { ResponsibleTabsScreen } from '../ResponsibleTabsScreen';
+import { responsibleService } from '../responsibleService';
 
 jest.mock('../../auth/AuthContext', () => ({
   useAuth: jest.fn(),
+}));
+
+jest.mock('../responsibleService', () => ({
+  responsibleService: {
+    getDashboard: jest.fn(),
+  },
 }));
 
 const logout = jest.fn();
@@ -32,6 +39,12 @@ describe('responsible navigation flow', () => {
       login: jest.fn(),
       logout,
       retryRestore: jest.fn(),
+    });
+    jest.mocked(responsibleService.getDashboard).mockResolvedValue({
+      children: [],
+      pendingApprovalCount: 0,
+      approvalPreview: [],
+      recentRedemptions: [],
     });
   });
 
@@ -60,5 +73,30 @@ describe('responsible navigation flow', () => {
     expect(screen.getByRole('button', { name: 'Abrir Perfil' })).toBeOnTheScreen();
     expect(screen.queryByText('jwt-token')).toBeNull();
     expect(screen.queryByText('family-1')).toBeNull();
+  });
+
+  it('renders responsible profile actions without exposing internal session identifiers', async () => {
+    render(
+      <NavigationContainer>
+        <ResponsibleTabsScreen
+          navigation={navigation}
+          route={{ key: 'ResponsibleTabs', name: 'ResponsibleTabs' }}
+        />
+      </NavigationContainer>,
+    );
+
+    fireEvent.press(await screen.findByRole('button', { name: 'Abrir Perfil' }));
+
+    expect(await screen.findByText('Dani')).toBeOnTheScreen();
+    expect(screen.getByText('dani@example.com')).toBeOnTheScreen();
+    expect(screen.getByText('Família Silva')).toBeOnTheScreen();
+    expect(screen.queryByText('jwt-token')).toBeNull();
+    expect(screen.queryByText('family-1')).toBeNull();
+
+    fireEvent.press(screen.getByRole('button', { name: 'Trocar modo' }));
+    fireEvent.press(screen.getByRole('button', { name: 'Sair da conta' }));
+
+    expect(navigate).toHaveBeenCalledWith('FamilyHub');
+    expect(logout).toHaveBeenCalledTimes(1);
   });
 });

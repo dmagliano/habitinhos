@@ -8,6 +8,7 @@ import {
   MissionResponse,
   RejectAssignedMissionRequest,
   ResponsibleDashboardResponse,
+  RewardRequest,
   RewardResponse,
 } from '../../api/types';
 
@@ -119,5 +120,32 @@ export const responsibleService = {
 
   async listRewards(token: string, includeInactive = false): Promise<RewardResponse[]> {
     return apiRequest<RewardResponse[]>(includeInactivePath('/rewards', includeInactive), { token });
+  },
+
+  async getReward(token: string, rewardId: string): Promise<RewardResponse> {
+    return apiRequest<RewardResponse>(`/rewards/${rewardId}`, { token });
+  },
+
+  async createReward(token: string, body: RewardRequest): Promise<RewardResponse> {
+    return apiRequest<RewardResponse>('/rewards', {
+      body,
+      method: 'POST',
+      token,
+    });
+  },
+
+  async updateReward(token: string, rewardId: string, body: RewardRequest): Promise<RewardResponse> {
+    return apiRequest<RewardResponse>(`/rewards/${rewardId}`, {
+      body,
+      method: 'PUT',
+      token,
+    });
+  },
+
+  async deactivateReward(token: string, rewardId: string): Promise<RewardResponse> {
+    return apiRequest<RewardResponse>(`/rewards/${rewardId}/deactivate`, {
+      method: 'PATCH',
+      token,
+    });
   },
 };

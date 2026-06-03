@@ -15,7 +15,12 @@ import { MetricSummaryCard } from './components/MetricSummaryCard';
 type ResponsibleHomeScreenProps = {
   navigation?: {
     navigate: (
-      route: 'ResponsibleApprovals' | 'ResponsibleChildDetail' | 'ResponsibleChildForm' | 'ResponsibleMissionForm',
+      route:
+        | 'ResponsibleApprovals'
+        | 'ResponsibleChildDetail'
+        | 'ResponsibleChildForm'
+        | 'ResponsibleMissionForm'
+        | 'ResponsibleRewardForm',
       params?: { childId: string },
     ) => void;
   };
@@ -70,6 +75,9 @@ export function ResponsibleHomeScreen({ navigation }: ResponsibleHomeScreenProps
   const openApprovals = () => {
     navigation?.navigate('ResponsibleApprovals');
   };
+  const openRewardForm = () => {
+    navigation?.navigate('ResponsibleRewardForm');
+  };
 
   return (
     <AppScreen>
@@ -123,7 +131,7 @@ export function ResponsibleHomeScreen({ navigation }: ResponsibleHomeScreenProps
           <SectionTitle title="Ações rápidas" />
           <View style={styles.quickActions}>
             <PrimaryButton label="Nova missão" onPress={openMissionForm} />
-            <PrimaryButton label="Nova recompensa" onPress={() => undefined} />
+            <PrimaryButton label="Nova recompensa" onPress={openRewardForm} />
             <PrimaryButton label="Nova criança" onPress={openChildForm} />
           </View>
 

@@ -3,13 +3,14 @@ import { NativeStackScreenProps } from '@react-navigation/native-stack';
 import { Pressable, StyleSheet, Text, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
-import { AppHeader, AppScreen, Card, SecondaryButton } from '../../components';
 import { RootStackParamList } from '../../navigation/routes';
 import { colors, radius, spacing, typography } from '../../theme';
 import { useAuth } from '../auth/AuthContext';
 
 import { ResponsibleHomeScreen } from './ResponsibleHomeScreen';
 import { ResponsibleMissionsScreen } from './ResponsibleMissionsScreen';
+import { ResponsibleProfileScreen } from './ResponsibleProfileScreen';
+import { ResponsibleRewardsScreen } from './ResponsibleRewardsScreen';
 
 type ResponsibleTabParamList = {
   ResponsibleHome: undefined;
@@ -23,8 +24,7 @@ type Props = NativeStackScreenProps<RootStackParamList, 'ResponsibleTabs'>;
 const Tab = createBottomTabNavigator<ResponsibleTabParamList>();
 
 export function ResponsibleTabsScreen({ navigation }: Props) {
-  const { logout, session } = useAuth();
-  const familyName = session?.family.name ?? 'sua família';
+  const { logout } = useAuth();
 
   return (
     <Tab.Navigator
@@ -53,6 +53,10 @@ export function ResponsibleTabsScreen({ navigation }: Props) {
                 if (route === 'ResponsibleApprovals') {
                   navigation.navigate(route);
                 }
+
+                if (route === 'ResponsibleRewardForm') {
+                  navigation.navigate(route);
+                }
               },
             }}
           />
@@ -70,57 +74,21 @@ export function ResponsibleTabsScreen({ navigation }: Props) {
       </Tab.Screen>
       <Tab.Screen name="ResponsibleRewards" options={{ title: 'Recompensas' }}>
         {() => (
-          <PlaceholderTab
-            emoji="🎁"
-            helper="Gerenciamento de recompensas será ligado aos dados reais do backend."
-            title="Recompensas"
+          <ResponsibleRewardsScreen
+            onCreateReward={() => navigation.navigate('ResponsibleRewardForm')}
+            onEditReward={(rewardId) => navigation.navigate('ResponsibleRewardForm', { rewardId })}
           />
         )}
       </Tab.Screen>
       <Tab.Screen name="ResponsibleProfile" options={{ title: 'Perfil' }}>
         {() => (
-          <ProfileTab
-            familyName={familyName}
+          <ResponsibleProfileScreen
             onBackToFamily={() => navigation.navigate('FamilyHub')}
             onLogout={logout}
           />
         )}
       </Tab.Screen>
     </Tab.Navigator>
-  );
-}
-
-function PlaceholderTab({ emoji, helper, title }: { emoji: string; helper: string; title: string }) {
-  return (
-    <AppScreen>
-      <AppHeader emoji={emoji} subtitle={helper} title={title} />
-    </AppScreen>
-  );
-}
-
-function ProfileTab({
-  familyName,
-  onBackToFamily,
-  onLogout,
-}: {
-  familyName: string;
-  onBackToFamily: () => void;
-  onLogout: () => void | Promise<void>;
-}) {
-  return (
-    <AppScreen>
-      <AppHeader emoji="🙂" title="Perfil" />
-
-      <Card style={styles.profileCard} variant="highlight">
-        <Text style={styles.profileTitle}>Responsável</Text>
-        <Text style={styles.profileText}>{familyName}</Text>
-      </Card>
-
-      <View style={styles.profileActions}>
-        <SecondaryButton label="Voltar para família" onPress={onBackToFamily} />
-        <SecondaryButton destructive label="Sair da conta" onPress={onLogout} />
-      </View>
-    </AppScreen>
   );
 }
 
@@ -175,21 +143,6 @@ function ResponsibleTabBar({ descriptors, navigation, state }: BottomTabBarProps
 }
 
 const styles = StyleSheet.create({
-  profileActions: {
-    gap: spacing.md,
-  },
-  profileCard: {
-    gap: spacing.xs,
-    marginBottom: spacing.lg,
-  },
-  profileText: {
-    ...typography.body,
-    color: colors.textSecondary,
-  },
-  profileTitle: {
-    ...typography.heading,
-    color: colors.textPrimary,
-  },
   tabContainer: {
     backgroundColor: colors.surface,
     borderColor: colors.border,

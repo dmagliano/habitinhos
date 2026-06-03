@@ -10,6 +10,7 @@ export type RootStackParamList = {
   ResponsibleMissionForm: { missionId?: string } | undefined;
   ResponsibleAssignmentForm: { missionId: string };
   ResponsibleApprovals: undefined;
+  ResponsibleRewardForm: { rewardId?: string } | undefined;
   ChildProfileSelect: undefined;
   ChildTabs: { child: ChildResponse };
   ChildMissionDetail: { child: ChildResponse; mission: AssignedMissionResponse | null };

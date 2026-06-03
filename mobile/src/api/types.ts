@@ -87,6 +87,12 @@ export type RewardResponse = {
   updatedAt: string;
 };
 
+export type RewardRequest = {
+  title: string;
+  description: string;
+  cost: number;
+};
+
 export type RewardRedemptionStatus = 'REDEEMED';
 
 export type RewardRedemptionResponse = {
