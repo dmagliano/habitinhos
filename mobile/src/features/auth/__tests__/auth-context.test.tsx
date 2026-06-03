@@ -81,7 +81,7 @@ describe('AuthProvider', () => {
     expect(tokenStorage.clearToken).toHaveBeenCalled();
   });
 
-  it('persists token after login and clears it on logout', async () => {
+  it('persists token after login when remember session is checked', async () => {
     jest.mocked(tokenStorage.getToken).mockResolvedValueOnce(null);
     jest.mocked(authService.login).mockResolvedValueOnce(session);
 
@@ -96,10 +96,52 @@ describe('AuthProvider', () => {
     await waitFor(() => expect(screen.getByText('unauthenticated')).toBeOnTheScreen());
 
     await act(async () => {
-      await latestAuth?.login('dani@example.com', 'secret');
+      await latestAuth?.login('dani@example.com', 'secret', true);
     });
 
     await waitFor(() => expect(tokenStorage.setToken).toHaveBeenCalledWith('jwt-token'));
+    expect(screen.getByText('authenticated')).toBeOnTheScreen();
+  });
+
+  it('authenticates without persisting token when remember session is unchecked', async () => {
+    jest.mocked(tokenStorage.getToken).mockResolvedValueOnce(null);
+    jest.mocked(authService.login).mockResolvedValueOnce(session);
+
+    let latestAuth: ReturnType<typeof useAuth> | undefined;
+
+    render(
+      <AuthProvider>
+        <AuthProbe onReady={(auth) => (latestAuth = auth)} />
+      </AuthProvider>,
+    );
+
+    await waitFor(() => expect(screen.getByText('unauthenticated')).toBeOnTheScreen());
+
+    await act(async () => {
+      await latestAuth?.login('dani@example.com', 'secret', false);
+    });
+
+    await waitFor(() => expect(screen.getByText('authenticated')).toBeOnTheScreen());
+    expect(tokenStorage.setToken).not.toHaveBeenCalled();
+  });
+
+  it('clears stored token on logout even when the current session was not remembered', async () => {
+    jest.mocked(tokenStorage.getToken).mockResolvedValueOnce(null);
+    jest.mocked(authService.login).mockResolvedValueOnce(session);
+
+    let latestAuth: ReturnType<typeof useAuth> | undefined;
+
+    render(
+      <AuthProvider>
+        <AuthProbe onReady={(auth) => (latestAuth = auth)} />
+      </AuthProvider>,
+    );
+
+    await waitFor(() => expect(screen.getByText('unauthenticated')).toBeOnTheScreen());
+
+    await act(async () => {
+      await latestAuth?.login('dani@example.com', 'secret', false);
+    });
 
     await act(async () => {
       await latestAuth?.logout();

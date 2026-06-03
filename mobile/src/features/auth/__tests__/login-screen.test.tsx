@@ -34,14 +34,30 @@ describe('LoginScreen', () => {
     expect(screen.getByRole('button', { name: 'Entrar na conta' })).toBeOnTheScreen();
   });
 
-  it('submits credentials through auth login', async () => {
+  it('submits credentials through auth login without remembering by default', async () => {
     render(<LoginScreen />);
 
     fireEvent.changeText(screen.getByLabelText('E-mail'), 'dani@example.com');
     fireEvent.changeText(screen.getByLabelText('Senha'), 'secret');
     fireEvent.press(screen.getByRole('button', { name: 'Entrar na conta' }));
 
-    await waitFor(() => expect(login).toHaveBeenCalledWith('dani@example.com', 'secret'));
+    await waitFor(() => expect(login).toHaveBeenCalledWith('dani@example.com', 'secret', false));
+  });
+
+  it('toggles the remember-session checkbox and submits the checked state', async () => {
+    render(<LoginScreen />);
+
+    const rememberCheckbox = screen.getByRole('checkbox', { name: 'Mantenha-me conectado' });
+    expect(rememberCheckbox).toHaveAccessibilityState({ checked: false });
+
+    fireEvent.press(rememberCheckbox);
+    expect(rememberCheckbox).toHaveAccessibilityState({ checked: true });
+
+    fireEvent.changeText(screen.getByLabelText('E-mail'), 'dani@example.com');
+    fireEvent.changeText(screen.getByLabelText('Senha'), 'secret');
+    fireEvent.press(screen.getByRole('button', { name: 'Entrar na conta' }));
+
+    await waitFor(() => expect(login).toHaveBeenCalledWith('dani@example.com', 'secret', true));
   });
 
   it('disables submit copy during loading and shows friendly errors', () => {
