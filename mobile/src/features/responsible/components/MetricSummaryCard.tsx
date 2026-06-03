@@ -7,11 +7,13 @@ type MetricSummaryCardProps = {
   label: string;
   value: string;
   helper?: string;
+  onPress?: () => void;
+  accessibilityLabel?: string;
 };
 
-export function MetricSummaryCard({ helper, label, value }: MetricSummaryCardProps) {
+export function MetricSummaryCard({ accessibilityLabel, helper, label, onPress, value }: MetricSummaryCardProps) {
   return (
-    <Card style={styles.card} variant="soft">
+    <Card accessibilityLabel={accessibilityLabel} onPress={onPress} style={styles.card} variant="soft">
       <View style={styles.row}>
         <Text style={styles.value}>{value}</Text>
         <Text style={styles.label}>{label}</Text>

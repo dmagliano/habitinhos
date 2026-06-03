@@ -33,6 +33,7 @@ export function ResponsibleHomeScreen({ navigation }: ResponsibleHomeScreenProps
   const token = session?.token ?? null;
   const [dashboard, setDashboard] = useState<ResponsibleDashboardResponse | null>(null);
   const [loadState, setLoadState] = useState<LoadState>('loading');
+  const [recentRedemptionsFocused, setRecentRedemptionsFocused] = useState(false);
 
   const metrics = useMemo(() => getMetrics(dashboard), [dashboard]);
 
@@ -44,6 +45,7 @@ export function ResponsibleHomeScreen({ navigation }: ResponsibleHomeScreenProps
     }
 
     setLoadState('loading');
+    setRecentRedemptionsFocused(false);
 
     try {
       const response = await responsibleService.getDashboard(token);
@@ -78,6 +80,9 @@ export function ResponsibleHomeScreen({ navigation }: ResponsibleHomeScreenProps
   const openRewardForm = () => {
     navigation?.navigate('ResponsibleRewardForm');
   };
+  const focusRecentRedemptions = () => {
+    setRecentRedemptionsFocused(true);
+  };
 
   return (
     <AppScreen>
@@ -106,9 +111,20 @@ export function ResponsibleHomeScreen({ navigation }: ResponsibleHomeScreenProps
       {loadState === 'ready' && dashboard ? (
         <>
           <View style={styles.metricGrid}>
-            {metrics.map((metric) => (
-              <MetricSummaryCard key={metric.label} label={metric.label} value={metric.value} />
-            ))}
+            {metrics.map((metric) => {
+              const isRecentRedemptions = metric.label === 'Resgates recentes';
+
+              return (
+                <MetricSummaryCard
+                  accessibilityLabel={isRecentRedemptions ? 'Ver resgates recentes' : undefined}
+                  helper={isRecentRedemptions ? 'Ver resgates recentes' : undefined}
+                  key={metric.label}
+                  label={metric.label}
+                  onPress={isRecentRedemptions ? focusRecentRedemptions : undefined}
+                  value={metric.value}
+                />
+              );
+            })}
           </View>
 
           <SectionTitle title="Suas crianças" />
@@ -142,25 +158,27 @@ export function ResponsibleHomeScreen({ navigation }: ResponsibleHomeScreenProps
             </>
           ) : null}
 
-          <SectionTitle title="Resgates recentes" />
-          {dashboard.recentRedemptions.length === 0 ? (
-            <EmptyState
-              body="Quando uma criança resgatar uma recompensa, ela aparece aqui."
-              emoji="🎁"
-              title="Nenhum resgate recente"
-            />
-          ) : (
-            <View style={styles.list}>
-              {dashboard.recentRedemptions.map((redemption) => (
-                <Card key={redemption.id} style={styles.redemptionCard}>
-                  <Text style={styles.redemptionTitle}>{redemption.rewardTitle}</Text>
-                  <Text style={styles.redemptionMeta}>
-                    {redemption.childName} · {redemption.rewardCost} moedas
-                  </Text>
-                </Card>
-              ))}
-            </View>
-          )}
+          <View testID={recentRedemptionsFocused ? 'recent-redemptions-section-focused' : 'recent-redemptions-section'}>
+            <SectionTitle title="Resgates recentes" />
+            {dashboard.recentRedemptions.length === 0 ? (
+              <EmptyState
+                body="Quando uma criança resgatar uma recompensa, ela aparece aqui."
+                emoji="🎁"
+                title="Nenhum resgate recente"
+              />
+            ) : (
+              <View style={styles.list}>
+                {dashboard.recentRedemptions.map((redemption) => (
+                  <Card key={redemption.id} style={styles.redemptionCard}>
+                    <Text style={styles.redemptionTitle}>{redemption.rewardTitle}</Text>
+                    <Text style={styles.redemptionMeta}>
+                      {redemption.childName} · {redemption.rewardCost} moedas
+                    </Text>
+                  </Card>
+                ))}
+              </View>
+            )}
+          </View>
         </>
       ) : null}
     </AppScreen>
