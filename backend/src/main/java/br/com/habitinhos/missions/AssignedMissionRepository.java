@@ -12,6 +12,9 @@ public interface AssignedMissionRepository extends JpaRepository<AssignedMission
   List<AssignedMission> findAllByFamilyUnitIdAndChildIdAndStatusOrderByDueDateAscCreatedAtAsc(
       UUID familyUnitId, UUID childId, AssignedMissionStatus status);
 
+  List<AssignedMission> findAllByFamilyUnitIdAndChildIdIn(
+      UUID familyUnitId, List<UUID> childIds);
+
   List<AssignedMission> findAllByFamilyUnitIdAndStatusOrderByCompletedAtAsc(
       UUID familyUnitId, AssignedMissionStatus status);
 

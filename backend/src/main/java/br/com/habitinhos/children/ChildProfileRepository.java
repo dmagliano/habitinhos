@@ -9,6 +9,8 @@ public interface ChildProfileRepository extends JpaRepository<ChildProfile, UUID
 
   List<ChildProfile> findAllByFamilyUnitIdAndActiveTrueOrderByCreatedAtAsc(UUID familyUnitId);
 
+  List<ChildProfile> findAllByFamilyUnitIdOrderByCreatedAtAsc(UUID familyUnitId);
+
   Optional<ChildProfile> findByIdAndFamilyUnitId(UUID id, UUID familyUnitId);
 
   Optional<ChildProfile> findByIdAndFamilyUnitIdAndActiveTrue(UUID id, UUID familyUnitId);

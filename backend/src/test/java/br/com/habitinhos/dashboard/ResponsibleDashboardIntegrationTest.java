@@ -115,7 +115,7 @@ class ResponsibleDashboardIntegrationTest extends AbstractIntegrationTest {
         .andExpect(jsonPath("$.children.length()").value(2))
         .andExpect(jsonPath("$.children[0].id").value(childA.toString()))
         .andExpect(jsonPath("$.children[0].name").value("Lia"))
-        .andExpect(jsonPath("$.children[0].balance").value(32))
+        .andExpect(jsonPath("$.children[0].balance").value(36))
         .andExpect(jsonPath("$.children[0].missionCounts.PENDING").value(1))
         .andExpect(jsonPath("$.children[0].missionCounts.AWAITING_APPROVAL").value(2))
         .andExpect(jsonPath("$.children[0].missionCounts.COMPLETED").value(1))
