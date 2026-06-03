@@ -1,5 +1,7 @@
 import { fireEvent, render, screen, waitFor } from '@testing-library/react-native';
 
+import { RootNavigator } from '../../../navigation/RootNavigator';
+import { AuthWelcomeScreen } from '../AuthWelcomeScreen';
 import { getLoginKeyboardBehavior, LoginScreen } from '../LoginScreen';
 import { useAuth } from '../AuthContext';
 
@@ -9,6 +11,7 @@ jest.mock('../AuthContext', () => ({
 
 const login = jest.fn();
 const retryRestore = jest.fn();
+const navigate = jest.fn();
 
 describe('LoginScreen', () => {
   beforeEach(() => {
@@ -23,11 +26,9 @@ describe('LoginScreen', () => {
     });
   });
 
-  it('renders PT-BR welcome and form labels', () => {
+  it('renders PT-BR form labels after login is selected', () => {
     render(<LoginScreen />);
 
-    expect(screen.getByText('Habitinhos')).toBeOnTheScreen();
-    expect(screen.getByText('Transforme tarefas em pequenas conquistas')).toBeOnTheScreen();
     expect(screen.getByLabelText('E-mail')).toBeOnTheScreen();
     expect(screen.getByLabelText('Senha')).toBeOnTheScreen();
     expect(screen.getByRole('button', { name: 'Entrar na conta' })).toBeOnTheScreen();
@@ -62,5 +63,67 @@ describe('LoginScreen', () => {
   it('uses height keyboard avoidance on Android so fields can slide above the keyboard', () => {
     expect(getLoginKeyboardBehavior('android')).toBe('height');
     expect(getLoginKeyboardBehavior('ios')).toBe('padding');
+  });
+});
+
+describe('AuthWelcomeScreen', () => {
+  beforeEach(() => {
+    jest.clearAllMocks();
+  });
+
+  it('offers visible login and registration entry actions', () => {
+    render(<AuthWelcomeScreen navigation={{ navigate } as never} route={{ key: 'AuthWelcome', name: 'AuthWelcome' }} />);
+
+    expect(screen.getByText('Habitinhos')).toBeOnTheScreen();
+    expect(screen.getByText('Transforme tarefas em pequenas conquistas')).toBeOnTheScreen();
+    expect(screen.getByText('Organize missões, moedas e recompensas da família.')).toBeOnTheScreen();
+
+    fireEvent.press(screen.getByRole('button', { name: 'Login' }));
+    fireEvent.press(screen.getByRole('button', { name: 'Registro' }));
+
+    expect(navigate).toHaveBeenCalledWith('AuthLogin');
+    expect(navigate).toHaveBeenCalledWith('AuthRegister');
+  });
+});
+
+describe('RootNavigator auth entry', () => {
+  beforeEach(() => {
+    jest.clearAllMocks();
+  });
+
+  it('renders the welcome entry before any login-only form for unauthenticated users', async () => {
+    jest.mocked(useAuth).mockReturnValue({
+      status: 'unauthenticated',
+      session: null,
+      errorMessage: null,
+      login,
+      logout: jest.fn(),
+      retryRestore,
+    });
+
+    render(<RootNavigator />);
+
+    expect(await screen.findByText('Habitinhos')).toBeOnTheScreen();
+    expect(screen.getByRole('button', { name: 'Login' })).toBeOnTheScreen();
+    expect(screen.getByRole('button', { name: 'Registro' })).toBeOnTheScreen();
+    expect(screen.queryByLabelText('E-mail')).not.toBeOnTheScreen();
+    expect(screen.queryByLabelText('Senha')).not.toBeOnTheScreen();
+  });
+
+  it('keeps the loading screen while auth state is restoring', () => {
+    jest.mocked(useAuth).mockReturnValue({
+      status: 'restoring',
+      session: null,
+      errorMessage: null,
+      login,
+      logout: jest.fn(),
+      retryRestore,
+    });
+
+    render(<RootNavigator />);
+
+    expect(screen.getByText('Preparando sua família...')).toBeOnTheScreen();
+    expect(screen.queryByRole('button', { name: 'Login' })).not.toBeOnTheScreen();
+    expect(screen.queryByRole('button', { name: 'Registro' })).not.toBeOnTheScreen();
   });
 });
