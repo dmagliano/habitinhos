@@ -18,6 +18,7 @@ jest.mock('../../../storage/tokenStorage', () => ({
 jest.mock('../authService', () => ({
   authService: {
     login: jest.fn(),
+    register: jest.fn(),
     me: jest.fn(),
   },
 }));
@@ -148,6 +149,39 @@ describe('AuthProvider', () => {
     });
 
     await waitFor(() => expect(tokenStorage.clearToken).toHaveBeenCalled());
+  });
+
+  it('registers a new account, persists the token, and enters the authenticated session', async () => {
+    jest.mocked(tokenStorage.getToken).mockResolvedValueOnce(null);
+    jest.mocked(authService.register).mockResolvedValueOnce(session);
+
+    let latestAuth: ReturnType<typeof useAuth> | undefined;
+
+    render(
+      <AuthProvider>
+        <AuthProbe onReady={(auth) => (latestAuth = auth)} />
+      </AuthProvider>,
+    );
+
+    await waitFor(() => expect(screen.getByText('unauthenticated')).toBeOnTheScreen());
+
+    await act(async () => {
+      await latestAuth?.register({
+        name: 'Dani',
+        email: 'dani@example.com',
+        password: 'secret',
+        familyName: 'Familia Silva',
+      });
+    });
+
+    await waitFor(() => expect(screen.getByText('authenticated')).toBeOnTheScreen());
+    expect(authService.register).toHaveBeenCalledWith({
+      name: 'Dani',
+      email: 'dani@example.com',
+      password: 'secret',
+      familyName: 'Familia Silva',
+    });
+    expect(tokenStorage.setToken).toHaveBeenCalledWith('jwt-token');
   });
 });
 

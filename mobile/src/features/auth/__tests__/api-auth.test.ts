@@ -1,5 +1,6 @@
 import { apiRequest } from '../../../api/client';
 import { ApiError, AuthResponse } from '../../../api/types';
+import { authService } from '../authService';
 
 const fetchMock = jest.fn();
 
@@ -33,6 +34,56 @@ describe('apiRequest', () => {
         body: JSON.stringify({ email: 'dani@example.com', password: 'secret' }),
       }),
     );
+  });
+
+  it('registers a responsible user through the backend auth endpoint', async () => {
+    const response: AuthResponse = {
+      token: 'jwt-token',
+      user: { id: 'user-1', name: 'Dani', email: 'dani@example.com', role: 'RESPONSIBLE' },
+      family: { id: 'family-1', name: 'Familia Silva' },
+    };
+
+    fetchMock.mockResolvedValueOnce(createResponse(200, response));
+
+    await expect(
+      authService.register({
+        name: 'Dani',
+        email: 'dani@example.com',
+        password: 'secret',
+        familyName: 'Familia Silva',
+      }),
+    ).resolves.toEqual({
+      token: 'jwt-token',
+      user: response.user,
+      family: response.family,
+    });
+
+    expect(fetchMock).toHaveBeenCalledWith(
+      'http://10.0.2.2:8080/auth/register',
+      expect.objectContaining({
+        method: 'POST',
+        body: JSON.stringify({
+          name: 'Dani',
+          email: 'dani@example.com',
+          password: 'secret',
+          familyName: 'Familia Silva',
+        }),
+      }),
+    );
+  });
+
+  it('rejects client familyUnitId in register body', async () => {
+    await expect(
+      authService.register({
+        name: 'Dani',
+        email: 'dani@example.com',
+        password: 'secret',
+        familyName: 'Familia Silva',
+        familyUnitId: 'client-family',
+      } as never),
+    ).rejects.toBeInstanceOf(ApiError);
+
+    expect(fetchMock).not.toHaveBeenCalled();
   });
 
   it('maps structured backend errors to friendly PT-BR messages', async () => {

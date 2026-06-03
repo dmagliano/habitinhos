@@ -3,6 +3,7 @@ import { fireEvent, render, screen, waitFor } from '@testing-library/react-nativ
 import { RootNavigator } from '../../../navigation/RootNavigator';
 import { AuthWelcomeScreen } from '../AuthWelcomeScreen';
 import { getLoginKeyboardBehavior, LoginScreen } from '../LoginScreen';
+import { RegisterScreen } from '../RegisterScreen';
 import { useAuth } from '../AuthContext';
 
 jest.mock('../AuthContext', () => ({
@@ -10,6 +11,7 @@ jest.mock('../AuthContext', () => ({
 }));
 
 const login = jest.fn();
+const register = jest.fn();
 const retryRestore = jest.fn();
 const navigate = jest.fn();
 
@@ -21,6 +23,7 @@ describe('LoginScreen', () => {
       session: null,
       errorMessage: null,
       login,
+      register,
       logout: jest.fn(),
       retryRestore,
     });
@@ -67,6 +70,7 @@ describe('LoginScreen', () => {
       session: null,
       errorMessage: 'Nao conseguimos conectar ao servidor. Verifique a conexao e tente novamente.',
       login,
+      register,
       logout: jest.fn(),
       retryRestore,
     });
@@ -114,6 +118,7 @@ describe('RootNavigator auth entry', () => {
       session: null,
       errorMessage: null,
       login,
+      register,
       logout: jest.fn(),
       retryRestore,
     });
@@ -133,6 +138,7 @@ describe('RootNavigator auth entry', () => {
       session: null,
       errorMessage: null,
       login,
+      register,
       logout: jest.fn(),
       retryRestore,
     });
@@ -142,5 +148,60 @@ describe('RootNavigator auth entry', () => {
     expect(screen.getByText('Preparando sua família...')).toBeOnTheScreen();
     expect(screen.queryByRole('button', { name: 'Login' })).not.toBeOnTheScreen();
     expect(screen.queryByRole('button', { name: 'Registro' })).not.toBeOnTheScreen();
+  });
+});
+
+describe('RegisterScreen', () => {
+  beforeEach(() => {
+    jest.clearAllMocks();
+    jest.mocked(useAuth).mockReturnValue({
+      status: 'unauthenticated',
+      session: null,
+      errorMessage: null,
+      login,
+      register,
+      logout: jest.fn(),
+      retryRestore,
+    });
+  });
+
+  it('renders the required registration fields and submits the account request', async () => {
+    render(<RegisterScreen navigation={{ navigate } as never} route={{ key: 'AuthRegister', name: 'AuthRegister' }} />);
+
+    expect(screen.getByText('Criar conta')).toBeOnTheScreen();
+    fireEvent.changeText(screen.getByLabelText('Nome'), 'Dani');
+    fireEvent.changeText(screen.getByLabelText('E-mail'), 'dani@example.com');
+    fireEvent.changeText(screen.getByLabelText('Senha'), 'secret');
+    fireEvent.changeText(screen.getByLabelText('Nome da família'), 'Familia Silva');
+    fireEvent.press(screen.getByRole('button', { name: 'Criar conta' }));
+
+    await waitFor(() =>
+      expect(register).toHaveBeenCalledWith({
+        name: 'Dani',
+        email: 'dani@example.com',
+        password: 'secret',
+        familyName: 'Familia Silva',
+      }),
+    );
+  });
+
+  it('renders friendly backend errors and lets the user return to login', () => {
+    jest.mocked(useAuth).mockReturnValue({
+      status: 'unauthenticated',
+      session: null,
+      errorMessage: 'Esse e-mail já está em uso. Entre ou use outro e-mail.',
+      login,
+      register,
+      logout: jest.fn(),
+      retryRestore,
+    });
+
+    render(<RegisterScreen navigation={{ navigate } as never} route={{ key: 'AuthRegister', name: 'AuthRegister' }} />);
+
+    expect(screen.getByText('Esse e-mail já está em uso. Entre ou use outro e-mail.')).toBeOnTheScreen();
+
+    fireEvent.press(screen.getByRole('button', { name: 'Já tenho conta' }));
+
+    expect(navigate).toHaveBeenCalledWith('AuthLogin');
   });
 });
