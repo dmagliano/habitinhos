@@ -121,6 +121,48 @@ class ChildIntegrationTest extends AbstractIntegrationTest {
   }
 
   @Test
+  void listChildrenCanIncludeInactiveWithoutLeakingOtherFamilies() throws Exception {
+    String token = registerToken("responsavel@example.com");
+    UUID activeChildId = createChild(token, new ChildRequest("Lia", 8, "star", null));
+    UUID inactiveChildId = createChild(token, new ChildRequest("Noah", 7, "rocket", null));
+    mockMvc.perform(patch("/children/{id}/deactivate", inactiveChildId)
+            .header("Authorization", "Bearer " + token))
+        .andExpect(status().isOk());
+
+    String otherToken = registerToken("outra-familia@example.com");
+    UUID otherFamilyChildId = createChild(otherToken, new ChildRequest("Bia", 6, "moon", null));
+
+    String defaultResponse = mockMvc.perform(get("/children")
+            .header("Authorization", "Bearer " + token))
+        .andExpect(status().isOk())
+        .andReturn()
+        .getResponse()
+        .getContentAsString();
+
+    JsonNode defaultChildren = objectMapper.readTree(defaultResponse);
+    assertThat(defaultChildren).hasSize(1);
+    assertThat(defaultChildren.get(0).get("id").asText()).isEqualTo(activeChildId.toString());
+
+    String includeInactiveResponse = mockMvc.perform(get("/children")
+            .queryParam("includeInactive", "true")
+            .header("Authorization", "Bearer " + token))
+        .andExpect(status().isOk())
+        .andReturn()
+        .getResponse()
+        .getContentAsString();
+
+    JsonNode children = objectMapper.readTree(includeInactiveResponse);
+    assertThat(children).hasSize(2);
+    assertThat(children)
+        .extracting(child -> child.get("id").asText())
+        .containsExactly(activeChildId.toString(), inactiveChildId.toString())
+        .doesNotContain(otherFamilyChildId.toString());
+    assertThat(children)
+        .extracting(child -> child.get("active").asBoolean())
+        .containsExactly(true, false);
+  }
+
+  @Test
   void optionalAvatarAndAccessPinArePersistedButPinHashIsNeverReturned() throws Exception {
     String token = registerToken("responsavel@example.com");
 
