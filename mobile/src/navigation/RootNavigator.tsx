@@ -9,6 +9,7 @@ import { ChildProfileSelectScreen } from '../features/child/ChildProfileSelectSc
 import { ChildTabsScreen } from '../features/child/ChildTabsScreen';
 import { FamilyHubScreen } from '../features/family/FamilyHubScreen';
 import { ResponsibleChildDetailScreen } from '../features/responsible/ResponsibleChildDetailScreen';
+import { ResponsibleChildFormScreen } from '../features/responsible/ResponsibleChildFormScreen';
 import { ResponsibleChildrenScreen } from '../features/responsible/ResponsibleChildrenScreen';
 import { ResponsibleTabsScreen } from '../features/responsible/ResponsibleTabsScreen';
 
@@ -31,6 +32,7 @@ export function RootNavigator() {
             <Stack.Screen component={FamilyHubScreen} name="FamilyHub" />
             <Stack.Screen component={ResponsibleTabsScreen} name="ResponsibleTabs" />
             <Stack.Screen component={ResponsibleChildrenScreen} name="ResponsibleChildren" />
+            <Stack.Screen component={ResponsibleChildFormScreen} name="ResponsibleChildForm" />
             <Stack.Screen component={ResponsibleChildDetailScreen} name="ResponsibleChildDetail" />
             <Stack.Screen component={ChildProfileSelectScreen} name="ChildProfileSelect" />
             <Stack.Screen component={ChildTabsScreen} name="ChildTabs" />

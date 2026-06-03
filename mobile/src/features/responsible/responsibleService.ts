@@ -1,5 +1,6 @@
 import { apiRequest } from '../../api/client';
 import {
+  ChildProfileRequest,
   ChildResponse,
   MissionResponse,
   ResponsibleDashboardResponse,
@@ -21,6 +22,22 @@ export const responsibleService = {
 
   async getChild(token: string, childId: string): Promise<ChildResponse> {
     return apiRequest<ChildResponse>(`/children/${childId}`, { token });
+  },
+
+  async createChild(token: string, body: ChildProfileRequest): Promise<ChildResponse> {
+    return apiRequest<ChildResponse>('/children', {
+      body,
+      method: 'POST',
+      token,
+    });
+  },
+
+  async updateChild(token: string, childId: string, body: ChildProfileRequest): Promise<ChildResponse> {
+    return apiRequest<ChildResponse>(`/children/${childId}`, {
+      body,
+      method: 'PUT',
+      token,
+    });
   },
 
   async listMissions(token: string, includeInactive = false): Promise<MissionResponse[]> {

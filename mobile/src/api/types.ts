@@ -39,6 +39,12 @@ export type ChildResponse = {
   updatedAt: string;
 };
 
+export type ChildProfileRequest = {
+  name: string;
+  age: number;
+  avatarKey: string;
+};
+
 export type WalletResponse = {
   childId: string;
   balance: number;
