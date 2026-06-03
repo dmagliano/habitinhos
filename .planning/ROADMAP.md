@@ -219,7 +219,7 @@ Plans:
   6. The dashboard approval card opens the pending approvals screen, and the recent-redemptions metric/card opens or scrolls to recent redemptions.
   7. Recent redemption cards show an "Entregue" checkbox; marking it persists the delivered state, greys the card text, and displays `Entregue em: {data}`.
 
-**Plans:** 1/3 plans executed
+**Plans:** 2/3 plans executed
 
 Plans:
 **Wave 1**
@@ -228,7 +228,7 @@ Plans:
 
 **Wave 2** *(blocked on 06.1-01 completion)*
 
-- [ ] 06.1-02: Troca de modo child-first e atalhos do dashboard
+- [x] 06.1-02: Troca de modo child-first e atalhos do dashboard
 
 **Wave 3** *(blocked on 06.1-02 completion)*
 
@@ -269,5 +269,5 @@ Phases execute in numeric order: 1 → 2 → 3 → 4 → 5 → 6 → 06.1 → 7
 | 4. Mobile base | 4/4 | Complete   | 2026-06-01 |
 | 5. Fluxo da criança | 4/4 | Complete   | 2026-06-02 |
 | 6. Fluxo do responsável | 4/4 | Complete | 2026-06-03 |
-| 06.1 Ajustes pós-UAT dos fluxos de entrada, troca de modo e entrega de resgates | 1/3 | In Progress|  |
+| 06.1 Ajustes pós-UAT dos fluxos de entrada, troca de modo e entrega de resgates | 2/3 | In Progress|  |
 | 7. Polimento para demonstração do TCC | 0/3 | Not started | - |

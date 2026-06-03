@@ -59,7 +59,7 @@
 - [x] **DASH-02**: Dashboard shows balance by child.
 - [x] **DASH-03**: Dashboard shows pending, awaiting approval, and completed missions.
 - [x] **DASH-04**: Dashboard shows recent reward redemptions.
-- [ ] **DASH-05**: Responsible dashboard approval and recent-redemption affordances navigate to the corresponding actionable screen or section.
+- [x] **DASH-05**: Responsible dashboard approval and recent-redemption affordances navigate to the corresponding actionable screen or section.
 
 ### Mobile App
 
@@ -69,7 +69,7 @@
 - [ ] **MOBL-04**: Child flow includes profile selection/access, home with balance, missions, completion feedback, reward catalog, redemption feedback, and insufficient balance message.
 - [x] **MOBL-05**: Mobile app consumes the real backend API for the demo flow.
 - [x] **MOBL-06**: Mobile screens from Phase 4 onward follow `docs/design/mobile-design-contract.md`, use `docs/design/phase-design-map.md` for visual references, and do not copy Stitch HTML/CSS exports.
-- [ ] **MOBL-07**: Authenticated entry can open directly into the child flow without a mandatory "sou responsável/sou criança" hub, while the child profile exposes "Gerenciar família" and the responsible area exposes a clear return path to child mode.
+- [x] **MOBL-07**: Authenticated entry can open directly into the child flow without a mandatory "sou responsável/sou criança" hub, while the child profile exposes "Gerenciar família" and the responsible area exposes a clear return path to child mode.
 
 ### Documentation and Demo
 
@@ -118,9 +118,9 @@
 | MOBL-04, MOBL-05 | Phase 5 | Pending |
 | CHLD-03, MISS-04..MISS-05, REWD-03..REWD-05, WALT-01 | Phase 5 | Pending |
 | MOBL-03, DASH-01..DASH-04 | Phase 6 | Complete |
-| DASH-05 | Phase 06.1 | Pending |
+| DASH-05 | Phase 06.1 | Complete |
 | MOBL-06 | Phases 4, 5, 6, 06.1, 7 | Complete |
-| MOBL-07 | Phase 06.1 | Pending |
+| MOBL-07 | Phase 06.1 | Complete |
 | DOCS-02..DOCS-04 | Phase 7 | Pending |
 
 **Coverage:**

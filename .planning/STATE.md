@@ -3,13 +3,13 @@ gsd_state_version: 1.0
 milestone: v1.0
 milestone_name: milestone
 status: executing
-last_updated: "2026-06-03T13:57:54.543Z"
+last_updated: "2026-06-03T14:10:47.540Z"
 last_activity: 2026-06-03
 progress:
   total_phases: 8
   completed_phases: 6
   total_plans: 26
-  completed_plans: 24
+  completed_plans: 25
   percent: 75
 ---
 
@@ -25,11 +25,11 @@ See: .planning/PROJECT.md (updated 2026-06-01)
 ## Current Position
 
 Phase: 06.1 (ajustes-p-s-uat-dos-fluxos-de-entrada-troca-de-modo-e-entreg) — EXECUTING
-Plan: 2 of 3
+Plan: 3 of 3
 Status: Ready to execute
 Last activity: 2026-06-03
 
-Progress: [█████████░] 92%
+Progress: [██████████] 96%
 
 ## Performance Metrics
 
@@ -68,6 +68,7 @@ Progress: [█████████░] 92%
 | Phase 06 P03 | 114min | 5 tasks | 21 files |
 | Phase 06 P04 | 142min | 4 tasks | 19 files |
 | Phase 06.1 P01 | 17min | 3 tasks | 19 files |
+| Phase 06.1 P02 | 10min | 3 tasks | 10 files |
 
 ## Accumulated Context
 
@@ -87,6 +88,9 @@ Decisions are logged in PROJECT.md Key Decisions table and .planning/DECISIONS.m
 - Tenant isolation is explicit through `CurrentUser.familyUnitId` and family-scoped repository methods.
 - [Phase 06.1]: Unchecked login keeps only the in-memory runtime session and skips SecureStore persistence. — Post-UAT AUTH-07 requires session restoration to follow the explicit remember-session choice.
 - [Phase 06.1]: Registration persists the new JWT by default after account creation. — Account creation should leave the responsible user inside the newly created family session.
+- [Phase 06.1]: Authenticated mobile entry starts at ChildProfileSelect while FamilyHub remains as fallback. — Post-UAT MOBL-07 removes the mandatory role hub from the normal demo path.
+- [Phase 06.1]: ResponsibleTabs preserves active child via route params for mode switching. — This keeps switching as UI/navigation state only and avoids JWT or backend authorization changes.
+- [Phase 06.1]: Recent redemptions use a pressable dashboard metric to focus the real section. — DASH-05 is satisfied without mock redemption data or a new route.
 
 ### Pending Todos
 
@@ -105,9 +109,9 @@ None yet.
 
 ## Session Continuity
 
-Last session: 2026-06-03T13:57:54.440Z
-Stopped at: Completed 06.1-01-PLAN.md
-Resume file: .planning/phases/06.1-ajustes-p-s-uat-dos-fluxos-de-entrada-troca-de-modo-e-entreg/06.1-02-PLAN.md
+Last session: 2026-06-03T14:10:47.510Z
+Stopped at: Completed 06.1-02-PLAN.md
+Resume file: .planning/phases/06.1-ajustes-p-s-uat-dos-fluxos-de-entrada-troca-de-modo-e-entreg/06.1-03-PLAN.md
 
 ## Quick Tasks Completed
 
