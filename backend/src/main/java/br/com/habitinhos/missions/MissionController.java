@@ -18,6 +18,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -49,10 +50,13 @@ public class MissionController {
   }
 
   @GetMapping
-  public List<MissionResponse> list() {
+  public List<MissionResponse> list(@RequestParam(defaultValue = "false") boolean includeInactive) {
     var currentUser = currentUserProvider.getCurrentUser();
-    log.debug("List missions request: familyUnitId={}", currentUser.familyUnitId());
-    return missionService.list(currentUser);
+    log.debug(
+        "List missions request: familyUnitId={} includeInactive={}",
+        currentUser.familyUnitId(),
+        includeInactive);
+    return missionService.list(currentUser, includeInactive);
   }
 
   @GetMapping("/{id}")

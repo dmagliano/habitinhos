@@ -40,13 +40,20 @@ public class MissionService {
   }
 
   @Transactional(readOnly = true)
-  public List<MissionResponse> list(CurrentUser currentUser) {
+  public List<MissionResponse> list(CurrentUser currentUser, boolean includeInactive) {
     requireResponsible(currentUser);
-    List<MissionResponse> missions = missionRepository.findAllByFamilyUnitIdAndActiveTrueOrderByCreatedAtAsc(currentUser.familyUnitId())
+    var missionEntities = includeInactive
+        ? missionRepository.findAllByFamilyUnitIdOrderByActiveDescCreatedAtAsc(currentUser.familyUnitId())
+        : missionRepository.findAllByFamilyUnitIdAndActiveTrueOrderByCreatedAtAsc(currentUser.familyUnitId());
+    List<MissionResponse> missions = missionEntities
         .stream()
         .map(this::toResponse)
         .toList();
-    log.debug("Missions listed: familyUnitId={} count={}", currentUser.familyUnitId(), missions.size());
+    log.debug(
+        "Missions listed: familyUnitId={} includeInactive={} count={}",
+        currentUser.familyUnitId(),
+        includeInactive,
+        missions.size());
     return missions;
   }
 

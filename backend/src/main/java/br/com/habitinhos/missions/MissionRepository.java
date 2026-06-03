@@ -9,6 +9,8 @@ public interface MissionRepository extends JpaRepository<Mission, UUID> {
 
   List<Mission> findAllByFamilyUnitIdAndActiveTrueOrderByCreatedAtAsc(UUID familyUnitId);
 
+  List<Mission> findAllByFamilyUnitIdOrderByActiveDescCreatedAtAsc(UUID familyUnitId);
+
   Optional<Mission> findByIdAndFamilyUnitId(UUID id, UUID familyUnitId);
 
   Optional<Mission> findByIdAndFamilyUnitIdAndActiveTrue(UUID id, UUID familyUnitId);
