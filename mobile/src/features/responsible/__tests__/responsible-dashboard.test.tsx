@@ -163,6 +163,7 @@ describe('responsible dashboard screens', () => {
     expect(screen.getByText('1 aguardando aprovação')).toBeOnTheScreen();
     expect(screen.getByText('5 concluídas')).toBeOnTheScreen();
     expect(screen.getByText('Cinema em família')).toBeOnTheScreen();
-    expect(screen.getByRole('button', { name: 'Editar criança' })).toBeOnTheScreen();
+    fireEvent.press(screen.getByRole('button', { name: 'Editar criança' }));
+    expect(navigate).toHaveBeenCalledWith('ResponsibleChildForm', { childId: 'child-1' });
   });
 });

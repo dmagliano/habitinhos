@@ -13,6 +13,7 @@ jest.mock('../../auth/AuthContext', () => ({
 jest.mock('../responsibleService', () => ({
   responsibleService: {
     createChild: jest.fn(),
+    deactivateChild: jest.fn(),
     getChild: jest.fn(),
     listChildren: jest.fn(),
     updateChild: jest.fn(),
@@ -193,5 +194,53 @@ describe('ResponsibleChildrenScreen', () => {
     expect(await screen.findByText('Informe o nome da criança.')).toBeOnTheScreen();
     expect(screen.getByText('Informe uma idade maior que zero.')).toBeOnTheScreen();
     expect(responsibleService.createChild).not.toHaveBeenCalled();
+  });
+
+  it('confirms deactivation with preserved-history copy and disables duplicate submits', async () => {
+    let resolveDeactivate: (child: ChildResponse) => void = () => undefined;
+    const deactivatePromise = new Promise<ChildResponse>((resolve) => {
+      resolveDeactivate = resolve;
+    });
+
+    jest.mocked(responsibleService.getChild).mockResolvedValue(activeChild);
+    jest.mocked(responsibleService.deactivateChild).mockReturnValue(deactivatePromise);
+
+    render(
+      <ResponsibleChildFormScreen
+        navigation={navigation}
+        route={{ key: 'ResponsibleChildForm', name: 'ResponsibleChildForm', params: { childId: 'child-active' } }}
+      />,
+    );
+
+    await screen.findByDisplayValue('Lia');
+    fireEvent.press(screen.getByRole('button', { name: 'Desativar criança' }));
+
+    expect(screen.getByText('Desativar criança?')).toBeOnTheScreen();
+    expect(
+      screen.getByText(
+        'O histórico, as moedas e as missões anteriores continuam guardados. A criança não aparece para novas atribuições.',
+      ),
+    ).toBeOnTheScreen();
+
+    fireEvent.press(screen.getByRole('button', { name: 'Confirmar desativação de Lia' }));
+    expect(screen.getByRole('button', { name: 'Desativando criança' })).toBeDisabled();
+    fireEvent.press(screen.getByRole('button', { name: 'Desativando criança' }));
+    expect(responsibleService.deactivateChild).toHaveBeenCalledTimes(1);
+
+    resolveDeactivate({ ...activeChild, active: false });
+
+    await waitFor(() =>
+      expect(navigate).toHaveBeenCalledWith('ResponsibleChildren', { feedback: 'child-deactivated' }),
+    );
+  });
+
+  it('refetches deactivated children in the management list as inactive', async () => {
+    jest.mocked(responsibleService.listChildren).mockResolvedValue([{ ...activeChild, active: false }]);
+
+    render(<ResponsibleChildrenScreen navigation={navigation} route={{ key: 'ResponsibleChildren', name: 'ResponsibleChildren' }} />);
+
+    const childCard = await screen.findByTestId('manage-child-child-active');
+    expect(within(childCard).getByText('Inativa')).toBeOnTheScreen();
+    expect(responsibleService.listChildren).toHaveBeenCalledWith('jwt-token', true);
   });
 });

@@ -112,6 +112,32 @@ describe('responsibleService', () => {
     expect(JSON.stringify(fetchMock.mock.calls)).not.toContain('familyUnitId');
   });
 
+  it('deactivates children with PATCH and never sends DELETE', async () => {
+    const child = {
+      id: 'child-1',
+      name: 'Lia',
+      age: 8,
+      avatarKey: 'fox',
+      active: false,
+      createdAt: '2026-06-01T10:00:00Z',
+      updatedAt: '2026-06-01T10:00:00Z',
+    };
+
+    fetchMock.mockResolvedValueOnce(createResponse(200, child));
+
+    await expect(responsibleService.deactivateChild('jwt-token', 'child-1')).resolves.toEqual(child);
+
+    expect(fetchMock).toHaveBeenCalledWith(
+      'http://10.0.2.2:8080/children/child-1/deactivate',
+      expect.objectContaining({
+        method: 'PATCH',
+        headers: expect.objectContaining({ Authorization: 'Bearer jwt-token' }),
+      }),
+    );
+    expect(JSON.stringify(fetchMock.mock.calls)).not.toContain('DELETE');
+    expect(JSON.stringify(fetchMock.mock.calls)).not.toContain('familyUnitId');
+  });
+
   it('lists missions and rewards with includeInactive only when requested', async () => {
     fetchMock
       .mockResolvedValueOnce(createResponse(200, []))
