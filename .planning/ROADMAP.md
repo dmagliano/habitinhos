@@ -12,7 +12,7 @@ Habitinhos will be built as a monorepo MVP in seven phases: backend foundation, 
 - [x] **Phase 4: Mobile base** - Create Expo app foundation, navigation, API client, login flow, and base visual structure. (completed 2026-06-01)
 - [x] **Phase 5: Fluxo da criança** - Build child home, balance, missions, completion feedback, rewards catalog, and redemption flow. (completed 2026-06-02)
 - [x] **Phase 6: Fluxo do responsável** - Build dashboard, children, missions, assignments, rewards, approvals, and child detail views. (completed 2026-06-03)
-- [ ] **Phase 06.1: Ajustes pós-UAT dos fluxos de entrada, troca de modo e entrega de resgates** - Refine unauthenticated entry, login/register/session persistence, child-first mode switching, dashboard links, and delivered reward redemptions. (INSERTED)
+- [x] **Phase 06.1: Ajustes pós-UAT dos fluxos de entrada, troca de modo e entrega de resgates** - Refine unauthenticated entry, login/register/session persistence, child-first mode switching, dashboard links, and delivered reward redemptions. (INSERTED) (completed 2026-06-03)
 - [ ] **Phase 7: Polimento para demonstração do TCC** - Add demo seeds, visual polish, README, architecture docs, presentation script, and final testing.
 
 ## Phase Details
@@ -219,7 +219,7 @@ Plans:
   6. The dashboard approval card opens the pending approvals screen, and the recent-redemptions metric/card opens or scrolls to recent redemptions.
   7. Recent redemption cards show an "Entregue" checkbox; marking it persists the delivered state, greys the card text, and displays `Entregue em: {data}`.
 
-**Plans:** 2/3 plans executed
+**Plans:** 3/3 plans complete
 
 Plans:
 **Wave 1**
@@ -232,7 +232,7 @@ Plans:
 
 **Wave 3** *(blocked on 06.1-02 completion)*
 
-- [ ] 06.1-03: Persistencia e UI de entrega de resgates
+- [x] 06.1-03: Persistencia e UI de entrega de resgates
 
 ### Phase 7: Polimento para demonstração do TCC
 
@@ -269,5 +269,5 @@ Phases execute in numeric order: 1 → 2 → 3 → 4 → 5 → 6 → 06.1 → 7
 | 4. Mobile base | 4/4 | Complete   | 2026-06-01 |
 | 5. Fluxo da criança | 4/4 | Complete   | 2026-06-02 |
 | 6. Fluxo do responsável | 4/4 | Complete | 2026-06-03 |
-| 06.1 Ajustes pós-UAT dos fluxos de entrada, troca de modo e entrega de resgates | 2/3 | In Progress|  |
+| 06.1 Ajustes pós-UAT dos fluxos de entrada, troca de modo e entrega de resgates | 3/3 | Complete   | 2026-06-03 |
 | 7. Polimento para demonstração do TCC | 0/3 | Not started | - |

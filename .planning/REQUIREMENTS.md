@@ -51,7 +51,7 @@
 - [x] **REWD-04**: Child can redeem a reward when balance is sufficient.
 - [x] **REWD-05**: System blocks reward redemption when balance is insufficient.
 - [x] **REWD-06**: Successful MVP redemption can be recorded directly as `REDEEMED`.
-- [ ] **REWD-07**: Responsible adult can mark a redeemed reward as delivered, preserving a delivered timestamp in the redemption history.
+- [x] **REWD-07**: Responsible adult can mark a redeemed reward as delivered, preserving a delivered timestamp in the redemption history.
 
 ### Responsible Dashboard
 
@@ -111,7 +111,7 @@
 | MISS-01..MISS-09 | Phase 2 | Complete |
 | WALT-01, WALT-02, WALT-04, WALT-06 | Phase 2 | Complete |
 | REWD-01..REWD-06 | Phase 3 | Complete |
-| REWD-07 | Phase 06.1 | Pending |
+| REWD-07 | Phase 06.1 | Complete |
 | WALT-03, WALT-05 | Phase 3 | Complete |
 | MOBL-01, MOBL-02 | Phase 4 | Complete |
 | AUTH-02, AUTH-04 | Phase 4 | Complete |
