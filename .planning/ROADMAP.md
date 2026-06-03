@@ -197,7 +197,7 @@ Plans:
 
 **Wave 3** *(blocked on Wave 2 completion)*
 
-- [ ] 06-03: Mission management, assignment, and approval queue
+- [x] 06-03: Mission management, assignment, and approval queue
 
 **Wave 4** *(blocked on Wave 3 completion)*
 
@@ -237,5 +237,5 @@ Phases execute in numeric order: 1 → 2 → 3 → 4 → 5 → 6 → 7
 | 3. Recompensas e resgates | 3/3 | Complete    | 2026-06-01 |
 | 4. Mobile base | 4/4 | Complete   | 2026-06-01 |
 | 5. Fluxo da criança | 4/4 | Complete   | 2026-06-02 |
-| 6. Fluxo do responsável | 2/4 | In Progress|  |
+| 6. Fluxo do responsável | 3/4 | In Progress|  |
 | 7. Polimento para demonstração do TCC | 0/3 | Not started | - |
