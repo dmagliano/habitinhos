@@ -186,12 +186,21 @@ Plans:
   6. Responsible screens follow `docs/design/mobile-design-contract.md` and the Phase 6 references in `docs/design/phase-design-map.md`.
 
 **Plans**: 4 plans
-
 Plans:
+**Wave 1**
 
 - [ ] 06-01: Responsible dashboard and child detail
+
+**Wave 2** *(blocked on Wave 1 completion)*
+
 - [ ] 06-02: Children management screens
+
+**Wave 3** *(blocked on Wave 2 completion)*
+
 - [ ] 06-03: Mission management, assignment, and approval queue
+
+**Wave 4** *(blocked on Wave 3 completion)*
+
 - [ ] 06-04: Reward management screens
 
 ### Phase 7: Polimento para demonstração do TCC
