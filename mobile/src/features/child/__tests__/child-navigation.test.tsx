@@ -2,6 +2,7 @@ import { NavigationContainer } from '@react-navigation/native';
 import { fireEvent, render, screen, waitFor } from '@testing-library/react-native';
 
 import { ChildResponse } from '../../../api/types';
+import { RootNavigator } from '../../../navigation/RootNavigator';
 import { useAuth } from '../../auth/AuthContext';
 import { FamilyHubScreen } from '../../family/FamilyHubScreen';
 import { childService } from '../childService';
@@ -72,6 +73,18 @@ describe('child navigation flow', () => {
       updatedAt: '2026-06-01T10:00:00Z',
     });
     jest.mocked(childService.listPendingMissions).mockResolvedValue([]);
+  });
+
+  it('starts authenticated sessions in child profile selection instead of the family hub', async () => {
+    jest.mocked(childService.listChildren).mockResolvedValue([joaquim]);
+
+    render(<RootNavigator />);
+
+    expect(await screen.findByText('Quem vai brincar agora?')).toBeOnTheScreen();
+    expect(screen.getByText('Escolha um perfil da família.')).toBeOnTheScreen();
+    expect(screen.queryByRole('button', { name: 'Sou responsável' })).toBeNull();
+    expect(screen.queryByRole('button', { name: 'Sou criança' })).toBeNull();
+    expect(childService.listChildren).toHaveBeenCalledWith('jwt-token');
   });
 
   it('opens backend child profile selection from FamilyHub', () => {
