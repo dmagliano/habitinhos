@@ -62,7 +62,7 @@
 
 - [x] **MOBL-01**: Mobile app is created with Expo, React Native, TypeScript, and React Navigation.
 - [x] **MOBL-02**: Mobile app has PT-BR screens and English technical names in code.
-- [ ] **MOBL-03**: Responsible flow includes login, family onboarding, dashboard, children, missions, assignments, approvals, rewards, and child details.
+- [x] **MOBL-03**: Responsible flow includes login, family onboarding, dashboard, children, missions, assignments, approvals, rewards, and child details.
 - [ ] **MOBL-04**: Child flow includes profile selection/access, home with balance, missions, completion feedback, reward catalog, redemption feedback, and insufficient balance message.
 - [ ] **MOBL-05**: Mobile app consumes the real backend API for the demo flow.
 - [ ] **MOBL-06**: Mobile screens from Phase 4 onward follow `docs/design/mobile-design-contract.md`, use `docs/design/phase-design-map.md` for visual references, and do not copy Stitch HTML/CSS exports.
@@ -111,7 +111,7 @@
 | AUTH-02, AUTH-04 | Phase 4 | Complete |
 | MOBL-04, MOBL-05 | Phase 5 | Pending |
 | CHLD-03, MISS-04..MISS-05, REWD-03..REWD-05, WALT-01 | Phase 5 | Pending |
-| MOBL-03, DASH-01..DASH-04 | Phase 6 | Pending |
+| MOBL-03, DASH-01..DASH-04 | Phase 6 | Complete |
 | MOBL-06 | Phases 4, 5, 6, 7 | Pending |
 | DOCS-02..DOCS-04 | Phase 7 | Pending |
 
@@ -122,4 +122,4 @@
 
 ---
 *Requirements defined: 2026-05-26*
-*Last updated: 2026-05-27 after adding Swagger/OpenAPI as a backend-phase requirement*
+*Last updated: 2026-06-03 after completing the responsible mobile flow*

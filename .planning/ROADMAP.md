@@ -11,7 +11,7 @@ Habitinhos will be built as a monorepo MVP in seven phases: backend foundation, 
 - [x] **Phase 3: Recompensas e resgates** - Implement rewards, redemptions, sufficient-balance validation, coin debits, ledger transactions, and balance tests. (completed 2026-06-01)
 - [x] **Phase 4: Mobile base** - Create Expo app foundation, navigation, API client, login flow, and base visual structure. (completed 2026-06-01)
 - [x] **Phase 5: Fluxo da criança** - Build child home, balance, missions, completion feedback, rewards catalog, and redemption flow. (completed 2026-06-02)
-- [ ] **Phase 6: Fluxo do responsável** - Build dashboard, children, missions, assignments, rewards, approvals, and child detail views.
+- [x] **Phase 6: Fluxo do responsável** - Build dashboard, children, missions, assignments, rewards, approvals, and child detail views. (completed 2026-06-03)
 - [ ] **Phase 7: Polimento para demonstração do TCC** - Add demo seeds, visual polish, README, architecture docs, presentation script, and final testing.
 
 ## Phase Details
@@ -201,7 +201,7 @@ Plans:
 
 **Wave 4** *(blocked on Wave 3 completion)*
 
-- [ ] 06-04: Reward management screens
+- [x] 06-04: Reward management screens
 
 ### Phase 7: Polimento para demonstração do TCC
 
@@ -237,5 +237,5 @@ Phases execute in numeric order: 1 → 2 → 3 → 4 → 5 → 6 → 7
 | 3. Recompensas e resgates | 3/3 | Complete    | 2026-06-01 |
 | 4. Mobile base | 4/4 | Complete   | 2026-06-01 |
 | 5. Fluxo da criança | 4/4 | Complete   | 2026-06-02 |
-| 6. Fluxo do responsável | 3/4 | In Progress|  |
+| 6. Fluxo do responsável | 4/4 | Complete | 2026-06-03 |
 | 7. Polimento para demonstração do TCC | 0/3 | Not started | - |
