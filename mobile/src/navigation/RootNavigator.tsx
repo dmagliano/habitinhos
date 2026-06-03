@@ -35,6 +35,9 @@ export function RootNavigator() {
       <Stack.Navigator screenOptions={{ headerShown: false }}>
         {session && status === 'authenticated' ? (
           <>
+            <Stack.Screen component={ChildProfileSelectScreen} name="ChildProfileSelect" />
+            <Stack.Screen component={ChildTabsScreen} name="ChildTabs" />
+            <Stack.Screen component={ChildMissionDetailScreen} name="ChildMissionDetail" />
             <Stack.Screen component={FamilyHubScreen} name="FamilyHub" />
             <Stack.Screen component={ResponsibleTabsScreen} name="ResponsibleTabs" />
             <Stack.Screen component={ResponsibleChildrenScreen} name="ResponsibleChildren" />
@@ -44,9 +47,6 @@ export function RootNavigator() {
             <Stack.Screen component={ResponsibleAssignmentFormScreen} name="ResponsibleAssignmentForm" />
             <Stack.Screen component={ResponsibleApprovalsScreen} name="ResponsibleApprovals" />
             <Stack.Screen component={ResponsibleRewardFormScreen} name="ResponsibleRewardForm" />
-            <Stack.Screen component={ChildProfileSelectScreen} name="ChildProfileSelect" />
-            <Stack.Screen component={ChildTabsScreen} name="ChildTabs" />
-            <Stack.Screen component={ChildMissionDetailScreen} name="ChildMissionDetail" />
           </>
         ) : (
           <>

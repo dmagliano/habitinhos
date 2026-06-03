@@ -84,7 +84,7 @@ describe('child navigation flow', () => {
     expect(screen.getByText('Escolha um perfil da família.')).toBeOnTheScreen();
     expect(screen.queryByRole('button', { name: 'Sou responsável' })).toBeNull();
     expect(screen.queryByRole('button', { name: 'Sou criança' })).toBeNull();
-    expect(childService.listChildren).toHaveBeenCalledWith('jwt-token');
+    await waitFor(() => expect(childService.listChildren).toHaveBeenCalledWith('jwt-token'));
   });
 
   it('opens backend child profile selection from FamilyHub', () => {
