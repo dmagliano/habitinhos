@@ -85,6 +85,7 @@ describe('ChildRewardsScreen', () => {
       snapshotTitle: cinema.title,
       snapshotCost: cinema.cost,
       coinTransactionId: 'transaction-1',
+      deliveredAt: null,
       createdAt: '2026-06-02T10:00:00Z',
       updatedAt: '2026-06-02T10:00:00Z',
     });

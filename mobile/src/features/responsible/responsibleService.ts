@@ -8,6 +8,7 @@ import {
   MissionResponse,
   RejectAssignedMissionRequest,
   ResponsibleDashboardResponse,
+  RewardRedemptionResponse,
   RewardRequest,
   RewardResponse,
 } from '../../api/types';
@@ -144,6 +145,13 @@ export const responsibleService = {
 
   async deactivateReward(token: string, rewardId: string): Promise<RewardResponse> {
     return apiRequest<RewardResponse>(`/rewards/${rewardId}/deactivate`, {
+      method: 'PATCH',
+      token,
+    });
+  },
+
+  async markRedemptionDelivered(token: string, redemptionId: string): Promise<RewardRedemptionResponse> {
+    return apiRequest<RewardRedemptionResponse>(`/reward-redemptions/${redemptionId}/delivered`, {
       method: 'PATCH',
       token,
     });

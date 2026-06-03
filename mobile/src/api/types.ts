@@ -100,7 +100,7 @@ export type RewardRequest = {
   cost: number;
 };
 
-export type RewardRedemptionStatus = 'REDEEMED';
+export type RewardRedemptionStatus = 'REDEEMED' | 'DELIVERED' | 'CANCELLED';
 
 export type RewardRedemptionResponse = {
   id: string;
@@ -111,6 +111,7 @@ export type RewardRedemptionResponse = {
   snapshotTitle: string;
   snapshotCost: number;
   coinTransactionId: string;
+  deliveredAt: string | null;
   createdAt: string;
   updatedAt: string;
 };
@@ -171,6 +172,8 @@ export type ResponsibleDashboardRedemption = {
   childName: string;
   rewardTitle: string;
   rewardCost: number;
+  status: RewardRedemptionStatus;
+  deliveredAt: string | null;
   redeemedAt: string;
 };
 

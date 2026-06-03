@@ -1,7 +1,7 @@
 import { useCallback, useEffect, useMemo, useState } from 'react';
-import { ActivityIndicator, StyleSheet, Text, View } from 'react-native';
+import { ActivityIndicator, Pressable, StyleSheet, Text, View } from 'react-native';
 
-import { ResponsibleDashboardResponse } from '../../api/types';
+import { ResponsibleDashboardRedemption, ResponsibleDashboardResponse } from '../../api/types';
 import { AppHeader, AppScreen, Card, PrimaryButton } from '../../components';
 import { colors, spacing, typography } from '../../theme';
 import { useAuth } from '../auth/AuthContext';
@@ -34,6 +34,8 @@ export function ResponsibleHomeScreen({ navigation }: ResponsibleHomeScreenProps
   const [dashboard, setDashboard] = useState<ResponsibleDashboardResponse | null>(null);
   const [loadState, setLoadState] = useState<LoadState>('loading');
   const [recentRedemptionsFocused, setRecentRedemptionsFocused] = useState(false);
+  const [deliveringRedemptionId, setDeliveringRedemptionId] = useState<string | null>(null);
+  const [deliveryErrors, setDeliveryErrors] = useState<Record<string, string>>({});
 
   const metrics = useMemo(() => getMetrics(dashboard), [dashboard]);
 
@@ -82,6 +84,47 @@ export function ResponsibleHomeScreen({ navigation }: ResponsibleHomeScreenProps
   };
   const focusRecentRedemptions = () => {
     setRecentRedemptionsFocused(true);
+  };
+  const markRedemptionDelivered = async (redemption: ResponsibleDashboardRedemption) => {
+    if (!token || deliveringRedemptionId || isDelivered(redemption)) {
+      return;
+    }
+
+    setDeliveringRedemptionId(redemption.id);
+    setDeliveryErrors((current) => {
+      const next = { ...current };
+      delete next[redemption.id];
+      return next;
+    });
+
+    try {
+      const delivered = await responsibleService.markRedemptionDelivered(token, redemption.id);
+      setDashboard((current) => {
+        if (!current) {
+          return current;
+        }
+
+        return {
+          ...current,
+          recentRedemptions: current.recentRedemptions.map((currentRedemption) =>
+            currentRedemption.id === redemption.id
+              ? {
+                  ...currentRedemption,
+                  status: delivered.status,
+                  deliveredAt: delivered.deliveredAt,
+                }
+              : currentRedemption,
+          ),
+        };
+      });
+    } catch {
+      setDeliveryErrors((current) => ({
+        ...current,
+        [redemption.id]: 'Não conseguimos marcar como entregue. Tente novamente.',
+      }));
+    } finally {
+      setDeliveringRedemptionId(null);
+    }
   };
 
   return (
@@ -169,12 +212,13 @@ export function ResponsibleHomeScreen({ navigation }: ResponsibleHomeScreenProps
             ) : (
               <View style={styles.list}>
                 {dashboard.recentRedemptions.map((redemption) => (
-                  <Card key={redemption.id} style={styles.redemptionCard}>
-                    <Text style={styles.redemptionTitle}>{redemption.rewardTitle}</Text>
-                    <Text style={styles.redemptionMeta}>
-                      {redemption.childName} · {redemption.rewardCost} moedas
-                    </Text>
-                  </Card>
+                  <RedemptionSummaryCard
+                    errorMessage={deliveryErrors[redemption.id]}
+                    key={redemption.id}
+                    loading={deliveringRedemptionId === redemption.id}
+                    onMarkDelivered={markRedemptionDelivered}
+                    redemption={redemption}
+                  />
                 ))}
               </View>
             )}
@@ -187,6 +231,55 @@ export function ResponsibleHomeScreen({ navigation }: ResponsibleHomeScreenProps
 
 function SectionTitle({ title }: { title: string }) {
   return <Text style={styles.sectionTitle}>{title}</Text>;
+}
+
+function RedemptionSummaryCard({
+  errorMessage,
+  loading,
+  onMarkDelivered,
+  redemption,
+}: {
+  errorMessage?: string;
+  loading: boolean;
+  onMarkDelivered: (redemption: ResponsibleDashboardRedemption) => void;
+  redemption: ResponsibleDashboardRedemption;
+}) {
+  const delivered = isDelivered(redemption);
+  const accessibilityLabel = delivered
+    ? `${redemption.rewardTitle} entregue`
+    : `Marcar ${redemption.rewardTitle} como entregue`;
+
+  return (
+    <Card style={styles.redemptionCard}>
+      <View style={styles.redemptionHeader}>
+        <View style={styles.redemptionTextColumn}>
+          <Text style={[styles.redemptionTitle, delivered && styles.redemptionDeliveredText]}>
+            {redemption.rewardTitle}
+          </Text>
+          <Text style={[styles.redemptionMeta, delivered && styles.redemptionDeliveredText]}>
+            {redemption.childName} · {redemption.rewardCost} moedas
+          </Text>
+        </View>
+        <Pressable
+          accessibilityLabel={accessibilityLabel}
+          accessibilityRole="checkbox"
+          accessibilityState={{ checked: delivered }}
+          onPress={() => onMarkDelivered(redemption)}
+          style={({ pressed }) => [styles.deliveredControl, pressed && styles.deliveredControlPressed]}
+        >
+          <View style={[styles.checkbox, delivered && styles.checkboxChecked]}>
+            {delivered ? <Text style={styles.checkboxMark}>✓</Text> : null}
+          </View>
+          <Text style={styles.deliveredLabel}>Entregue</Text>
+        </Pressable>
+      </View>
+      {loading ? <Text style={styles.deliveryHelper}>Salvando...</Text> : null}
+      {delivered && redemption.deliveredAt ? (
+        <Text style={styles.deliveryDate}>Entregue em: {formatShortDate(redemption.deliveredAt)}</Text>
+      ) : null}
+      {errorMessage ? <Text style={styles.deliveryError}>{errorMessage}</Text> : null}
+    </Card>
+  );
 }
 
 function getMetrics(dashboard: ResponsibleDashboardResponse | null): { label: string; value: string }[] {
@@ -205,6 +298,24 @@ function getMetrics(dashboard: ResponsibleDashboardResponse | null): { label: st
     { label: 'Missões abertas', value: String(openMissions) },
     { label: 'Resgates recentes', value: String(redemptions) },
   ];
+}
+
+function isDelivered(redemption: ResponsibleDashboardRedemption): boolean {
+  return redemption.status === 'DELIVERED' || redemption.deliveredAt != null;
+}
+
+function formatShortDate(value: string): string {
+  const date = new Date(value);
+
+  if (Number.isNaN(date.getTime())) {
+    return value;
+  }
+
+  return new Intl.DateTimeFormat('pt-BR', {
+    day: '2-digit',
+    month: '2-digit',
+    year: 'numeric',
+  }).format(date);
 }
 
 const styles = StyleSheet.create({
@@ -241,6 +352,16 @@ const styles = StyleSheet.create({
   redemptionCard: {
     gap: spacing.xs,
   },
+  redemptionHeader: {
+    alignItems: 'flex-start',
+    flexDirection: 'row',
+    gap: spacing.md,
+    justifyContent: 'space-between',
+  },
+  redemptionTextColumn: {
+    flex: 1,
+    gap: spacing.xs,
+  },
   redemptionTitle: {
     ...typography.heading,
     color: colors.textPrimary,
@@ -248,5 +369,51 @@ const styles = StyleSheet.create({
   redemptionMeta: {
     ...typography.body,
     color: colors.textSecondary,
+  },
+  redemptionDeliveredText: {
+    color: colors.textMuted,
+  },
+  deliveredControl: {
+    alignItems: 'center',
+    flexDirection: 'row',
+    gap: spacing.sm,
+    minHeight: 44,
+    paddingHorizontal: spacing.xs,
+  },
+  deliveredControlPressed: {
+    opacity: 0.8,
+  },
+  checkbox: {
+    alignItems: 'center',
+    borderColor: colors.borderStrong,
+    borderRadius: 4,
+    borderWidth: 2,
+    height: 24,
+    justifyContent: 'center',
+    width: 24,
+  },
+  checkboxChecked: {
+    backgroundColor: colors.success,
+    borderColor: colors.success,
+  },
+  checkboxMark: {
+    ...typography.label,
+    color: colors.textInverse,
+  },
+  deliveredLabel: {
+    ...typography.label,
+    color: colors.textPrimary,
+  },
+  deliveryDate: {
+    ...typography.body,
+    color: colors.textMuted,
+  },
+  deliveryHelper: {
+    ...typography.body,
+    color: colors.textSecondary,
+  },
+  deliveryError: {
+    ...typography.body,
+    color: colors.error,
   },
 });
