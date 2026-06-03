@@ -13,7 +13,7 @@
 - [x] **AUTH-04**: Authenticated responsible adult can retrieve `/me` with user and family context.
 - [x] **AUTH-05**: Backend derives `familyUnitId` from authentication context for protected operations.
 - [x] **AUTH-06**: Users from one family cannot access data from another family.
-- [ ] **AUTH-07**: Mobile unauthenticated entry shows a welcome screen with login and registration options, and session persistence is controlled by an explicit "mantenha-me conectado" choice.
+- [x] **AUTH-07**: Mobile unauthenticated entry shows a welcome screen with login and registration options, and session persistence is controlled by an explicit "mantenha-me conectado" choice.
 
 ### Children
 
@@ -67,8 +67,8 @@
 - [x] **MOBL-02**: Mobile app has PT-BR screens and English technical names in code.
 - [x] **MOBL-03**: Responsible flow includes login, family onboarding, dashboard, children, missions, assignments, approvals, rewards, and child details.
 - [ ] **MOBL-04**: Child flow includes profile selection/access, home with balance, missions, completion feedback, reward catalog, redemption feedback, and insufficient balance message.
-- [ ] **MOBL-05**: Mobile app consumes the real backend API for the demo flow.
-- [ ] **MOBL-06**: Mobile screens from Phase 4 onward follow `docs/design/mobile-design-contract.md`, use `docs/design/phase-design-map.md` for visual references, and do not copy Stitch HTML/CSS exports.
+- [x] **MOBL-05**: Mobile app consumes the real backend API for the demo flow.
+- [x] **MOBL-06**: Mobile screens from Phase 4 onward follow `docs/design/mobile-design-contract.md`, use `docs/design/phase-design-map.md` for visual references, and do not copy Stitch HTML/CSS exports.
 - [ ] **MOBL-07**: Authenticated entry can open directly into the child flow without a mandatory "sou responsável/sou criança" hub, while the child profile exposes "Gerenciar família" and the responsible area exposes a clear return path to child mode.
 
 ### Documentation and Demo
@@ -105,7 +105,7 @@
 | Requirement | Phase | Status |
 |-------------|-------|--------|
 | AUTH-01..AUTH-06 | Phase 1 | Complete |
-| AUTH-07 | Phase 06.1 | Pending |
+| AUTH-07 | Phase 06.1 | Complete |
 | CHLD-01..CHLD-04 | Phase 1 | Complete |
 | DOCS-01 | Phases 1, 2, 3 | Complete |
 | MISS-01..MISS-09 | Phase 2 | Complete |
@@ -119,7 +119,7 @@
 | CHLD-03, MISS-04..MISS-05, REWD-03..REWD-05, WALT-01 | Phase 5 | Pending |
 | MOBL-03, DASH-01..DASH-04 | Phase 6 | Complete |
 | DASH-05 | Phase 06.1 | Pending |
-| MOBL-06 | Phases 4, 5, 6, 06.1, 7 | Pending |
+| MOBL-06 | Phases 4, 5, 6, 06.1, 7 | Complete |
 | MOBL-07 | Phase 06.1 | Pending |
 | DOCS-02..DOCS-04 | Phase 7 | Pending |
 
