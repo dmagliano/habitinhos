@@ -53,10 +53,10 @@
 
 ### Responsible Dashboard
 
-- [ ] **DASH-01**: Responsible dashboard lists children in the family.
-- [ ] **DASH-02**: Dashboard shows balance by child.
-- [ ] **DASH-03**: Dashboard shows pending, awaiting approval, and completed missions.
-- [ ] **DASH-04**: Dashboard shows recent reward redemptions.
+- [x] **DASH-01**: Responsible dashboard lists children in the family.
+- [x] **DASH-02**: Dashboard shows balance by child.
+- [x] **DASH-03**: Dashboard shows pending, awaiting approval, and completed missions.
+- [x] **DASH-04**: Dashboard shows recent reward redemptions.
 
 ### Mobile App
 

@@ -189,7 +189,7 @@ Plans:
 Plans:
 **Wave 1**
 
-- [ ] 06-01: Responsible dashboard and child detail
+- [x] 06-01: Responsible dashboard and child detail
 
 **Wave 2** *(blocked on Wave 1 completion)*
 
@@ -237,5 +237,5 @@ Phases execute in numeric order: 1 → 2 → 3 → 4 → 5 → 6 → 7
 | 3. Recompensas e resgates | 3/3 | Complete    | 2026-06-01 |
 | 4. Mobile base | 4/4 | Complete   | 2026-06-01 |
 | 5. Fluxo da criança | 4/4 | Complete   | 2026-06-02 |
-| 6. Fluxo do responsável | 0/4 | Not started | - |
+| 6. Fluxo do responsável | 1/4 | In Progress|  |
 | 7. Polimento para demonstração do TCC | 0/3 | Not started | - |
