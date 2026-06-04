@@ -13,7 +13,7 @@ Habitinhos will be built as a monorepo MVP in seven phases: backend foundation, 
 - [x] **Phase 5: Fluxo da criança** - Build child home, balance, missions, completion feedback, rewards catalog, and redemption flow. (completed 2026-06-02)
 - [x] **Phase 6: Fluxo do responsável** - Build dashboard, children, missions, assignments, rewards, approvals, and child detail views. (completed 2026-06-03)
 - [x] **Phase 06.1: Ajustes pós-UAT dos fluxos de entrada, troca de modo e entrega de resgates** - Refine unauthenticated entry, login/register/session persistence, child-first mode switching, dashboard links, and delivered reward redemptions. (INSERTED) (completed 2026-06-03)
-- [ ] **Phase 06.2: Ajustes pós-UAT de cadastro, seletor de crianças e navegação responsável** - Remove registration stale-session copy, clarify child creation copy, eliminate entry-mode selection, add family-management access from child selector, and add responsible-home return to children. (INSERTED)
+- [x] **Phase 06.2: Ajustes pós-UAT de cadastro, seletor de crianças e navegação responsável** - Remove registration stale-session copy, clarify child creation copy, eliminate entry-mode selection, add family-management access from child selector, and add responsible-home return to children. (INSERTED) (completed 2026-06-04)
 - [ ] **Phase 7: Polimento para demonstração do TCC** - Add demo seeds, visual polish, README, architecture docs, presentation script, and final testing.
 
 ## Phase Details
@@ -250,12 +250,12 @@ Plans:
   6. Existing child-first login/register behavior, responsible tabs, and child profile navigation keep working.
   7. Relevant navigation/copy tests, TypeScript, and lint pass.
 
-**Plans:** 1 plan
+**Plans:** 1/1 plans complete
 
 Plans:
 **Wave 1**
 
-- [ ] 06.2-01: Ajustes de copy e navegação pós-UAT
+- [x] 06.2-01: Ajustes de copy e navegação pós-UAT
 
 ### Phase 7: Polimento para demonstração do TCC
 
@@ -293,5 +293,5 @@ Phases execute in numeric order: 1 → 2 → 3 → 4 → 5 → 6 → 06.1 → 06
 | 5. Fluxo da criança | 4/4 | Complete   | 2026-06-02 |
 | 6. Fluxo do responsável | 4/4 | Complete | 2026-06-03 |
 | 06.1 Ajustes pós-UAT dos fluxos de entrada, troca de modo e entrega de resgates | 3/3 | Complete    | 2026-06-03 |
-| 06.2 Ajustes pós-UAT de cadastro, seletor de crianças e navegação responsável | 0/1 | Not started | - |
+| 06.2 Ajustes pós-UAT de cadastro, seletor de crianças e navegação responsável | 1/1 | Complete   | 2026-06-04 |
 | 7. Polimento para demonstração do TCC | 0/3 | Not started | - |
