@@ -4,7 +4,6 @@ export type RootStackParamList = {
   AuthWelcome: undefined;
   AuthLogin: undefined;
   AuthRegister: undefined;
-  FamilyHub: undefined;
   ResponsibleTabs: { activeChild?: ChildResponse } | undefined;
   ResponsibleChildren: { feedback?: 'child-created' | 'child-deactivated' } | undefined;
   ResponsibleChildForm: { childId?: string } | undefined;

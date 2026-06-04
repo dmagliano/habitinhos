@@ -9,7 +9,6 @@ import { RegisterScreen } from '../features/auth/RegisterScreen';
 import { ChildMissionDetailScreen } from '../features/child/ChildMissionDetailScreen';
 import { ChildProfileSelectScreen } from '../features/child/ChildProfileSelectScreen';
 import { ChildTabsScreen } from '../features/child/ChildTabsScreen';
-import { FamilyHubScreen } from '../features/family/FamilyHubScreen';
 import { ResponsibleChildDetailScreen } from '../features/responsible/ResponsibleChildDetailScreen';
 import { ResponsibleChildFormScreen } from '../features/responsible/ResponsibleChildFormScreen';
 import { ResponsibleChildrenScreen } from '../features/responsible/ResponsibleChildrenScreen';
@@ -38,7 +37,6 @@ export function RootNavigator() {
             <Stack.Screen component={ChildProfileSelectScreen} name="ChildProfileSelect" />
             <Stack.Screen component={ChildTabsScreen} name="ChildTabs" />
             <Stack.Screen component={ChildMissionDetailScreen} name="ChildMissionDetail" />
-            <Stack.Screen component={FamilyHubScreen} name="FamilyHub" />
             <Stack.Screen component={ResponsibleTabsScreen} name="ResponsibleTabs" />
             <Stack.Screen component={ResponsibleChildrenScreen} name="ResponsibleChildren" />
             <Stack.Screen component={ResponsibleChildFormScreen} name="ResponsibleChildForm" />

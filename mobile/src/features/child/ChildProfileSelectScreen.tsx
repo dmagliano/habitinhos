@@ -130,7 +130,7 @@ export function ChildProfileSelectScreen({ navigation }: Props) {
         onPress={enterProfile}
         style={styles.enterButton}
       />
-      <SecondaryButton label="Voltar para família" onPress={() => navigation.navigate('FamilyHub')} />
+      <SecondaryButton label="Gerenciar família" onPress={() => navigation.navigate('ResponsibleTabs')} />
     </AppScreen>
   );
 }

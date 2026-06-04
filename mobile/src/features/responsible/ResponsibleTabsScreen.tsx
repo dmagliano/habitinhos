@@ -47,6 +47,10 @@ export function ResponsibleTabsScreen({ navigation, route }: Props) {
                   navigation.navigate(route);
                 }
 
+                if (route === 'ChildProfileSelect') {
+                  navigation.navigate(route);
+                }
+
                 if (route === 'ResponsibleMissionForm') {
                   navigation.navigate(route);
                 }

@@ -2,7 +2,7 @@ import { useCallback, useEffect, useMemo, useState } from 'react';
 import { ActivityIndicator, Pressable, StyleSheet, Text, View } from 'react-native';
 
 import { ResponsibleDashboardRedemption, ResponsibleDashboardResponse } from '../../api/types';
-import { AppHeader, AppScreen, Card, PrimaryButton } from '../../components';
+import { AppHeader, AppScreen, Card, PrimaryButton, SecondaryButton } from '../../components';
 import { colors, spacing, typography } from '../../theme';
 import { useAuth } from '../auth/AuthContext';
 
@@ -19,6 +19,7 @@ type ResponsibleHomeScreenProps = {
         | 'ResponsibleApprovals'
         | 'ResponsibleChildDetail'
         | 'ResponsibleChildForm'
+        | 'ChildProfileSelect'
         | 'ResponsibleMissionForm'
         | 'ResponsibleRewardForm',
       params?: { childId: string },
@@ -72,6 +73,9 @@ export function ResponsibleHomeScreen({ navigation }: ResponsibleHomeScreenProps
   };
   const openChildForm = () => {
     navigation?.navigate('ResponsibleChildForm');
+  };
+  const returnToChildren = () => {
+    navigation?.navigate('ChildProfileSelect');
   };
   const openMissionForm = () => {
     navigation?.navigate('ResponsibleMissionForm');
@@ -135,6 +139,8 @@ export function ResponsibleHomeScreen({ navigation }: ResponsibleHomeScreenProps
         subtitle="Acompanhe crianças, missões, moedas e resgates."
         title="Olá, responsável"
       />
+
+      <SecondaryButton label="Retornar às crianças" onPress={returnToChildren} style={styles.returnButton} />
 
       {loadState === 'loading' ? (
         <Card style={styles.stateCard} variant="highlight">
@@ -330,6 +336,9 @@ const styles = StyleSheet.create({
   stateTitle: {
     ...typography.heading,
     color: colors.textPrimary,
+  },
+  returnButton: {
+    marginBottom: spacing.lg,
   },
   metricGrid: {
     flexDirection: 'row',
