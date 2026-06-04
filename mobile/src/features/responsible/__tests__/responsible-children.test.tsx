@@ -98,7 +98,7 @@ describe('ResponsibleChildrenScreen', () => {
 
     const childCard = await screen.findByTestId('manage-child-child-active');
     fireEvent.press(within(childCard).getByRole('button', { name: 'Editar Lia' }));
-    fireEvent.press(screen.getByRole('button', { name: 'Nova criança' }));
+    fireEvent.press(screen.getByRole('button', { name: 'Cadastrar criança' }));
 
     expect(navigate).toHaveBeenCalledWith('ResponsibleChildForm', { childId: 'child-active' });
     expect(navigate).toHaveBeenCalledWith('ResponsibleChildForm');
@@ -110,7 +110,8 @@ describe('ResponsibleChildrenScreen', () => {
     render(<ResponsibleChildrenScreen navigation={navigation} route={{ key: 'ResponsibleChildren', name: 'ResponsibleChildren' }} />);
 
     expect(await screen.findByText('Nenhuma criança cadastrada')).toBeOnTheScreen();
-    expect(screen.getAllByRole('button', { name: 'Nova criança' }).length).toBeGreaterThan(0);
+    expect(screen.getAllByRole('button', { name: 'Cadastrar criança' }).length).toBeGreaterThan(0);
+    expect(screen.queryByRole('button', { name: 'Nova criança' })).toBeNull();
     expect(screen.queryByText('Lia')).toBeNull();
   });
 

@@ -106,7 +106,7 @@ describe('responsible dashboard screens', () => {
 
     expect(screen.getByRole('button', { name: 'Nova Missão' })).toBeOnTheScreen();
     expect(screen.getByRole('button', { name: 'Cadastrar Recompensa' })).toBeOnTheScreen();
-    expect(screen.getByRole('button', { name: 'Cadastrar Criança' })).toBeOnTheScreen();
+    expect(screen.getByRole('button', { name: 'Cadastrar criança' })).toBeOnTheScreen();
     expect(screen.getByText('1 missão aguardando aprovação')).toBeOnTheScreen();
     expect(screen.getByRole('button', { name: 'Abrir aprovações' })).toBeOnTheScreen();
     expect(screen.getByText('Cinema em família')).toBeOnTheScreen();
@@ -151,7 +151,8 @@ describe('responsible dashboard screens', () => {
     const emptyRender = render(<ResponsibleHomeScreen navigation={navigation} />);
 
     expect(await screen.findByText('Nenhuma criança cadastrada')).toBeOnTheScreen();
-    expect(screen.getAllByRole('button', { name: 'Nova criança' }).length).toBeGreaterThan(0);
+    expect(screen.getAllByRole('button', { name: 'Cadastrar criança' }).length).toBeGreaterThan(0);
+    expect(screen.queryByRole('button', { name: 'Nova criança' })).toBeNull();
     expect(screen.queryByText('24 moedas')).toBeNull();
 
     emptyRender.unmount();
