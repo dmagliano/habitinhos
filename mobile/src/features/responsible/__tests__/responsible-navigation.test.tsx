@@ -3,7 +3,6 @@ import { fireEvent, render, screen } from '@testing-library/react-native';
 
 import { ChildResponse } from '../../../api/types';
 import { useAuth } from '../../auth/AuthContext';
-import { FamilyHubScreen } from '../../family/FamilyHubScreen';
 import { ResponsibleTabsScreen } from '../ResponsibleTabsScreen';
 import { responsibleService } from '../responsibleService';
 
@@ -58,15 +57,6 @@ describe('responsible navigation flow', () => {
       approvalPreview: [],
       recentRedemptions: [],
     });
-  });
-
-  it('opens responsible tabs from FamilyHub instead of the old stub', () => {
-    render(<FamilyHubScreen navigation={navigation} route={{ key: 'FamilyHub', name: 'FamilyHub' }} />);
-
-    fireEvent.press(screen.getByRole('button', { name: 'Sou responsável' }));
-
-    expect(navigate).toHaveBeenCalledWith('ResponsibleTabs');
-    expect(navigate).not.toHaveBeenCalledWith('ResponsibleStub');
   });
 
   it('renders responsible tabs with the expected accessibility labels', async () => {

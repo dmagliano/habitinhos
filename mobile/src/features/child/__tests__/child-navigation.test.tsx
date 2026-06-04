@@ -4,7 +4,6 @@ import { fireEvent, render, screen, waitFor } from '@testing-library/react-nativ
 import { ChildResponse } from '../../../api/types';
 import { RootNavigator } from '../../../navigation/RootNavigator';
 import { useAuth } from '../../auth/AuthContext';
-import { FamilyHubScreen } from '../../family/FamilyHubScreen';
 import { childService } from '../childService';
 import { ChildProfileSelectScreen } from '../ChildProfileSelectScreen';
 import { ChildTabsScreen } from '../ChildTabsScreen';
@@ -82,18 +81,10 @@ describe('child navigation flow', () => {
 
     expect(await screen.findByText('Quem vai brincar agora?')).toBeOnTheScreen();
     expect(screen.getByText('Escolha um perfil da família.')).toBeOnTheScreen();
+    expect(screen.queryByText('Escolha como quer entrar')).toBeNull();
     expect(screen.queryByRole('button', { name: 'Sou responsável' })).toBeNull();
     expect(screen.queryByRole('button', { name: 'Sou criança' })).toBeNull();
     await waitFor(() => expect(childService.listChildren).toHaveBeenCalledWith('jwt-token'));
-  });
-
-  it('opens backend child profile selection from FamilyHub', () => {
-    render(<FamilyHubScreen navigation={navigation} route={{ key: 'FamilyHub', name: 'FamilyHub' }} />);
-
-    fireEvent.press(screen.getByRole('button', { name: 'Sou criança' }));
-
-    expect(navigate).toHaveBeenCalledWith('ChildProfileSelect');
-    expect(screen.getByText('Escolha um perfil para brincar com as missões da família.')).toBeOnTheScreen();
   });
 
   it('loads active children, requires selection, and navigates with selected child state', async () => {
@@ -110,6 +101,8 @@ describe('child navigation flow', () => {
     expect(screen.getByText('Escolha um perfil da família.')).toBeOnTheScreen();
     expect(await screen.findByText('Joaquim')).toBeOnTheScreen();
     expect(screen.queryByText('Ana')).toBeNull();
+    expect(screen.getByRole('button', { name: 'Gerenciar família' })).toBeOnTheScreen();
+    expect(screen.queryByRole('button', { name: 'Voltar para família' })).toBeNull();
     expect(childService.listChildren).toHaveBeenCalledWith('jwt-token');
 
     const enterButton = screen.getByRole('button', { name: 'Entrar no perfil' });
@@ -119,8 +112,10 @@ describe('child navigation flow', () => {
     expect(enterButton).not.toBeDisabled();
 
     fireEvent.press(enterButton);
+    fireEvent.press(screen.getByRole('button', { name: 'Gerenciar família' }));
 
     expect(navigate).toHaveBeenCalledWith('ChildTabs', { child: joaquim });
+    expect(navigate).toHaveBeenCalledWith('ResponsibleTabs');
   });
 
   it('shows empty, error, and retry states without fake child data', async () => {

@@ -92,6 +92,7 @@ describe('responsible dashboard screens', () => {
     render(<ResponsibleHomeScreen navigation={navigation} />);
 
     expect(screen.getByText('Olá, responsável')).toBeOnTheScreen();
+    expect(await screen.findByRole('button', { name: 'Retornar às crianças' })).toBeOnTheScreen();
     expect(await screen.findByText('Crianças')).toBeOnTheScreen();
     expect(screen.getAllByText('Aprovações').length).toBeGreaterThan(0);
     expect(screen.getByText('Missões abertas')).toBeOnTheScreen();
@@ -118,6 +119,8 @@ describe('responsible dashboard screens', () => {
     expect(navigate).toHaveBeenCalledWith('ResponsibleChildDetail', { childId: 'child-1' });
     fireEvent.press(screen.getByRole('button', { name: 'Cadastrar Recompensa' }));
     expect(navigate).toHaveBeenCalledWith('ResponsibleRewardForm');
+    fireEvent.press(screen.getByRole('button', { name: 'Retornar às crianças' }));
+    expect(navigate).toHaveBeenCalledWith('ChildProfileSelect');
     expect(responsibleService.getDashboard).toHaveBeenCalledWith('jwt-token');
     expect(screen.queryByText('family-1')).toBeNull();
     expect(screen.queryByText('jwt-token')).toBeNull();
