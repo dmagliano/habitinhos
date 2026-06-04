@@ -173,7 +173,7 @@ export function ResponsibleHomeScreen({ navigation }: ResponsibleHomeScreenProps
           <SectionTitle title="Suas crianças" />
           {dashboard.children.length === 0 ? (
             <EmptyState
-              actionLabel="Nova criança"
+              actionLabel="Cadastrar criança"
               body="Cadastre uma criança para organizar missões, moedas e recompensas da família."
               emoji="⭐"
               onAction={openChildForm}
@@ -191,7 +191,7 @@ export function ResponsibleHomeScreen({ navigation }: ResponsibleHomeScreenProps
           <View style={styles.quickActions}>
             <PrimaryButton label="Nova Missão" onPress={openMissionForm} />
             <PrimaryButton label="Cadastrar Recompensa" onPress={openRewardForm} />
-            <PrimaryButton label="Cadastrar Criança" onPress={openChildForm} />
+            <PrimaryButton label="Cadastrar criança" onPress={openChildForm} />
           </View>
 
           {dashboard.pendingApprovalCount > 0 ? (

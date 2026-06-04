@@ -56,7 +56,7 @@ export function ResponsibleChildrenScreen({ navigation }: Props) {
   return (
     <AppScreen>
       <AppHeader
-        action={<PrimaryButton label="Nova criança" onPress={openCreate} />}
+        action={<PrimaryButton label="Cadastrar criança" onPress={openCreate} />}
         emoji="⭐"
         subtitle="Veja crianças ativas e inativas da família."
         title="Crianças"
@@ -79,7 +79,7 @@ export function ResponsibleChildrenScreen({ navigation }: Props) {
 
       {loadState === 'ready' && sortedChildren.length === 0 ? (
         <EmptyState
-          actionLabel="Nova criança"
+          actionLabel="Cadastrar criança"
           body="Cadastre uma criança para começar a organizar missões, moedas e recompensas."
           emoji="⭐"
           onAction={openCreate}
