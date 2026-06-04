@@ -25,6 +25,7 @@ export function RegisterScreen({ navigation }: Props) {
   const [password, setPassword] = useState('');
   const [familyName, setFamilyName] = useState('');
   const isLoading = status === 'loading';
+  const registrationErrorMessage = isSessionRecoveryMessage(errorMessage) ? null : errorMessage;
 
   async function handleSubmit() {
     if (isLoading) {
@@ -102,7 +103,7 @@ export function RegisterScreen({ navigation }: Props) {
               />
             </View>
 
-            {errorMessage ? <Text style={styles.error}>{errorMessage}</Text> : null}
+            {registrationErrorMessage ? <Text style={styles.error}>{registrationErrorMessage}</Text> : null}
 
             <PrimaryButton
               label={isLoading ? 'Criando conta...' : 'Criar conta'}
@@ -123,6 +124,17 @@ export function RegisterScreen({ navigation }: Props) {
 
 export function getRegisterKeyboardBehavior(platformOS: string): KeyboardAvoidingViewProps['behavior'] {
   return platformOS === 'ios' ? 'padding' : 'height';
+}
+
+function isSessionRecoveryMessage(message: string | null): boolean {
+  if (!message) {
+    return false;
+  }
+
+  return (
+    message === 'Sua sessao terminou. Entre novamente para continuar.' ||
+    message === 'Sua sessão terminou. Entre novamente para continuar.'
+  );
 }
 
 const styles = StyleSheet.create({
