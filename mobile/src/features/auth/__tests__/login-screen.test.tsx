@@ -204,4 +204,21 @@ describe('RegisterScreen', () => {
 
     expect(navigate).toHaveBeenCalledWith('AuthLogin');
   });
+
+  it('does not render expired-session recovery copy on account creation', () => {
+    jest.mocked(useAuth).mockReturnValue({
+      status: 'unauthenticated',
+      session: null,
+      errorMessage: 'Sua sessao terminou. Entre novamente para continuar.',
+      login,
+      register,
+      logout: jest.fn(),
+      retryRestore,
+    });
+
+    render(<RegisterScreen navigation={{ navigate } as never} route={{ key: 'AuthRegister', name: 'AuthRegister' }} />);
+
+    expect(screen.queryByText('Sua sessao terminou. Entre novamente para continuar.')).toBeNull();
+    expect(screen.getByRole('button', { name: 'Criar conta' })).toBeOnTheScreen();
+  });
 });
