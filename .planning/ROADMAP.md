@@ -13,6 +13,7 @@ Habitinhos will be built as a monorepo MVP in seven phases: backend foundation, 
 - [x] **Phase 5: Fluxo da criança** - Build child home, balance, missions, completion feedback, rewards catalog, and redemption flow. (completed 2026-06-02)
 - [x] **Phase 6: Fluxo do responsável** - Build dashboard, children, missions, assignments, rewards, approvals, and child detail views. (completed 2026-06-03)
 - [x] **Phase 06.1: Ajustes pós-UAT dos fluxos de entrada, troca de modo e entrega de resgates** - Refine unauthenticated entry, login/register/session persistence, child-first mode switching, dashboard links, and delivered reward redemptions. (INSERTED) (completed 2026-06-03)
+- [ ] **Phase 06.2: Ajustes pós-UAT de cadastro, seletor de crianças e navegação responsável** - Remove registration stale-session copy, clarify child creation copy, eliminate entry-mode selection, add family-management access from child selector, and add responsible-home return to children. (INSERTED)
 - [ ] **Phase 7: Polimento para demonstração do TCC** - Add demo seeds, visual polish, README, architecture docs, presentation script, and final testing.
 
 ## Phase Details
@@ -234,10 +235,32 @@ Plans:
 
 - [x] 06.1-03: Persistencia e UI de entrega de resgates
 
+### Phase 06.2: Ajustes pós-UAT de cadastro, seletor de crianças e navegação responsável (INSERTED)
+
+**Goal:** The post-login mobile flow is direct and demo-ready: registration does not show stale session-recovery copy, children management uses clearer create-child wording, the intermediate entry-mode screen is removed from normal navigation, the child selector can open family management, and the responsible home can return to the children selector.
+**Requirements**: AUTH-08, CHLD-05, MOBL-06, MOBL-08
+**Depends on:** Phase 06.1
+**Success Criteria** (what must be TRUE):
+
+  1. The registration screen never displays "Sua sessão terminou. Entre novamente para continuar." or other expired-session recovery copy.
+  2. Children management primary create actions say "Cadastrar criança" instead of "Nova criança".
+  3. The "Escolha como quer entrar" screen is removed from the normal post-login app flow.
+  4. The child selector screen ("Quem vai brincar agora?") shows a clear "Gerenciar família" action that opens the responsible area.
+  5. The responsible home screen shows a clear "Retornar às crianças" action that returns to the standard child selector.
+  6. Existing child-first login/register behavior, responsible tabs, and child profile navigation keep working.
+  7. Relevant navigation/copy tests, TypeScript, and lint pass.
+
+**Plans:** 1 plan
+
+Plans:
+**Wave 1**
+
+- [ ] 06.2-01: Ajustes de copy e navegação pós-UAT
+
 ### Phase 7: Polimento para demonstração do TCC
 
 **Goal**: The MVP is demo-ready with repeatable data, documentation, visual polish, and final verification.
-**Depends on**: Phase 06.1
+**Depends on**: Phase 06.2
 **Requirements**: DOCS-02, DOCS-03, DOCS-04
 **Success Criteria** (what must be TRUE):
 
@@ -259,7 +282,7 @@ Plans:
 ## Progress
 
 **Execution Order:**
-Phases execute in numeric order: 1 → 2 → 3 → 4 → 5 → 6 → 06.1 → 7
+Phases execute in numeric order: 1 → 2 → 3 → 4 → 5 → 6 → 06.1 → 06.2 → 7
 
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
@@ -270,4 +293,5 @@ Phases execute in numeric order: 1 → 2 → 3 → 4 → 5 → 6 → 06.1 → 7
 | 5. Fluxo da criança | 4/4 | Complete   | 2026-06-02 |
 | 6. Fluxo do responsável | 4/4 | Complete | 2026-06-03 |
 | 06.1 Ajustes pós-UAT dos fluxos de entrada, troca de modo e entrega de resgates | 3/3 | Complete    | 2026-06-03 |
+| 06.2 Ajustes pós-UAT de cadastro, seletor de crianças e navegação responsável | 0/1 | Not started | - |
 | 7. Polimento para demonstração do TCC | 0/3 | Not started | - |
