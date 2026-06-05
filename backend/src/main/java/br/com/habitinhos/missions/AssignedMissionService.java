@@ -88,10 +88,11 @@ public class AssignedMissionService {
         .orElseThrow(this::childNotFound);
 
     List<AssignedMissionResponse> pendingMissions = assignedMissionRepository
-        .findAllByFamilyUnitIdAndChildIdAndStatusOrderByDueDateAscCreatedAtAsc(
+        .findVisiblePendingForChild(
             familyUnitId,
             childId,
-            AssignedMissionStatus.PENDING)
+            AssignedMissionStatus.PENDING,
+            LocalDate.now())
         .stream()
         .map(this::toResponse)
         .toList();

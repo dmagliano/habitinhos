@@ -153,10 +153,12 @@ class MissionApprovalIntegrationTest extends AbstractIntegrationTest {
   void approvingRecurringMissionCreatesNextPendingOccurrence() throws Exception {
     String token = registerToken("responsavel@example.com", "Familia Demo");
     UUID childId = createChild(token, new ChildRequest("Lia", 8, "star", null));
+    LocalDate assignedDueDate = LocalDate.now().plusDays(1);
     UUID assignedMissionId = assignMission(
         token,
         childId,
-        new MissionRequest("Ler livro", "Ler por 20 minutos", 6, true, RecurrenceType.WEEKLY));
+        new MissionRequest("Ler livro", "Ler por 20 minutos", 6, true, RecurrenceType.WEEKLY),
+        assignedDueDate);
     complete(token, assignedMissionId);
 
     mockMvc.perform(post("/assigned-missions/{id}/approve", assignedMissionId)
@@ -174,7 +176,7 @@ class MissionApprovalIntegrationTest extends AbstractIntegrationTest {
     assertThat(nextAssignment.getChildId()).isEqualTo(childId);
     assertThat(nextAssignment.getMissionId()).isEqualTo(
         assignedMissionRepository.findById(assignedMissionId).orElseThrow().getMissionId());
-    assertThat(nextAssignment.getDueDate()).isEqualTo(LocalDate.of(2026, 6, 8));
+    assertThat(nextAssignment.getDueDate()).isEqualTo(assignedDueDate.plusWeeks(1));
     assertThat(nextAssignment.getSnapshotRecurrenceType()).isEqualTo(RecurrenceType.WEEKLY);
   }
 
@@ -234,12 +236,16 @@ class MissionApprovalIntegrationTest extends AbstractIntegrationTest {
   }
 
   private UUID assignMission(String token, UUID childId, MissionRequest missionRequest) throws Exception {
+    return assignMission(token, childId, missionRequest, LocalDate.now());
+  }
+
+  private UUID assignMission(String token, UUID childId, MissionRequest missionRequest, LocalDate dueDate) throws Exception {
     UUID missionId = createMission(token, missionRequest);
     String response = mockMvc.perform(post("/missions/{id}/assign", missionId)
             .header("Authorization", "Bearer " + token)
             .contentType(MediaType.APPLICATION_JSON)
             .content(objectMapper.writeValueAsString(
-                new AssignMissionRequest(List.of(childId), LocalDate.of(2026, 6, 1)))))
+                new AssignMissionRequest(List.of(childId), dueDate))))
         .andExpect(status().isCreated())
         .andReturn()
         .getResponse()

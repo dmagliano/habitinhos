@@ -63,6 +63,11 @@ approval. There is no background scheduler in the MVP.
 | POST | `/assigned-missions/{id}/approve` | Responsible approves mission |
 | POST | `/assigned-missions/{id}/reject` | Responsible rejects mission |
 
+`GET /children/{childId}/missions` returns only visible pending assignments for
+the child. Assignments with no `dueDate` remain visible; assignments due today
+or in the future remain visible; assignments with `dueDate` before the current
+date are omitted from the child list without changing their stored status.
+
 Assigned mission responses include snapshot fields from the assignment moment:
 `snapshotTitle`, `snapshotDescription`, `snapshotCoinValue`,
 `snapshotRequiresApproval`, and `snapshotRecurrenceType`.
