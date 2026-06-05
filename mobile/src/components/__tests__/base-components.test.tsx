@@ -1,9 +1,14 @@
 import { fireEvent, render, screen } from '@testing-library/react-native';
-import { Text } from 'react-native';
+import { act } from 'react';
+import { Keyboard, ScrollView, Text } from 'react-native';
 
-import { Card, EmojiAvatar, PrimaryButton, StatusBadge } from '..';
+import { AppScreen, Card, EmojiAvatar, PrimaryButton, StatusBadge } from '..';
 
 describe('base components', () => {
+  beforeEach(() => {
+    jest.restoreAllMocks();
+  });
+
   it('renders PrimaryButton with accessible label and disabled state', () => {
     const onPress = jest.fn();
 
@@ -46,5 +51,37 @@ describe('base components', () => {
     expect(screen.getByText('Em preparacao')).toBeOnTheScreen();
     expect(screen.getByLabelText('Avatar da familia')).toBeOnTheScreen();
     expect(screen.getByText('⭐')).toHaveStyle({ lineHeight: 52 });
+  });
+
+  it('adds scroll space while the keyboard is visible', () => {
+    const listeners: Record<string, (event?: unknown) => void> = {};
+    jest.spyOn(Keyboard, 'addListener').mockImplementation((eventName, listener) => {
+      listeners[eventName] = listener as (event?: unknown) => void;
+      return { remove: jest.fn() } as unknown as ReturnType<typeof Keyboard.addListener>;
+    });
+
+    const { UNSAFE_getByType } = render(
+      <AppScreen>
+        <Text>PIN do responsável</Text>
+      </AppScreen>,
+    );
+
+    act(() => {
+      const showKeyboard = listeners.keyboardDidShow ?? listeners.keyboardWillShow;
+      showKeyboard?.({ endCoordinates: { height: 280 } });
+    });
+
+    expect(UNSAFE_getByType(ScrollView).props.contentContainerStyle).toEqual(
+      expect.arrayContaining([expect.objectContaining({ paddingBottom: 280 })]),
+    );
+
+    act(() => {
+      const hideKeyboard = listeners.keyboardDidHide ?? listeners.keyboardWillHide;
+      hideKeyboard?.();
+    });
+
+    expect(UNSAFE_getByType(ScrollView).props.contentContainerStyle).not.toEqual(
+      expect.arrayContaining([expect.objectContaining({ paddingBottom: 280 })]),
+    );
   });
 });

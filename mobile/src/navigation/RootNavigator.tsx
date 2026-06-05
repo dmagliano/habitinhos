@@ -1,5 +1,6 @@
 import { NavigationContainer } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
+import { useEffect, useState } from 'react';
 
 import { AuthLoadingScreen } from '../features/auth/AuthLoadingScreen';
 import { AuthWelcomeScreen } from '../features/auth/AuthWelcomeScreen';
@@ -21,11 +22,23 @@ import { ResponsibleTabsScreen } from '../features/responsible/ResponsibleTabsSc
 import { RootStackParamList } from './routes';
 
 const Stack = createNativeStackNavigator<RootStackParamList>();
+const MIN_INITIAL_PRESENTATION_MS = 3000;
 
 export function RootNavigator() {
   const { session, status } = useAuth();
+  const [initialPresentationDone, setInitialPresentationDone] = useState(false);
 
-  if (status === 'restoring' || (status === 'error' && !session)) {
+  useEffect(() => {
+    const presentationTimer = setTimeout(() => {
+      setInitialPresentationDone(true);
+    }, MIN_INITIAL_PRESENTATION_MS);
+
+    return () => clearTimeout(presentationTimer);
+  }, []);
+
+  const shouldHoldAuthEntry = status === 'unauthenticated' && !initialPresentationDone;
+
+  if (status === 'restoring' || shouldHoldAuthEntry || (status === 'error' && !session)) {
     return <AuthLoadingScreen />;
   }
 
