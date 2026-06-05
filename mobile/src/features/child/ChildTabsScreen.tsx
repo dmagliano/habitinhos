@@ -1,11 +1,13 @@
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
+import { useState } from 'react';
 import { StyleSheet, Text, View } from 'react-native';
 
 import { AppHeader, AppScreen, Card, EmojiAvatar, SecondaryButton } from '../../components';
 import { RootStackParamList } from '../../navigation/routes';
 import { colors, spacing, typography } from '../../theme';
 import { useAuth } from '../auth/AuthContext';
+import { ResponsiblePinPrompt } from '../auth/ResponsiblePinPrompt';
 
 import { ChildHomeScreen } from './ChildHomeScreen';
 import { ChildMissionsScreen } from './ChildMissionsScreen';
@@ -62,6 +64,7 @@ export function ChildTabsScreen({ navigation, route }: Props) {
             avatarKey={child.avatarKey}
             onManageFamily={() => navigation.navigate('ResponsibleTabs', { activeChild: child })}
             onSwitchChild={() => navigation.navigate('ChildProfileSelect')}
+            token={session?.token ?? null}
           />
         )}
       </Tab.Screen>
@@ -75,13 +78,17 @@ function ProfileTab({
   familyName,
   onManageFamily,
   onSwitchChild,
+  token,
 }: {
   avatarKey: string;
   childName: string;
   familyName?: string;
   onManageFamily: () => void;
   onSwitchChild: () => void;
+  token: string | null;
 }) {
+  const [showResponsiblePin, setShowResponsiblePin] = useState(false);
+
   return (
     <AppScreen>
       <AppHeader emoji="🙂" title="Perfil" />
@@ -98,8 +105,16 @@ function ProfileTab({
 
       <View style={styles.profileActions}>
         <SecondaryButton label="Trocar criança" onPress={onSwitchChild} />
-        <SecondaryButton label="Gerenciar família" onPress={onManageFamily} />
+        <SecondaryButton label="Gerenciar família" onPress={() => setShowResponsiblePin(true)} />
       </View>
+
+      {showResponsiblePin ? (
+        <ResponsiblePinPrompt
+          onCancel={() => setShowResponsiblePin(false)}
+          onVerified={onManageFamily}
+          token={token}
+        />
+      ) : null}
     </AppScreen>
   );
 }

@@ -94,6 +94,10 @@ function createApiError(status: number, body?: ApiErrorBody): ApiError {
 }
 
 function mapUserMessage(status: number, body?: ApiErrorBody): string {
+  if (body?.code === 'INVALID_RESPONSIBLE_PIN') {
+    return body.message || 'PIN inválido. Tente novamente.';
+  }
+
   if (status === 401 || status === 403) {
     return body?.code === 'INVALID_CREDENTIALS'
       ? INVALID_CREDENTIALS_MESSAGE

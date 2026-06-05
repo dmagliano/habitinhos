@@ -154,7 +154,7 @@ class RewardIntegrationTest extends AbstractIntegrationTest {
     String response = mockMvc.perform(post("/auth/register")
             .contentType(MediaType.APPLICATION_JSON)
             .content(objectMapper.writeValueAsString(
-                new RegisterRequest("Responsavel Demo", email, "senha123", familyName))))
+                new RegisterRequest("Responsavel Demo", email, "senha123", familyName, "1234"))))
         .andExpect(status().isCreated())
         .andReturn()
         .getResponse()

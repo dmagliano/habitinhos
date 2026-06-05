@@ -29,6 +29,7 @@ export type RegisterRequest = {
   email: string;
   password: string;
   familyName: string;
+  responsiblePin: string;
 };
 
 export type MeResponse = UserSummary & {

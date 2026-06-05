@@ -35,6 +35,14 @@ export const authService = {
     };
   },
 
+  async verifyResponsiblePin(token: string, pin: string): Promise<void> {
+    await apiRequest<void>('/auth/responsible-pin/verify', {
+      method: 'POST',
+      token,
+      body: { pin },
+    });
+  },
+
   async me(token: string): Promise<AuthSession> {
     const response = await apiRequest<MeResponse>('/me', {
       token,

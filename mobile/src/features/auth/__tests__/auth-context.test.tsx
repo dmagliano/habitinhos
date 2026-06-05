@@ -171,6 +171,7 @@ describe('AuthProvider', () => {
         email: 'dani@example.com',
         password: 'secret',
         familyName: 'Familia Silva',
+        responsiblePin: '1234',
       });
     });
 
@@ -180,6 +181,7 @@ describe('AuthProvider', () => {
       email: 'dani@example.com',
       password: 'secret',
       familyName: 'Familia Silva',
+      responsiblePin: '1234',
     });
     expect(tokenStorage.setToken).toHaveBeenCalledWith('jwt-token');
   });

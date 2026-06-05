@@ -24,6 +24,7 @@ export function RegisterScreen({ navigation }: Props) {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [familyName, setFamilyName] = useState('');
+  const [responsiblePin, setResponsiblePin] = useState('');
   const isLoading = status === 'loading';
   const registrationErrorMessage = isSessionRecoveryMessage(errorMessage) ? null : errorMessage;
 
@@ -37,6 +38,7 @@ export function RegisterScreen({ navigation }: Props) {
       email: email.trim(),
       password,
       familyName: familyName.trim(),
+      responsiblePin,
     });
   }
 
@@ -101,6 +103,22 @@ export function RegisterScreen({ navigation }: Props) {
                 style={styles.input}
                 value={familyName}
               />
+            </View>
+
+            <View style={styles.field}>
+              <Text style={styles.label}>PIN do responsável</Text>
+              <TextInput
+                accessibilityLabel="PIN do responsável"
+                keyboardType="number-pad"
+                maxLength={4}
+                onChangeText={(value) => setResponsiblePin(value.replace(/\D/g, '').slice(0, 4))}
+                placeholder="4 dígitos"
+                placeholderTextColor={colors.textMuted}
+                secureTextEntry
+                style={styles.input}
+                value={responsiblePin}
+              />
+              <Text style={styles.helper}>Use este PIN para entrar na gestão da família a partir do modo criança.</Text>
             </View>
 
             {registrationErrorMessage ? <Text style={styles.error}>{registrationErrorMessage}</Text> : null}
@@ -180,5 +198,9 @@ const styles = StyleSheet.create({
   error: {
     ...typography.body,
     color: colors.error,
+  },
+  helper: {
+    ...typography.body,
+    color: colors.textMuted,
   },
 });

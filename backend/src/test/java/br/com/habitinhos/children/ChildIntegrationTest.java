@@ -188,7 +188,8 @@ class ChildIntegrationTest extends AbstractIntegrationTest {
                 "Responsavel Demo",
                 email,
                 "senha123",
-                "Familia Demo"))))
+                "Familia Demo",
+                "1234"))))
         .andExpect(status().isCreated())
         .andReturn()
         .getResponse()

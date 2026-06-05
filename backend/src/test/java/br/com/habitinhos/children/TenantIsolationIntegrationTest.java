@@ -72,7 +72,8 @@ class TenantIsolationIntegrationTest extends AbstractIntegrationTest {
                 "Responsavel Demo",
                 email,
                 "senha123",
-                familyName))))
+                familyName,
+                "1234"))))
         .andExpect(status().isCreated())
         .andReturn()
         .getResponse()

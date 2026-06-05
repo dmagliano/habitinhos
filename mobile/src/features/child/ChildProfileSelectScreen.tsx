@@ -7,6 +7,7 @@ import { AppHeader, AppScreen, Card, EmojiAvatar, PrimaryButton, SecondaryButton
 import { RootStackParamList } from '../../navigation/routes';
 import { colors, spacing, typography } from '../../theme';
 import { useAuth } from '../auth/AuthContext';
+import { ResponsiblePinPrompt } from '../auth/ResponsiblePinPrompt';
 
 import { childService } from './childService';
 
@@ -28,6 +29,7 @@ export function ChildProfileSelectScreen({ navigation }: Props) {
   const [children, setChildren] = useState<ChildResponse[]>([]);
   const [selectedChild, setSelectedChild] = useState<ChildResponse | null>(null);
   const [loadState, setLoadState] = useState<LoadState>('loading');
+  const [showResponsiblePin, setShowResponsiblePin] = useState(false);
 
   const activeChildren = useMemo(() => children.filter((child) => child.active), [children]);
 
@@ -130,7 +132,14 @@ export function ChildProfileSelectScreen({ navigation }: Props) {
         onPress={enterProfile}
         style={styles.enterButton}
       />
-      <SecondaryButton label="Gerenciar família" onPress={() => navigation.navigate('ResponsibleTabs')} />
+      <SecondaryButton label="Gerenciar família" onPress={() => setShowResponsiblePin(true)} />
+      {showResponsiblePin ? (
+        <ResponsiblePinPrompt
+          onCancel={() => setShowResponsiblePin(false)}
+          onVerified={() => navigation.navigate('ResponsibleTabs')}
+          token={token}
+        />
+      ) : null}
     </AppScreen>
   );
 }
