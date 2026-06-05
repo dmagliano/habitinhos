@@ -176,6 +176,7 @@ describe('RegisterScreen', () => {
     fireEvent.changeText(screen.getByLabelText('E-mail'), 'dani@example.com');
     fireEvent.changeText(screen.getByLabelText('Senha'), 'secret');
     fireEvent.changeText(screen.getByLabelText('Nome da família'), 'Familia Silva');
+    fireEvent.changeText(screen.getByLabelText('PIN do responsável'), '1234');
     fireEvent.press(screen.getByRole('button', { name: 'Criar conta' }));
 
     await waitFor(() =>
@@ -184,6 +185,7 @@ describe('RegisterScreen', () => {
         email: 'dani@example.com',
         password: 'secret',
         familyName: 'Familia Silva',
+        responsiblePin: '1234',
       }),
     );
   });

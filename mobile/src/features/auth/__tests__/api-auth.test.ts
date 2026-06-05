@@ -51,6 +51,7 @@ describe('apiRequest', () => {
         email: 'dani@example.com',
         password: 'secret',
         familyName: 'Familia Silva',
+        responsiblePin: '1234',
       }),
     ).resolves.toEqual({
       token: 'jwt-token',
@@ -67,9 +68,39 @@ describe('apiRequest', () => {
           email: 'dani@example.com',
           password: 'secret',
           familyName: 'Familia Silva',
+          responsiblePin: '1234',
         }),
       }),
     );
+  });
+
+  it('verifies the responsible PIN with the authenticated token', async () => {
+    fetchMock.mockResolvedValueOnce(createResponse(204, undefined));
+
+    await expect(authService.verifyResponsiblePin('jwt-token', '1234')).resolves.toBeUndefined();
+
+    expect(fetchMock).toHaveBeenCalledWith(
+      'http://10.0.2.2:8080/auth/responsible-pin/verify',
+      expect.objectContaining({
+        method: 'POST',
+        headers: expect.objectContaining({ Authorization: 'Bearer jwt-token' }),
+        body: JSON.stringify({ pin: '1234' }),
+      }),
+    );
+  });
+
+  it('maps invalid responsible PIN to a PIN-specific message', async () => {
+    fetchMock.mockResolvedValueOnce(
+      createResponse(403, {
+        code: 'INVALID_RESPONSIBLE_PIN',
+        message: 'PIN inválido. Tente novamente.',
+      }),
+    );
+
+    await expect(authService.verifyResponsiblePin('jwt-token', '9999')).rejects.toMatchObject({
+      code: 'INVALID_RESPONSIBLE_PIN',
+      userMessage: 'PIN inválido. Tente novamente.',
+    });
   });
 
   it('rejects client familyUnitId in register body', async () => {
@@ -79,6 +110,7 @@ describe('apiRequest', () => {
         email: 'dani@example.com',
         password: 'secret',
         familyName: 'Familia Silva',
+        responsiblePin: '1234',
         familyUnitId: 'client-family',
       } as never),
     ).rejects.toBeInstanceOf(ApiError);

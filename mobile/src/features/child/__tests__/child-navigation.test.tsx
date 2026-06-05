@@ -4,12 +4,19 @@ import { fireEvent, render, screen, waitFor } from '@testing-library/react-nativ
 import { ChildResponse } from '../../../api/types';
 import { RootNavigator } from '../../../navigation/RootNavigator';
 import { useAuth } from '../../auth/AuthContext';
+import { authService } from '../../auth/authService';
 import { childService } from '../childService';
 import { ChildProfileSelectScreen } from '../ChildProfileSelectScreen';
 import { ChildTabsScreen } from '../ChildTabsScreen';
 
 jest.mock('../../auth/AuthContext', () => ({
   useAuth: jest.fn(),
+}));
+
+jest.mock('../../auth/authService', () => ({
+  authService: {
+    verifyResponsiblePin: jest.fn(),
+  },
 }));
 
 jest.mock('../childService', () => ({
@@ -72,6 +79,7 @@ describe('child navigation flow', () => {
       updatedAt: '2026-06-01T10:00:00Z',
     });
     jest.mocked(childService.listPendingMissions).mockResolvedValue([]);
+    jest.mocked(authService.verifyResponsiblePin).mockResolvedValue(undefined);
   });
 
   it('starts authenticated sessions in child profile selection instead of the family hub', async () => {
@@ -112,10 +120,37 @@ describe('child navigation flow', () => {
     expect(enterButton).not.toBeDisabled();
 
     fireEvent.press(enterButton);
-    fireEvent.press(screen.getByRole('button', { name: 'Gerenciar família' }));
 
     expect(navigate).toHaveBeenCalledWith('ChildTabs', { child: joaquim });
+    expect(navigate).not.toHaveBeenCalledWith('ResponsibleTabs');
+
+    fireEvent.press(screen.getByRole('button', { name: 'Gerenciar família' }));
+    expect(screen.getByText('PIN do responsável')).toBeOnTheScreen();
+    fireEvent.changeText(screen.getByLabelText('PIN do responsável'), '1234');
+    fireEvent.press(screen.getByRole('button', { name: 'Confirmar PIN' }));
+
+    await waitFor(() => expect(authService.verifyResponsiblePin).toHaveBeenCalledWith('jwt-token', '1234'));
     expect(navigate).toHaveBeenCalledWith('ResponsibleTabs');
+  });
+
+  it('keeps the child selector open when the responsible PIN is rejected', async () => {
+    jest.mocked(childService.listChildren).mockResolvedValue([joaquim]);
+    jest.mocked(authService.verifyResponsiblePin).mockRejectedValueOnce(new Error('PIN inválido. Tente novamente.'));
+
+    render(
+      <ChildProfileSelectScreen
+        navigation={navigation}
+        route={{ key: 'ChildProfileSelect', name: 'ChildProfileSelect' }}
+      />,
+    );
+
+    expect(await screen.findByText('Joaquim')).toBeOnTheScreen();
+    fireEvent.press(screen.getByRole('button', { name: 'Gerenciar família' }));
+    fireEvent.changeText(screen.getByLabelText('PIN do responsável'), '9999');
+    fireEvent.press(screen.getByRole('button', { name: 'Confirmar PIN' }));
+
+    expect(await screen.findByText('PIN inválido. Tente novamente.')).toBeOnTheScreen();
+    expect(navigate).not.toHaveBeenCalledWith('ResponsibleTabs');
   });
 
   it('shows empty, error, and retry states without fake child data', async () => {
@@ -179,8 +214,11 @@ describe('child navigation flow', () => {
 
     fireEvent.press(screen.getByRole('button', { name: 'Trocar criança' }));
     fireEvent.press(screen.getByRole('button', { name: 'Gerenciar família' }));
+    fireEvent.changeText(screen.getByLabelText('PIN do responsável'), '1234');
+    fireEvent.press(screen.getByRole('button', { name: 'Confirmar PIN' }));
 
     expect(navigate).toHaveBeenCalledWith('ChildProfileSelect');
+    await waitFor(() => expect(authService.verifyResponsiblePin).toHaveBeenCalledWith('jwt-token', '1234'));
     expect(navigate).toHaveBeenCalledWith('ResponsibleTabs', { activeChild: joaquim });
     expect(logout).not.toHaveBeenCalled();
   });
