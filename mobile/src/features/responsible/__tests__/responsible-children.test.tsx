@@ -104,6 +104,18 @@ describe('ResponsibleChildrenScreen', () => {
     expect(navigate).toHaveBeenCalledWith('ResponsibleChildForm');
   });
 
+  it('returns from children management to the responsible home', async () => {
+    jest.mocked(responsibleService.listChildren).mockResolvedValue([activeChild]);
+
+    render(<ResponsibleChildrenScreen navigation={navigation} route={{ key: 'ResponsibleChildren', name: 'ResponsibleChildren' }} />);
+
+    expect(await screen.findByRole('button', { name: 'Retornar ao início' })).toBeOnTheScreen();
+
+    fireEvent.press(screen.getByRole('button', { name: 'Retornar ao início' }));
+
+    expect(navigate).toHaveBeenCalledWith('ResponsibleTabs');
+  });
+
   it('renders an empty state with create CTA without fake children', async () => {
     jest.mocked(responsibleService.listChildren).mockResolvedValue([]);
 

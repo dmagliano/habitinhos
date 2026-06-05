@@ -110,6 +110,9 @@ describe('responsible dashboard screens', () => {
     expect(screen.getByRole('button', { name: 'Cadastrar criança' })).toBeOnTheScreen();
     expect(screen.getByText('1 missão aguardando aprovação')).toBeOnTheScreen();
     expect(screen.getByRole('button', { name: 'Abrir aprovações' })).toBeOnTheScreen();
+    expect(screen.getByRole('button', { name: 'Abrir gestão de crianças' })).toBeOnTheScreen();
+    expect(screen.getByRole('button', { name: 'Abrir aprovações pendentes' })).toBeOnTheScreen();
+    expect(screen.getByRole('button', { name: 'Abrir missões' })).toBeOnTheScreen();
     expect(screen.getByText('Cinema em família')).toBeOnTheScreen();
     expect(screen.getByText('Lia · 20 moedas')).toBeOnTheScreen();
     const deliveredCheckbox = screen.getByRole('checkbox', { name: 'Marcar Cinema em família como entregue' });
@@ -126,15 +129,21 @@ describe('responsible dashboard screens', () => {
     expect(screen.queryByText('jwt-token')).toBeNull();
   });
 
-  it('opens approvals and focuses recent redemptions from dashboard affordances', async () => {
+  it('opens responsible areas and focuses recent redemptions from dashboard summary cards', async () => {
     jest.mocked(responsibleService.getDashboard).mockResolvedValue(dashboardFixture);
 
     render(<ResponsibleHomeScreen navigation={navigation} />);
 
     expect(await screen.findByText('Cinema em família')).toBeOnTheScreen();
 
-    fireEvent.press(screen.getByRole('button', { name: 'Abrir aprovações' }));
+    fireEvent.press(screen.getByRole('button', { name: 'Abrir gestão de crianças' }));
+    expect(navigate).toHaveBeenCalledWith('ResponsibleChildren');
+
+    fireEvent.press(screen.getByRole('button', { name: 'Abrir aprovações pendentes' }));
     expect(navigate).toHaveBeenCalledWith('ResponsibleApprovals');
+
+    fireEvent.press(screen.getByRole('button', { name: 'Abrir missões' }));
+    expect(navigate).toHaveBeenCalledWith('ResponsibleMissions');
 
     fireEvent.press(screen.getByRole('button', { name: 'Ver resgates recentes' }));
 

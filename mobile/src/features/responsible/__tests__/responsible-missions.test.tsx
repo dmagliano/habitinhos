@@ -168,6 +168,13 @@ describe('ResponsibleMissionFormScreen', () => {
     );
 
     await waitFor(() => expect(responsibleService.listChildren).toHaveBeenCalledWith('jwt-token', false));
+    expect(screen.queryByText('Frequência')).toBeNull();
+    expect(screen.queryByText('A frequência orienta como a família enxerga a missão.')).toBeNull();
+    expect(screen.queryByRole('button', { name: 'Selecionar frequência Uma vez' })).toBeNull();
+    expect(screen.queryByRole('button', { name: 'Selecionar frequência Diária' })).toBeNull();
+    expect(screen.queryByRole('button', { name: 'Selecionar frequência Semanal' })).toBeNull();
+    expect(screen.queryByRole('button', { name: 'Selecionar frequência Personalizada' })).toBeNull();
+    expect(screen.getByText('Moedas')).toBeOnTheScreen();
     fireEvent.changeText(screen.getByLabelText('Título'), 'Guardar brinquedos');
     fireEvent.changeText(screen.getByLabelText('Descrição opcional'), 'Organizar a sala');
     fireEvent.changeText(screen.getByLabelText('Recompensa em moedas'), '4');

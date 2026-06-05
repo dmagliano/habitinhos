@@ -3,7 +3,7 @@ import { fireEvent, render, screen } from '@testing-library/react-native';
 
 import { ChildResponse } from '../../../api/types';
 import { useAuth } from '../../auth/AuthContext';
-import { ResponsibleTabsScreen } from '../ResponsibleTabsScreen';
+import { getResponsibleTabBottomPadding, ResponsibleTabsScreen } from '../ResponsibleTabsScreen';
 import { responsibleService } from '../responsibleService';
 
 jest.mock('../../auth/AuthContext', () => ({
@@ -75,6 +75,11 @@ describe('responsible navigation flow', () => {
     expect(screen.getByRole('button', { name: 'Abrir Perfil' })).toBeOnTheScreen();
     expect(screen.queryByText('jwt-token')).toBeNull();
     expect(screen.queryByText('family-1')).toBeNull();
+  });
+
+  it('caps the responsible tab bottom padding to avoid a large visual dead band', () => {
+    expect(getResponsibleTabBottomPadding(0)).toBe(4);
+    expect(getResponsibleTabBottomPadding(120)).toBe(8);
   });
 
   it('renders responsible profile return-to-child action when active child context exists', async () => {

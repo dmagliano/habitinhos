@@ -173,16 +173,15 @@ describe('child navigation flow', () => {
     expect(screen.getByText('Joaquim')).toBeOnTheScreen();
     expect(screen.getByText('Família Silva')).toBeOnTheScreen();
     expect(screen.getByRole('button', { name: 'Gerenciar família' })).toBeOnTheScreen();
-    expect(screen.getByRole('button', { name: 'Sair da conta' })).toBeOnTheScreen();
+    expect(screen.queryByRole('button', { name: 'Sair da conta' })).toBeNull();
     expect(screen.queryByText('jwt-token')).toBeNull();
     expect(screen.queryByText('family-1')).toBeNull();
 
     fireEvent.press(screen.getByRole('button', { name: 'Trocar criança' }));
     fireEvent.press(screen.getByRole('button', { name: 'Gerenciar família' }));
-    fireEvent.press(screen.getByRole('button', { name: 'Sair da conta' }));
 
     expect(navigate).toHaveBeenCalledWith('ChildProfileSelect');
     expect(navigate).toHaveBeenCalledWith('ResponsibleTabs', { activeChild: joaquim });
-    expect(logout).toHaveBeenCalledTimes(1);
+    expect(logout).not.toHaveBeenCalled();
   });
 });
