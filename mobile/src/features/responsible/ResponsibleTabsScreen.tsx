@@ -122,52 +122,58 @@ const tabCopy: Record<keyof ResponsibleTabParamList, { emoji: string; label: str
 
 function ResponsibleTabBar({ descriptors, navigation, state }: BottomTabBarProps) {
   const insets = useSafeAreaInsets();
-  const bottomPadding = getResponsibleTabBottomPadding(insets.bottom);
+  const bottomSafeAreaHeight = getResponsibleTabBottomSafeAreaHeight(insets.bottom);
 
   return (
-    <View style={[styles.tabContainer, { paddingBottom: bottomPadding }]}>
-      {state.routes.map((route, index) => {
-        const isFocused = state.index === index;
-        const copy = tabCopy[route.name as keyof ResponsibleTabParamList];
-        const options = descriptors[route.key]?.options;
-        const label = copy?.label ?? options?.title ?? route.name;
+    <View style={styles.tabShell}>
+      <View style={styles.tabContainer}>
+        {state.routes.map((route, index) => {
+          const isFocused = state.index === index;
+          const copy = tabCopy[route.name as keyof ResponsibleTabParamList];
+          const options = descriptors[route.key]?.options;
+          const label = copy?.label ?? options?.title ?? route.name;
 
-        const onPress = () => {
-          const event = navigation.emit({
-            type: 'tabPress',
-            target: route.key,
-            canPreventDefault: true,
-          });
+          const onPress = () => {
+            const event = navigation.emit({
+              type: 'tabPress',
+              target: route.key,
+              canPreventDefault: true,
+            });
 
-          if (!isFocused && !event.defaultPrevented) {
-            navigation.navigate(route.name);
-          }
-        };
+            if (!isFocused && !event.defaultPrevented) {
+              navigation.navigate(route.name);
+            }
+          };
 
-        return (
-          <Pressable
-            accessibilityLabel={`Abrir ${label}`}
-            accessibilityRole="button"
-            key={route.key}
-            onPress={onPress}
-            style={[styles.tabItem, isFocused && styles.tabItemActive]}
-          >
-            <Text style={styles.tabEmoji}>{copy?.emoji ?? '⭐'}</Text>
-            <Text numberOfLines={1} style={[styles.tabLabel, isFocused && styles.tabLabelActive]}>
-              {label}
-            </Text>
-          </Pressable>
-        );
-      })}
+          return (
+            <Pressable
+              accessibilityLabel={`Abrir ${label}`}
+              accessibilityRole="button"
+              key={route.key}
+              onPress={onPress}
+              style={[styles.tabItem, isFocused && styles.tabItemActive]}
+            >
+              <Text style={styles.tabEmoji}>{copy?.emoji ?? '⭐'}</Text>
+              <Text numberOfLines={1} style={[styles.tabLabel, isFocused && styles.tabLabelActive]}>
+                {label}
+              </Text>
+            </Pressable>
+          );
+        })}
+      </View>
+      {bottomSafeAreaHeight > 0 ? <View style={[styles.tabSafeArea, { height: bottomSafeAreaHeight }]} /> : null}
     </View>
   );
 }
 
-export function getResponsibleTabBottomPadding(insetBottom: number): number {
-  return Math.min(Math.max(insetBottom, spacing.xs), spacing.sm);
+export function getResponsibleTabBottomSafeAreaHeight(insetBottom: number): number {
+  return Math.max(insetBottom, 0);
 }
 
 const styles = StyleSheet.create({
+  tabShell: {
+    backgroundColor: colors.background,
+  },
   tabContainer: {
     backgroundColor: colors.surface,
     borderColor: colors.border,
@@ -175,7 +181,11 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     gap: spacing.xs,
     paddingHorizontal: spacing.sm,
+    paddingBottom: spacing.xs,
     paddingTop: spacing.sm,
+  },
+  tabSafeArea: {
+    backgroundColor: colors.background,
   },
   tabEmoji: {
     fontSize: 18,

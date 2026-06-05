@@ -3,7 +3,7 @@ import { fireEvent, render, screen } from '@testing-library/react-native';
 
 import { ChildResponse } from '../../../api/types';
 import { useAuth } from '../../auth/AuthContext';
-import { getResponsibleTabBottomPadding, ResponsibleTabsScreen } from '../ResponsibleTabsScreen';
+import { getResponsibleTabBottomSafeAreaHeight, ResponsibleTabsScreen } from '../ResponsibleTabsScreen';
 import { responsibleService } from '../responsibleService';
 
 jest.mock('../../auth/AuthContext', () => ({
@@ -77,9 +77,9 @@ describe('responsible navigation flow', () => {
     expect(screen.queryByText('family-1')).toBeNull();
   });
 
-  it('caps the responsible tab bottom padding to avoid a large visual dead band', () => {
-    expect(getResponsibleTabBottomPadding(0)).toBe(4);
-    expect(getResponsibleTabBottomPadding(120)).toBe(8);
+  it('keeps the responsible tab row above the Android safe area without adding extra dead band', () => {
+    expect(getResponsibleTabBottomSafeAreaHeight(0)).toBe(0);
+    expect(getResponsibleTabBottomSafeAreaHeight(48)).toBe(48);
   });
 
   it('renders responsible profile return-to-child action when active child context exists', async () => {

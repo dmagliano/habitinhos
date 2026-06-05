@@ -95,6 +95,9 @@ describe('AuthWelcomeScreen', () => {
   it('offers visible login and registration entry actions', () => {
     render(<AuthWelcomeScreen navigation={{ navigate } as never} route={{ key: 'AuthWelcome', name: 'AuthWelcome' }} />);
 
+    expect(screen.getByLabelText('Ilustração de missões, moedas e recompensas')).toBeOnTheScreen();
+    expect(screen.getByText('⭐')).toBeOnTheScreen();
+    expect(screen.getByText('🎁')).toBeOnTheScreen();
     expect(screen.getByText('Habitinhos')).toBeOnTheScreen();
     expect(screen.getByText('Transforme tarefas em pequenas conquistas')).toBeOnTheScreen();
     expect(screen.getByText('Organize missões, moedas e recompensas da família.')).toBeOnTheScreen();
