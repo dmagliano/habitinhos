@@ -25,7 +25,15 @@ type FormErrors = {
   assignment?: string;
 };
 
-const MVP_RECURRENCE_TYPE: MissionRequest['recurrenceType'] = 'ONCE';
+const RECURRENCE_OPTIONS: {
+  label: string;
+  helper: string;
+  value: MissionRequest['recurrenceType'];
+}[] = [
+  { label: 'Uma vez', helper: 'A missão termina depois de concluída.', value: 'ONCE' },
+  { label: 'Diária', helper: 'Após o crédito, nasce uma nova para o dia seguinte.', value: 'DAILY' },
+  { label: 'Semanal', helper: 'Após o crédito, nasce uma nova para a próxima semana.', value: 'WEEKLY' },
+];
 
 export function ResponsibleMissionFormScreen({ navigation, route }: Props) {
   const { session } = useAuth();
@@ -36,6 +44,7 @@ export function ResponsibleMissionFormScreen({ navigation, route }: Props) {
   const [description, setDescription] = useState('');
   const [coinValue, setCoinValue] = useState('1');
   const [requiresApproval, setRequiresApproval] = useState(true);
+  const [recurrenceType, setRecurrenceType] = useState<MissionRequest['recurrenceType']>('ONCE');
   const [children, setChildren] = useState<ChildResponse[]>([]);
   const [selectedChildIds, setSelectedChildIds] = useState<string[]>([]);
   const [dueDate, setDueDate] = useState('');
@@ -69,6 +78,7 @@ export function ResponsibleMissionFormScreen({ navigation, route }: Props) {
         setDescription(mission.description ?? '');
         setCoinValue(String(mission.coinValue));
         setRequiresApproval(mission.requiresApproval);
+        setRecurrenceType(mission.recurrenceType === 'CUSTOM' ? 'ONCE' : mission.recurrenceType);
       }
 
       setLoadState('ready');
@@ -90,7 +100,7 @@ export function ResponsibleMissionFormScreen({ navigation, route }: Props) {
     description: description.trim(),
     coinValue: parsedCoinValue,
     requiresApproval,
-    recurrenceType: MVP_RECURRENCE_TYPE,
+    recurrenceType,
   });
 
   const validateDetails = () => {
@@ -201,6 +211,8 @@ export function ResponsibleMissionFormScreen({ navigation, route }: Props) {
             onChangeTitle={setTitle}
             onSubmit={handleSaveDetails}
             requiresApproval={requiresApproval}
+            recurrenceType={recurrenceType}
+            setRecurrenceType={setRecurrenceType}
             submitting={submitting}
             title={title}
             toggleApproval={() => setRequiresApproval((current) => !current)}
@@ -255,6 +267,8 @@ function MissionDetailsForm({
   onChangeTitle,
   onSubmit,
   requiresApproval,
+  recurrenceType,
+  setRecurrenceType,
   submitting,
   title,
   toggleApproval,
@@ -268,6 +282,8 @@ function MissionDetailsForm({
   onChangeTitle: (value: string) => void;
   onSubmit: () => void;
   requiresApproval: boolean;
+  recurrenceType: MissionRequest['recurrenceType'];
+  setRecurrenceType: (value: MissionRequest['recurrenceType']) => void;
   submitting: boolean;
   title: string;
   toggleApproval: () => void;
@@ -335,6 +351,30 @@ function MissionDetailsForm({
         </Pressable>
       </ResponsibleFormSection>
 
+      <ResponsibleFormSection
+        helper="Escolha se a missão aparece uma vez ou se gera a próxima ocorrência após o crédito."
+        title="Recorrência"
+      >
+        <View style={styles.recurrenceList}>
+          {RECURRENCE_OPTIONS.map((option) => {
+            const selected = recurrenceType === option.value;
+            return (
+              <Pressable
+                accessibilityLabel={`Selecionar recorrência ${option.label}`}
+                accessibilityRole="button"
+                accessibilityState={{ selected }}
+                key={option.value}
+                onPress={() => setRecurrenceType(option.value)}
+                style={[styles.recurrenceOption, selected && styles.recurrenceOptionSelected]}
+              >
+                <Text style={styles.toggleTitle}>{option.label}</Text>
+                <Text style={styles.toggleHelper}>{option.helper}</Text>
+              </Pressable>
+            );
+          })}
+        </View>
+      </ResponsibleFormSection>
+
       <PrimaryButton
         disabled={submitting}
         label={submitting ? 'Salvando missão' : 'Salvar missão'}
@@ -393,6 +433,21 @@ const styles = StyleSheet.create({
   label: {
     ...typography.label,
     color: colors.textSecondary,
+  },
+  recurrenceList: {
+    gap: spacing.sm,
+  },
+  recurrenceOption: {
+    backgroundColor: colors.surface,
+    borderColor: colors.border,
+    borderRadius: radius.md,
+    borderWidth: 1,
+    gap: spacing.xs,
+    padding: spacing.md,
+  },
+  recurrenceOptionSelected: {
+    backgroundColor: colors.primarySoft,
+    borderColor: colors.primary,
   },
   stateCard: {
     alignItems: 'flex-start',

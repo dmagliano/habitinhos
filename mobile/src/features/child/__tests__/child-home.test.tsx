@@ -142,6 +142,7 @@ function mission(
     snapshotDescription: `${title} com carinho`,
     snapshotCoinValue: 5,
     snapshotRequiresApproval: false,
+    snapshotRecurrenceType: 'ONCE',
     createdAt,
     updatedAt: createdAt,
   };

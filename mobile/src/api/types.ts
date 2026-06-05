@@ -81,6 +81,7 @@ export type AssignedMissionResponse = {
   snapshotDescription: string;
   snapshotCoinValue: number;
   snapshotRequiresApproval: boolean;
+  snapshotRecurrenceType: MissionResponse['recurrenceType'];
   createdAt: string;
   updatedAt: string;
 };
@@ -144,6 +145,7 @@ export type AssignMissionRequest = {
 
 export type RejectAssignedMissionRequest = {
   reason?: string;
+  returnToPending?: boolean;
 };
 
 export type ResponsibleDashboardMissionCounts = Record<AssignedMissionStatus, number>;

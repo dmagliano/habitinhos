@@ -48,6 +48,11 @@ Phase 1 child endpoints are responsible-only. Children are not authenticatable `
 | PATCH | `/missions/{id}/deactivate` | Soft deactivate mission |
 | POST | `/missions/{id}/assign` | Assign mission to one or more children |
 
+`recurrenceType` accepts `ONCE`, `DAILY`, `WEEKLY`, and `CUSTOM`; the MVP mobile
+UI exposes only `ONCE`, `DAILY`, and `WEEKLY`. For recurring missions, the next
+pending occurrence is created after automatic mission credit or responsible
+approval. There is no background scheduler in the MVP.
+
 ## Assigned Missions
 
 | Method | Path | Purpose |
@@ -57,6 +62,23 @@ Phase 1 child endpoints are responsible-only. Children are not authenticatable `
 | POST | `/assigned-missions/{id}/complete` | Child marks assigned mission complete |
 | POST | `/assigned-missions/{id}/approve` | Responsible approves mission |
 | POST | `/assigned-missions/{id}/reject` | Responsible rejects mission |
+
+Assigned mission responses include snapshot fields from the assignment moment:
+`snapshotTitle`, `snapshotDescription`, `snapshotCoinValue`,
+`snapshotRequiresApproval`, and `snapshotRecurrenceType`.
+
+Reject request body:
+
+```json
+{
+  "reason": "Faltou guardar os carrinhos",
+  "returnToPending": true
+}
+```
+
+When `returnToPending` is `true`, the assignment returns to `PENDING` without
+crediting coins and keeps `rejectionReason` visible to the child. When omitted
+or `false`, the assignment remains `REJECTED`.
 
 ## Rewards
 

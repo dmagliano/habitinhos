@@ -74,6 +74,7 @@ describe('childService', () => {
         snapshotDescription: 'Deixar o quarto pronto para o dia',
         snapshotCoinValue: 5,
         snapshotRequiresApproval: false,
+        snapshotRecurrenceType: 'ONCE',
         createdAt: '2026-06-01T10:00:00Z',
         updatedAt: '2026-06-01T10:00:00Z',
       },
@@ -109,6 +110,7 @@ describe('childService', () => {
       snapshotDescription: 'Deixar o quarto pronto para o dia',
       snapshotCoinValue: 5,
       snapshotRequiresApproval: false,
+      snapshotRecurrenceType: 'ONCE',
       createdAt: '2026-06-01T10:00:00Z',
       updatedAt: '2026-06-02T10:00:00Z',
     };

@@ -122,6 +122,8 @@ public class AssignedMissionService {
           assignedMission.getId(),
           assignedMission.getSnapshotCoinValue(),
           currentUser.userId());
+      assignedMissionRepository.flush();
+      createNextRecurringAssignmentIfNeeded(assignedMission);
       log.info(
           "Assigned mission completed with automatic credit: familyUnitId={} assignedMissionId={} childId={}",
           familyUnitId,
@@ -170,6 +172,8 @@ public class AssignedMissionService {
         assignedMission.getId(),
         assignedMission.getSnapshotCoinValue(),
         currentUser.userId());
+    assignedMissionRepository.flush();
+    createNextRecurringAssignmentIfNeeded(assignedMission);
     log.info(
         "Assigned mission approved: familyUnitId={} assignedMissionId={} childId={}",
         familyUnitId,
@@ -179,19 +183,28 @@ public class AssignedMissionService {
   }
 
   @Transactional
-  public AssignedMissionResponse reject(CurrentUser currentUser, UUID assignedMissionId, String reason) {
+  public AssignedMissionResponse reject(
+      CurrentUser currentUser,
+      UUID assignedMissionId,
+      String reason,
+      boolean returnToPending) {
     requireResponsible(currentUser);
     AssignedMission assignedMission = assignedMissionRepository
         .findByIdAndFamilyUnitId(assignedMissionId, currentUser.familyUnitId())
         .orElseThrow(this::assignedMissionNotFound);
     requireStatus(assignedMission, AssignedMissionStatus.AWAITING_APPROVAL);
 
-    assignedMission.reject(normalizeOptional(reason));
+    if (returnToPending) {
+      assignedMission.rejectAndReturnToPending(normalizeOptional(reason));
+    } else {
+      assignedMission.reject(normalizeOptional(reason));
+    }
     log.info(
-        "Assigned mission rejected: familyUnitId={} assignedMissionId={} childId={}",
+        "Assigned mission rejected: familyUnitId={} assignedMissionId={} childId={} returnToPending={}",
         currentUser.familyUnitId(),
         assignedMissionId,
-        assignedMission.getChildId());
+        assignedMission.getChildId(),
+        returnToPending);
     return toResponse(assignedMission);
   }
 
@@ -229,6 +242,58 @@ public class AssignedMissionService {
     return value == null || value.trim().isEmpty() ? null : value.trim();
   }
 
+  private void createNextRecurringAssignmentIfNeeded(AssignedMission completedAssignment) {
+    RecurrenceType recurrenceType = completedAssignment.getSnapshotRecurrenceType();
+    if (recurrenceType == RecurrenceType.ONCE || recurrenceType == RecurrenceType.CUSTOM) {
+      return;
+    }
+
+    List<AssignedMissionStatus> openStatuses =
+        List.of(AssignedMissionStatus.PENDING, AssignedMissionStatus.AWAITING_APPROVAL);
+    boolean hasOpenAssignment = assignedMissionRepository
+        .existsByFamilyUnitIdAndMissionIdAndChildIdAndStatusIn(
+            completedAssignment.getFamilyUnitId(),
+            completedAssignment.getMissionId(),
+            completedAssignment.getChildId(),
+            openStatuses);
+    if (hasOpenAssignment) {
+      log.debug(
+          "Skipping recurring assignment because an open assignment exists: familyUnitId={} missionId={} childId={}",
+          completedAssignment.getFamilyUnitId(),
+          completedAssignment.getMissionId(),
+          completedAssignment.getChildId());
+      return;
+    }
+
+    Mission mission = missionRepository
+        .findByIdAndFamilyUnitId(completedAssignment.getMissionId(), completedAssignment.getFamilyUnitId())
+        .orElseThrow(this::missionNotFound);
+    LocalDate nextDueDate = nextDueDate(completedAssignment.getDueDate(), recurrenceType);
+    AssignedMission nextAssignment = new AssignedMission(
+        completedAssignment.getFamilyUnitId(),
+        completedAssignment.getMissionId(),
+        completedAssignment.getChildId(),
+        nextDueDate,
+        mission);
+    assignedMissionRepository.save(nextAssignment);
+    log.info(
+        "Recurring assigned mission created: familyUnitId={} missionId={} childId={} recurrenceType={} dueDate={}",
+        completedAssignment.getFamilyUnitId(),
+        completedAssignment.getMissionId(),
+        completedAssignment.getChildId(),
+        recurrenceType,
+        nextDueDate);
+  }
+
+  private LocalDate nextDueDate(LocalDate currentDueDate, RecurrenceType recurrenceType) {
+    LocalDate baseDate = currentDueDate == null ? LocalDate.now() : currentDueDate;
+    return switch (recurrenceType) {
+      case DAILY -> baseDate.plusDays(1);
+      case WEEKLY -> baseDate.plusWeeks(1);
+      case ONCE, CUSTOM -> baseDate;
+    };
+  }
+
   private AssignedMissionResponse toResponse(AssignedMission assignedMission) {
     return new AssignedMissionResponse(
         assignedMission.getId(),
@@ -244,6 +309,7 @@ public class AssignedMissionService {
         assignedMission.getSnapshotDescription(),
         assignedMission.getSnapshotCoinValue(),
         assignedMission.isSnapshotRequiresApproval(),
+        assignedMission.getSnapshotRecurrenceType(),
         assignedMission.getCreatedAt(),
         assignedMission.getUpdatedAt());
   }

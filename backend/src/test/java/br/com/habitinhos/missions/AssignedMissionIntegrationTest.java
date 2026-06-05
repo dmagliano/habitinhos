@@ -95,6 +95,36 @@ class AssignedMissionIntegrationTest extends AbstractIntegrationTest {
   }
 
   @Test
+  void completeNoApprovalRecurringMissionCreditsAndCreatesNextPendingOccurrence() throws Exception {
+    String token = registerToken("responsavel@example.com", "Familia Demo");
+    UUID childId = createChild(token, new ChildRequest("Lia", 8, "star", null));
+    UUID assignedMissionId = assignMission(
+        token,
+        childId,
+        new MissionRequest("Arrumar cama", "Deixar quarto organizado", 3, false, RecurrenceType.DAILY));
+
+    mockMvc.perform(post("/assigned-missions/{id}/complete", assignedMissionId)
+            .header("Authorization", "Bearer " + token))
+        .andExpect(status().isOk())
+        .andExpect(jsonPath("$.status").value("COMPLETED"))
+        .andExpect(jsonPath("$.snapshotRecurrenceType").value("DAILY"));
+
+    AssignedMission completedAssignment = assignedMissionRepository.findById(assignedMissionId).orElseThrow();
+    assertThat(walletRepository.findByChildIdAndFamilyUnitId(childId, completedAssignment.getFamilyUnitId())
+        .orElseThrow()
+        .getBalance()).isEqualTo(3);
+    assertThat(coinTransactionRepository.findAll()).hasSize(1);
+
+    mockMvc.perform(get("/children/{childId}/missions", childId)
+            .header("Authorization", "Bearer " + token))
+        .andExpect(status().isOk())
+        .andExpect(jsonPath("$[0].status").value("PENDING"))
+        .andExpect(jsonPath("$[0].dueDate").value("2026-06-02"))
+        .andExpect(jsonPath("$[0].snapshotRecurrenceType").value("DAILY"))
+        .andExpect(jsonPath("$[1]").doesNotExist());
+  }
+
+  @Test
   void completeApprovalRequiredMissionWaitsForApprovalWithoutCredit() throws Exception {
     String token = registerToken("responsavel@example.com", "Familia Demo");
     UUID childId = createChild(token, new ChildRequest("Lia", 8, "star", null));

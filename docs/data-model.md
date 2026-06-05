@@ -93,6 +93,11 @@ Mission assigned to a specific child.
 | approvedAt | Approval timestamp |
 | rejectedAt | Rejection timestamp |
 | rejectionReason | Optional rejection note |
+| snapshotTitle | Mission title copied at assignment time |
+| snapshotDescription | Mission description copied at assignment time |
+| snapshotCoinValue | Coin value copied at assignment time |
+| snapshotRequiresApproval | Approval rule copied at assignment time |
+| snapshotRecurrenceType | Recurrence rule copied at assignment time |
 | coinsCredited | Amount credited when completed/approved |
 | createdAt | Creation timestamp |
 | updatedAt | Update timestamp |

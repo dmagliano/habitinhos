@@ -1,6 +1,6 @@
 import { fireEvent, render, screen, waitFor, within } from '@testing-library/react-native';
 
-import { ChildResponse, MissionResponse } from '../../../api/types';
+import { AssignedMissionResponse, ChildResponse, MissionResponse } from '../../../api/types';
 import { useAuth } from '../../auth/AuthContext';
 import { ResponsibleAssignmentFormScreen } from '../ResponsibleAssignmentFormScreen';
 import { ResponsibleMissionFormScreen } from '../ResponsibleMissionFormScreen';
@@ -168,16 +168,16 @@ describe('ResponsibleMissionFormScreen', () => {
     );
 
     await waitFor(() => expect(responsibleService.listChildren).toHaveBeenCalledWith('jwt-token', false));
-    expect(screen.queryByText('Frequência')).toBeNull();
-    expect(screen.queryByText('A frequência orienta como a família enxerga a missão.')).toBeNull();
-    expect(screen.queryByRole('button', { name: 'Selecionar frequência Uma vez' })).toBeNull();
-    expect(screen.queryByRole('button', { name: 'Selecionar frequência Diária' })).toBeNull();
-    expect(screen.queryByRole('button', { name: 'Selecionar frequência Semanal' })).toBeNull();
-    expect(screen.queryByRole('button', { name: 'Selecionar frequência Personalizada' })).toBeNull();
+    expect(screen.getByText('Recorrência')).toBeOnTheScreen();
+    expect(screen.getByText('Uma vez')).toBeOnTheScreen();
+    expect(screen.getByText('Diária')).toBeOnTheScreen();
+    expect(screen.getByText('Semanal')).toBeOnTheScreen();
+    expect(screen.queryByRole('button', { name: 'Selecionar recorrência Personalizada' })).toBeNull();
     expect(screen.getByText('Moedas')).toBeOnTheScreen();
     fireEvent.changeText(screen.getByLabelText('Título'), 'Guardar brinquedos');
     fireEvent.changeText(screen.getByLabelText('Descrição opcional'), 'Organizar a sala');
     fireEvent.changeText(screen.getByLabelText('Recompensa em moedas'), '4');
+    fireEvent.press(screen.getByRole('button', { name: 'Selecionar recorrência Diária' }));
     fireEvent.press(screen.getByRole('button', { name: 'Salvar missão' }));
 
     await waitFor(() =>
@@ -186,7 +186,7 @@ describe('ResponsibleMissionFormScreen', () => {
         description: 'Organizar a sala',
         coinValue: 4,
         requiresApproval: true,
-        recurrenceType: 'ONCE',
+        recurrenceType: 'DAILY',
       }),
     );
 
@@ -343,7 +343,7 @@ function mission({
   };
 }
 
-function assignedMission({ id, missionId }: { id: string; missionId: string }) {
+function assignedMission({ id, missionId }: { id: string; missionId: string }): AssignedMissionResponse {
   return {
     id,
     missionId,
@@ -358,6 +358,7 @@ function assignedMission({ id, missionId }: { id: string; missionId: string }) {
     snapshotDescription: 'Organizar a sala',
     snapshotCoinValue: 4,
     snapshotRequiresApproval: true,
+    snapshotRecurrenceType: 'ONCE',
     createdAt: '2026-06-01T10:00:00Z',
     updatedAt: '2026-06-02T10:00:00Z',
   };

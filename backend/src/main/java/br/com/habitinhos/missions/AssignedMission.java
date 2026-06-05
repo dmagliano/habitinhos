@@ -59,6 +59,10 @@ public class AssignedMission extends BaseEntity {
   @Column(name = "snapshot_requires_approval", nullable = false)
   private boolean snapshotRequiresApproval;
 
+  @Enumerated(EnumType.STRING)
+  @Column(name = "snapshot_recurrence_type", nullable = false, length = 24)
+  private RecurrenceType snapshotRecurrenceType = RecurrenceType.ONCE;
+
   public AssignedMission(UUID familyUnitId, UUID missionId, UUID childId, LocalDate dueDate,
       Mission mission) {
     this.familyUnitId = familyUnitId;
@@ -70,12 +74,16 @@ public class AssignedMission extends BaseEntity {
     this.snapshotDescription = mission.getDescription();
     this.snapshotCoinValue = mission.getCoinValue();
     this.snapshotRequiresApproval = mission.isRequiresApproval();
+    this.snapshotRecurrenceType = mission.getRecurrenceType();
   }
 
   // --- Domain methods ---
 
   public void markCompleted() {
     this.completedAt = Instant.now();
+    this.approvedAt = null;
+    this.rejectedAt = null;
+    this.rejectionReason = null;
     if (this.snapshotRequiresApproval) {
       this.status = AssignedMissionStatus.AWAITING_APPROVAL;
     } else {
@@ -92,6 +100,14 @@ public class AssignedMission extends BaseEntity {
     this.rejectedAt = Instant.now();
     this.rejectionReason = reason;
     this.status = AssignedMissionStatus.REJECTED;
+  }
+
+  public void rejectAndReturnToPending(String reason) {
+    this.completedAt = null;
+    this.approvedAt = null;
+    this.rejectedAt = Instant.now();
+    this.rejectionReason = reason;
+    this.status = AssignedMissionStatus.PENDING;
   }
 
   public void cancel() {

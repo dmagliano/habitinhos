@@ -20,4 +20,7 @@ public interface AssignedMissionRepository extends JpaRepository<AssignedMission
 
   boolean existsByMissionIdAndChildIdAndStatusIn(
       UUID missionId, UUID childId, List<AssignedMissionStatus> statuses);
+
+  boolean existsByFamilyUnitIdAndMissionIdAndChildIdAndStatusIn(
+      UUID familyUnitId, UUID missionId, UUID childId, List<AssignedMissionStatus> statuses);
 }

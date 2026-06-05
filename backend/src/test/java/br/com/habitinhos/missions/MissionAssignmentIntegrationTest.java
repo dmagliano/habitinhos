@@ -47,6 +47,7 @@ class MissionAssignmentIntegrationTest extends AbstractIntegrationTest {
         .andExpect(jsonPath("$[0].snapshotTitle").value("Arrumar cama"))
         .andExpect(jsonPath("$[0].snapshotCoinValue").value(9))
         .andExpect(jsonPath("$[0].snapshotRequiresApproval").value(true))
+        .andExpect(jsonPath("$[0].snapshotRecurrenceType").value("WEEKLY"))
         .andExpect(jsonPath("$[0].familyUnitId").doesNotExist())
         .andExpect(jsonPath("$[1].missionId").value(missionId.toString()));
   }

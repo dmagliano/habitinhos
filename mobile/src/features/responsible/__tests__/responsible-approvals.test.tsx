@@ -94,7 +94,7 @@ describe('ResponsibleApprovalsScreen', () => {
     expect(screen.queryByText('Saldo atualizado')).toBeNull();
   });
 
-  it('opens optional rejection reason and sends reason only when typed', async () => {
+  it('returns rejected mission to pending by default and sends the reason', async () => {
     jest.mocked(responsibleService.listPendingApprovals)
       .mockResolvedValueOnce([approval()])
       .mockResolvedValueOnce([]);
@@ -110,16 +110,45 @@ describe('ResponsibleApprovalsScreen', () => {
 
     fireEvent.press(await screen.findByRole('button', { name: 'Rejeitar missão Guardar brinquedos de Lia' }));
     expect(screen.getByText('Rejeitar essa conclusão?')).toBeOnTheScreen();
+    expect(screen.getByRole('switch', { name: 'Devolver para refazer' })).toBeOnTheScreen();
+    expect(screen.getByText('A missão volta para a lista da criança com essa mensagem.')).toBeOnTheScreen();
     fireEvent.changeText(screen.getByLabelText('Motivo da rejeição'), 'Faltou guardar tudo');
     fireEvent.press(screen.getByRole('button', { name: 'Confirmar rejeição de Guardar brinquedos' }));
 
     await waitFor(() =>
       expect(responsibleService.rejectAssignedMission).toHaveBeenCalledWith('jwt-token', 'approval-1', {
         reason: 'Faltou guardar tudo',
+        returnToPending: true,
+      }),
+    );
+    expect(await screen.findByText('Missão devolvida para a criança refazer.')).toBeOnTheScreen();
+    expect(await screen.findByText('Tudo revisado por enquanto')).toBeOnTheScreen();
+  });
+
+  it('can reject without returning the mission to the child', async () => {
+    jest.mocked(responsibleService.listPendingApprovals)
+      .mockResolvedValueOnce([approval()])
+      .mockResolvedValueOnce([]);
+    jest.mocked(responsibleService.listChildren).mockResolvedValue([child]);
+    jest.mocked(responsibleService.rejectAssignedMission).mockResolvedValue({
+      ...approval(),
+      status: 'REJECTED',
+      rejectedAt: '2026-06-02T11:00:00Z',
+      rejectionReason: null,
+    });
+
+    render(<ResponsibleApprovalsScreen navigation={navigation} route={{ key: 'ResponsibleApprovals', name: 'ResponsibleApprovals' }} />);
+
+    fireEvent.press(await screen.findByRole('button', { name: 'Rejeitar missão Guardar brinquedos de Lia' }));
+    fireEvent.press(screen.getByRole('switch', { name: 'Devolver para refazer' }));
+    fireEvent.press(screen.getByRole('button', { name: 'Confirmar rejeição de Guardar brinquedos' }));
+
+    await waitFor(() =>
+      expect(responsibleService.rejectAssignedMission).toHaveBeenCalledWith('jwt-token', 'approval-1', {
+        returnToPending: false,
       }),
     );
     expect(await screen.findByText('Missão rejeitada.')).toBeOnTheScreen();
-    expect(await screen.findByText('Tudo revisado por enquanto')).toBeOnTheScreen();
   });
 
   it('renders the empty state without fake approvals', async () => {
@@ -149,6 +178,7 @@ function approval(): AssignedMissionResponse {
     snapshotDescription: 'Organizar a sala',
     snapshotCoinValue: 4,
     snapshotRequiresApproval: true,
+    snapshotRecurrenceType: 'ONCE',
     createdAt: '2026-06-01T10:00:00Z',
     updatedAt: '2026-06-02T10:00:00Z',
   };

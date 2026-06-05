@@ -1,6 +1,6 @@
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
 import { useCallback, useEffect, useMemo, useState } from 'react';
-import { ActivityIndicator, StyleSheet, Text, TextInput, View } from 'react-native';
+import { ActivityIndicator, Pressable, StyleSheet, Text, TextInput, View } from 'react-native';
 
 import { AssignedMissionResponse, ChildResponse } from '../../api/types';
 import { AppHeader, AppScreen, Card, SecondaryButton } from '../../components';
@@ -28,6 +28,7 @@ export function ResponsibleApprovalsScreen({ navigation }: Props) {
   const [submittingId, setSubmittingId] = useState<string | null>(null);
   const [rejecting, setRejecting] = useState<AssignedMissionResponse | null>(null);
   const [rejectReason, setRejectReason] = useState('');
+  const [returnToPending, setReturnToPending] = useState(true);
 
   const childrenById = useMemo(
     () => new Map(children.map((child) => [child.id, child])),
@@ -101,11 +102,15 @@ export function ResponsibleApprovalsScreen({ navigation }: Props) {
       await responsibleService.rejectAssignedMission(
         token,
         rejecting.id,
-        reason ? { reason } : {},
+        reason ? { reason, returnToPending } : { returnToPending },
       );
-      setFeedback({ title: 'Missão rejeitada.', variant: 'success' });
+      setFeedback({
+        title: returnToPending ? 'Missão devolvida para a criança refazer.' : 'Missão rejeitada.',
+        variant: 'success',
+      });
       setRejecting(null);
       setRejectReason('');
+      setReturnToPending(true);
       await loadApprovals();
     } catch {
       setFeedback({ title: 'Não conseguimos revisar essa missão. Tente novamente.', variant: 'error' });
@@ -166,6 +171,7 @@ export function ResponsibleApprovalsScreen({ navigation }: Props) {
                 onReject={() => {
                   setRejecting(approval);
                   setRejectReason('');
+                  setReturnToPending(true);
                 }}
               />
             );
@@ -176,7 +182,7 @@ export function ResponsibleApprovalsScreen({ navigation }: Props) {
       {rejecting ? (
         <Card style={styles.rejectCard}>
           <ResponsibleFormSection
-            helper="Você pode adicionar um motivo para a criança entender."
+            helper="Explique o que precisa mudar para a criança entender."
             title="Rejeitar essa conclusão?"
           >
             <TextInput
@@ -188,9 +194,29 @@ export function ResponsibleApprovalsScreen({ navigation }: Props) {
               style={[styles.input, styles.textArea]}
               value={rejectReason}
             />
+            <Pressable
+              accessibilityLabel="Devolver para refazer"
+              accessibilityRole="switch"
+              accessibilityState={{ checked: returnToPending }}
+              onPress={() => setReturnToPending((current) => !current)}
+              style={[styles.returnToggle, returnToPending && styles.returnToggleSelected]}
+            >
+              <Text style={styles.toggleTitle}>
+                {returnToPending ? 'Devolver para refazer' : 'Apenas rejeitar'}
+              </Text>
+              <Text style={styles.toggleHelper}>
+                {returnToPending
+                  ? 'A missão volta para a lista da criança com essa mensagem.'
+                  : 'A missão sai da fila sem voltar para a criança.'}
+              </Text>
+            </Pressable>
           </ResponsibleFormSection>
           <ConfirmActionSheet
-            body="A missão volta como rejeitada sem creditar moedas."
+            body={
+              returnToPending
+                ? 'A missão volta como pendente sem creditar moedas.'
+                : 'A missão fica rejeitada sem creditar moedas.'
+            }
             cancelLabel="Cancelar"
             confirmAccessibilityLabel={`Confirmar rejeição de ${rejecting.snapshotTitle}`}
             confirmLabel="Rejeitar"
@@ -224,6 +250,18 @@ const styles = StyleSheet.create({
     gap: spacing.md,
     marginTop: spacing.lg,
   },
+  returnToggle: {
+    backgroundColor: colors.surface,
+    borderColor: colors.border,
+    borderRadius: radius.md,
+    borderWidth: 1,
+    gap: spacing.xs,
+    padding: spacing.md,
+  },
+  returnToggleSelected: {
+    backgroundColor: colors.primarySoft,
+    borderColor: colors.primary,
+  },
   stateCard: {
     alignItems: 'flex-start',
     gap: spacing.md,
@@ -239,5 +277,13 @@ const styles = StyleSheet.create({
     minHeight: 96,
     paddingTop: spacing.md,
     textAlignVertical: 'top',
+  },
+  toggleHelper: {
+    ...typography.body,
+    color: colors.textSecondary,
+  },
+  toggleTitle: {
+    ...typography.label,
+    color: colors.textPrimary,
   },
 });

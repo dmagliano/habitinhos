@@ -1,6 +1,7 @@
 package br.com.habitinhos.missions.dto;
 
 import br.com.habitinhos.missions.AssignedMissionStatus;
+import br.com.habitinhos.missions.RecurrenceType;
 import java.time.Instant;
 import java.time.LocalDate;
 import java.util.UUID;
@@ -19,6 +20,7 @@ public record AssignedMissionResponse(
     String snapshotDescription,
     int snapshotCoinValue,
     boolean snapshotRequiresApproval,
+    RecurrenceType snapshotRecurrenceType,
     Instant createdAt,
     Instant updatedAt) {
 }
