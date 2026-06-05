@@ -36,6 +36,9 @@ public class Mission extends BaseEntity {
   @Column(name = "recurrence_type", nullable = false, length = 24)
   private RecurrenceType recurrenceType = RecurrenceType.ONCE;
 
+  @Column(name = "completion_window_days", nullable = false)
+  private int completionWindowDays;
+
   @Column(nullable = false)
   private boolean active = true;
 
@@ -43,25 +46,27 @@ public class Mission extends BaseEntity {
   private UUID createdByUserId;
 
   public Mission(UUID familyUnitId, String title, String description, int coinValue,
-      boolean requiresApproval, RecurrenceType recurrenceType, UUID createdByUserId) {
+      boolean requiresApproval, RecurrenceType recurrenceType, int completionWindowDays, UUID createdByUserId) {
     this.familyUnitId = familyUnitId;
     this.title = title;
     this.description = description;
     this.coinValue = coinValue;
     this.requiresApproval = requiresApproval;
     this.recurrenceType = recurrenceType;
+    this.completionWindowDays = completionWindowDays;
     this.createdByUserId = createdByUserId;
   }
 
   // --- Domain methods ---
 
   public void update(String title, String description, int coinValue,
-      boolean requiresApproval, RecurrenceType recurrenceType) {
+      boolean requiresApproval, RecurrenceType recurrenceType, int completionWindowDays) {
     this.title = title;
     this.description = description;
     this.coinValue = coinValue;
     this.requiresApproval = requiresApproval;
     this.recurrenceType = recurrenceType;
+    this.completionWindowDays = completionWindowDays;
   }
 
   public void deactivate() {

@@ -12,7 +12,9 @@ import br.com.habitinhos.wallet.WalletService;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.UUID;
+import java.util.stream.Collectors;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
@@ -59,8 +61,16 @@ public class AssignedMissionService {
       ChildProfile child = childProfileRepository.findByIdAndFamilyUnitIdAndActiveTrue(childId, familyUnitId)
           .orElseThrow(this::childNotFound);
 
-      boolean hasOpenAssignment = assignedMissionRepository.existsByMissionIdAndChildIdAndStatusIn(
-          missionId, child.getId(), openStatuses);
+      LocalDate scheduledDate = scheduledDateForInitialAssignment(mission, dueDate);
+      LocalDate assignmentDueDate = dueDateForInitialAssignment(mission, scheduledDate, dueDate);
+      boolean hasOpenAssignment = isRecurring(mission.getRecurrenceType())
+          ? assignedMissionRepository.existsByFamilyUnitIdAndMissionIdAndChildIdAndScheduledDate(
+              familyUnitId,
+              missionId,
+              child.getId(),
+              scheduledDate)
+          : assignedMissionRepository.existsByMissionIdAndChildIdAndStatusIn(
+              missionId, child.getId(), openStatuses);
       if (hasOpenAssignment) {
         log.warn(
             "Duplicate assignment blocked: familyUnitId={} missionId={} childId={}",
@@ -72,7 +82,7 @@ public class AssignedMissionService {
             "Missão já atribuída para esta criança.");
       }
 
-      assignments.add(new AssignedMission(familyUnitId, missionId, child.getId(), dueDate, mission));
+      assignments.add(new AssignedMission(familyUnitId, missionId, child.getId(), scheduledDate, assignmentDueDate, mission));
     }
 
     assignedMissionRepository.saveAll(assignments);
@@ -81,18 +91,21 @@ public class AssignedMissionService {
     return assignments.stream().map(this::toResponse).toList();
   }
 
-  @Transactional(readOnly = true)
+  @Transactional
   public List<AssignedMissionResponse> listPendingForChild(CurrentUser currentUser, UUID childId) {
     UUID familyUnitId = currentUser.familyUnitId();
     childProfileRepository.findByIdAndFamilyUnitId(childId, familyUnitId)
         .orElseThrow(this::childNotFound);
+
+    LocalDate today = LocalDate.now();
+    ensureRecurringAssignmentsForChild(familyUnitId, childId, today);
 
     List<AssignedMissionResponse> pendingMissions = assignedMissionRepository
         .findVisiblePendingForChild(
             familyUnitId,
             childId,
             AssignedMissionStatus.PENDING,
-            LocalDate.now())
+            today)
         .stream()
         .map(this::toResponse)
         .toList();
@@ -249,50 +262,141 @@ public class AssignedMissionService {
       return;
     }
 
-    List<AssignedMissionStatus> openStatuses =
-        List.of(AssignedMissionStatus.PENDING, AssignedMissionStatus.AWAITING_APPROVAL);
-    boolean hasOpenAssignment = assignedMissionRepository
-        .existsByFamilyUnitIdAndMissionIdAndChildIdAndStatusIn(
-            completedAssignment.getFamilyUnitId(),
-            completedAssignment.getMissionId(),
-            completedAssignment.getChildId(),
-            openStatuses);
-    if (hasOpenAssignment) {
-      log.debug(
-          "Skipping recurring assignment because an open assignment exists: familyUnitId={} missionId={} childId={}",
-          completedAssignment.getFamilyUnitId(),
-          completedAssignment.getMissionId(),
-          completedAssignment.getChildId());
-      return;
-    }
-
     Mission mission = missionRepository
         .findByIdAndFamilyUnitId(completedAssignment.getMissionId(), completedAssignment.getFamilyUnitId())
         .orElseThrow(this::missionNotFound);
-    LocalDate nextDueDate = nextDueDate(completedAssignment.getDueDate(), recurrenceType);
+    if (!mission.isActive() || !isRecurring(mission.getRecurrenceType())) {
+      return;
+    }
+
+    LocalDate nextScheduledDate = nextScheduledDate(completedAssignment.getScheduledDate(), recurrenceType);
+    if (assignedMissionRepository.existsByFamilyUnitIdAndMissionIdAndChildIdAndScheduledDate(
+        completedAssignment.getFamilyUnitId(),
+        completedAssignment.getMissionId(),
+        completedAssignment.getChildId(),
+        nextScheduledDate)) {
+      log.debug(
+          "Skipping recurring assignment because scheduled occurrence exists: familyUnitId={} missionId={} childId={} scheduledDate={}",
+          completedAssignment.getFamilyUnitId(),
+          completedAssignment.getMissionId(),
+          completedAssignment.getChildId(),
+          nextScheduledDate);
+      return;
+    }
+    LocalDate nextDueDate = dueDateForScheduledDate(nextScheduledDate, mission.getCompletionWindowDays());
     AssignedMission nextAssignment = new AssignedMission(
         completedAssignment.getFamilyUnitId(),
         completedAssignment.getMissionId(),
         completedAssignment.getChildId(),
+        nextScheduledDate,
         nextDueDate,
         mission);
     assignedMissionRepository.save(nextAssignment);
     log.info(
-        "Recurring assigned mission created: familyUnitId={} missionId={} childId={} recurrenceType={} dueDate={}",
+        "Recurring assigned mission created: familyUnitId={} missionId={} childId={} recurrenceType={} scheduledDate={} dueDate={}",
         completedAssignment.getFamilyUnitId(),
         completedAssignment.getMissionId(),
         completedAssignment.getChildId(),
         recurrenceType,
+        nextScheduledDate,
         nextDueDate);
   }
 
-  private LocalDate nextDueDate(LocalDate currentDueDate, RecurrenceType recurrenceType) {
-    LocalDate baseDate = currentDueDate == null ? LocalDate.now() : currentDueDate;
+  private void ensureRecurringAssignmentsForChild(UUID familyUnitId, UUID childId, LocalDate today) {
+    List<AssignedMission> recurringAssignments = assignedMissionRepository
+        .findAllByFamilyUnitIdAndChildIdAndSnapshotRecurrenceTypeIn(
+            familyUnitId,
+            childId,
+            List.of(RecurrenceType.DAILY, RecurrenceType.WEEKLY));
+    Map<UUID, AssignedMission> latestByMissionId = recurringAssignments.stream()
+        .collect(Collectors.toMap(
+            AssignedMission::getMissionId,
+            assignment -> assignment,
+            (left, right) -> latestScheduledDate(left).isAfter(latestScheduledDate(right)) ? left : right));
+
+    for (AssignedMission latestAssignment : latestByMissionId.values()) {
+      RecurrenceType recurrenceType = latestAssignment.getSnapshotRecurrenceType();
+      LocalDate nextScheduledDate = nextScheduledDate(latestAssignment.getScheduledDate(), recurrenceType);
+      Mission mission = missionRepository
+          .findByIdAndFamilyUnitId(latestAssignment.getMissionId(), familyUnitId)
+          .orElse(null);
+      if (mission == null || !mission.isActive() || !isRecurring(mission.getRecurrenceType())) {
+        continue;
+      }
+
+      LocalDate latestDueDate =
+          dueDateForScheduledDate(latestAssignment.getScheduledDate(), latestAssignment.getSnapshotCompletionWindowDays());
+      if (latestAssignment.getStatus() == AssignedMissionStatus.AWAITING_APPROVAL
+          || (latestAssignment.getStatus() == AssignedMissionStatus.PENDING && !latestDueDate.isBefore(today))) {
+        continue;
+      }
+
+      while (dueDateForScheduledDate(nextScheduledDate, mission.getCompletionWindowDays()).isBefore(today)) {
+        nextScheduledDate = nextScheduledDate(nextScheduledDate, recurrenceType);
+      }
+
+      if (assignedMissionRepository.existsByFamilyUnitIdAndMissionIdAndChildIdAndScheduledDate(
+          familyUnitId,
+          latestAssignment.getMissionId(),
+          childId,
+          nextScheduledDate)) {
+        continue;
+      }
+
+      LocalDate dueDate = dueDateForScheduledDate(nextScheduledDate, mission.getCompletionWindowDays());
+      assignedMissionRepository.save(new AssignedMission(
+          familyUnitId,
+          latestAssignment.getMissionId(),
+          childId,
+          nextScheduledDate,
+          dueDate,
+          mission));
+      log.info(
+          "Recurring assigned mission ensured: familyUnitId={} missionId={} childId={} recurrenceType={} scheduledDate={} dueDate={}",
+          familyUnitId,
+          latestAssignment.getMissionId(),
+          childId,
+          recurrenceType,
+          nextScheduledDate,
+          dueDate);
+    }
+  }
+
+  private LocalDate latestScheduledDate(AssignedMission assignedMission) {
+    return assignedMission.getScheduledDate() == null ? assignedMission.getDueDate() : assignedMission.getScheduledDate();
+  }
+
+  private LocalDate scheduledDateForInitialAssignment(Mission mission, LocalDate requestedDueDate) {
+    if (!isRecurring(mission.getRecurrenceType())) {
+      return requestedDueDate == null ? LocalDate.now() : requestedDueDate;
+    }
+    return requestedDueDate == null
+        ? LocalDate.now()
+        : requestedDueDate.minusDays(mission.getCompletionWindowDays());
+  }
+
+  private LocalDate dueDateForInitialAssignment(Mission mission, LocalDate scheduledDate, LocalDate requestedDueDate) {
+    if (!isRecurring(mission.getRecurrenceType())) {
+      return requestedDueDate;
+    }
+    return dueDateForScheduledDate(scheduledDate, mission.getCompletionWindowDays());
+  }
+
+  private LocalDate dueDateForScheduledDate(LocalDate scheduledDate, int completionWindowDays) {
+    return scheduledDate.plusDays(completionWindowDays);
+  }
+
+  private LocalDate nextScheduledDate(LocalDate currentScheduledDate, RecurrenceType recurrenceType) {
+    LocalDate baseDate = currentScheduledDate == null ? LocalDate.now() : currentScheduledDate;
     return switch (recurrenceType) {
       case DAILY -> baseDate.plusDays(1);
       case WEEKLY -> baseDate.plusWeeks(1);
       case ONCE, CUSTOM -> baseDate;
     };
+  }
+
+  private boolean isRecurring(RecurrenceType recurrenceType) {
+    return recurrenceType == RecurrenceType.DAILY || recurrenceType == RecurrenceType.WEEKLY;
   }
 
   private AssignedMissionResponse toResponse(AssignedMission assignedMission) {
@@ -301,6 +405,7 @@ public class AssignedMissionService {
         assignedMission.getMissionId(),
         assignedMission.getChildId(),
         assignedMission.getStatus(),
+        assignedMission.getScheduledDate(),
         assignedMission.getDueDate(),
         assignedMission.getCompletedAt(),
         assignedMission.getApprovedAt(),
@@ -311,6 +416,7 @@ public class AssignedMissionService {
         assignedMission.getSnapshotCoinValue(),
         assignedMission.isSnapshotRequiresApproval(),
         assignedMission.getSnapshotRecurrenceType(),
+        assignedMission.getSnapshotCompletionWindowDays(),
         assignedMission.getCreatedAt(),
         assignedMission.getUpdatedAt());
   }

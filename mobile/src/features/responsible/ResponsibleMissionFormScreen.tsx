@@ -31,8 +31,15 @@ const RECURRENCE_OPTIONS: {
   value: MissionRequest['recurrenceType'];
 }[] = [
   { label: 'Uma vez', helper: 'A missão termina depois de concluída.', value: 'ONCE' },
-  { label: 'Diária', helper: 'Após o crédito, nasce uma nova para o dia seguinte.', value: 'DAILY' },
-  { label: 'Semanal', helper: 'Após o crédito, nasce uma nova para a próxima semana.', value: 'WEEKLY' },
+  { label: 'Diária', helper: 'Cria uma nova ocorrência para cada dia.', value: 'DAILY' },
+  { label: 'Semanal', helper: 'Cria uma nova ocorrência para cada semana.', value: 'WEEKLY' },
+];
+
+const COMPLETION_WINDOW_OPTIONS = [
+  { label: 'Mesmo dia', value: 0 },
+  { label: '1 dia', value: 1 },
+  { label: '2 dias', value: 2 },
+  { label: '7 dias', value: 7 },
 ];
 
 export function ResponsibleMissionFormScreen({ navigation, route }: Props) {
@@ -45,6 +52,7 @@ export function ResponsibleMissionFormScreen({ navigation, route }: Props) {
   const [coinValue, setCoinValue] = useState('1');
   const [requiresApproval, setRequiresApproval] = useState(true);
   const [recurrenceType, setRecurrenceType] = useState<MissionRequest['recurrenceType']>('ONCE');
+  const [completionWindowDays, setCompletionWindowDays] = useState('0');
   const [children, setChildren] = useState<ChildResponse[]>([]);
   const [selectedChildIds, setSelectedChildIds] = useState<string[]>([]);
   const [dueDate, setDueDate] = useState('');
@@ -56,6 +64,10 @@ export function ResponsibleMissionFormScreen({ navigation, route }: Props) {
   const [submitting, setSubmitting] = useState(false);
 
   const parsedCoinValue = useMemo(() => Number.parseInt(coinValue, 10), [coinValue]);
+  const parsedCompletionWindowDays = useMemo(
+    () => Number.parseInt(completionWindowDays, 10),
+    [completionWindowDays],
+  );
   const activeChildren = useMemo(() => children.filter((child) => child.active), [children]);
 
   const loadInitialData = useCallback(async () => {
@@ -79,6 +91,7 @@ export function ResponsibleMissionFormScreen({ navigation, route }: Props) {
         setCoinValue(String(mission.coinValue));
         setRequiresApproval(mission.requiresApproval);
         setRecurrenceType(mission.recurrenceType === 'CUSTOM' ? 'ONCE' : mission.recurrenceType);
+        setCompletionWindowDays(String(mission.completionWindowDays));
       }
 
       setLoadState('ready');
@@ -101,6 +114,9 @@ export function ResponsibleMissionFormScreen({ navigation, route }: Props) {
     coinValue: parsedCoinValue,
     requiresApproval,
     recurrenceType,
+    completionWindowDays: isRecurringType(recurrenceType) && Number.isFinite(parsedCompletionWindowDays)
+        ? parsedCompletionWindowDays
+        : 0,
   });
 
   const validateDetails = () => {
@@ -158,7 +174,7 @@ export function ResponsibleMissionFormScreen({ navigation, route }: Props) {
     try {
       await responsibleService.assignMission(token, createdMission.id, {
         childIds: selectedChildIds,
-        dueDate: normalizeDueDate(dueDate),
+        dueDate: isRecurringType(createdMission.recurrenceType) ? null : normalizeDueDate(dueDate),
       });
       navigation.navigate('ResponsibleTabs');
     } catch {
@@ -211,6 +227,8 @@ export function ResponsibleMissionFormScreen({ navigation, route }: Props) {
             onChangeTitle={setTitle}
             onSubmit={handleSaveDetails}
             requiresApproval={requiresApproval}
+            completionWindowDays={completionWindowDays}
+            setCompletionWindowDays={setCompletionWindowDays}
             recurrenceType={recurrenceType}
             setRecurrenceType={setRecurrenceType}
             submitting={submitting}
@@ -232,16 +250,27 @@ export function ResponsibleMissionFormScreen({ navigation, route }: Props) {
               {errors.assignment ? <Text style={styles.error}>{errors.assignment}</Text> : null}
             </ResponsibleFormSection>
 
-            <ResponsibleFormSection helper="Use o formato AAAA-MM-DD ou deixe em branco." title="Prazo opcional">
-              <TextInput
-                accessibilityLabel="Data limite opcional"
-                onChangeText={setDueDate}
-                placeholder="2026-06-10"
-                placeholderTextColor={colors.textMuted}
-                style={styles.input}
-                value={dueDate}
-              />
-            </ResponsibleFormSection>
+            {isRecurringType(createdMission.recurrenceType) ? (
+              <ResponsibleFormSection
+                helper={formatCompletionWindowHelper(createdMission.completionWindowDays)}
+                title="Prazo da recorrência"
+              >
+                <Text style={styles.assignmentHelper}>
+                  A primeira ocorrência começa hoje e repete esse prazo em cada nova missão.
+                </Text>
+              </ResponsibleFormSection>
+            ) : (
+              <ResponsibleFormSection helper="Use o formato AAAA-MM-DD ou deixe em branco." title="Prazo opcional">
+                <TextInput
+                  accessibilityLabel="Data limite opcional"
+                  onChangeText={setDueDate}
+                  placeholder="2026-06-10"
+                  placeholderTextColor={colors.textMuted}
+                  style={styles.input}
+                  value={dueDate}
+                />
+              </ResponsibleFormSection>
+            )}
 
             <PrimaryButton
               disabled={submitting}
@@ -267,6 +296,8 @@ function MissionDetailsForm({
   onChangeTitle,
   onSubmit,
   requiresApproval,
+  completionWindowDays,
+  setCompletionWindowDays,
   recurrenceType,
   setRecurrenceType,
   submitting,
@@ -282,6 +313,8 @@ function MissionDetailsForm({
   onChangeTitle: (value: string) => void;
   onSubmit: () => void;
   requiresApproval: boolean;
+  completionWindowDays: string;
+  setCompletionWindowDays: (value: string) => void;
   recurrenceType: MissionRequest['recurrenceType'];
   setRecurrenceType: (value: MissionRequest['recurrenceType']) => void;
   submitting: boolean;
@@ -352,7 +385,7 @@ function MissionDetailsForm({
       </ResponsibleFormSection>
 
       <ResponsibleFormSection
-        helper="Escolha se a missão aparece uma vez ou se gera a próxima ocorrência após o crédito."
+        helper="Escolha se a missão aparece uma vez ou se tem novas ocorrências."
         title="Recorrência"
       >
         <View style={styles.recurrenceList}>
@@ -375,6 +408,31 @@ function MissionDetailsForm({
         </View>
       </ResponsibleFormSection>
 
+      {isRecurringType(recurrenceType) ? (
+        <ResponsibleFormSection
+          helper="Esse prazo se repete em cada ocorrência da missão."
+          title="Prazo para concluir"
+        >
+          <View style={styles.recurrenceList}>
+            {COMPLETION_WINDOW_OPTIONS.map((option) => {
+              const selected = completionWindowDays === String(option.value);
+              return (
+                <Pressable
+                  accessibilityLabel={`Selecionar prazo ${option.label}`}
+                  accessibilityRole="button"
+                  accessibilityState={{ selected }}
+                  key={option.value}
+                  onPress={() => setCompletionWindowDays(String(option.value))}
+                  style={[styles.recurrenceOption, selected && styles.recurrenceOptionSelected]}
+                >
+                  <Text style={styles.toggleTitle}>{option.label}</Text>
+                </Pressable>
+              );
+            })}
+          </View>
+        </ResponsibleFormSection>
+      ) : null}
+
       <PrimaryButton
         disabled={submitting}
         label={submitting ? 'Salvando missão' : 'Salvar missão'}
@@ -388,6 +446,18 @@ function MissionDetailsForm({
 function normalizeDueDate(value: string): string | null {
   const trimmed = value.trim();
   return trimmed.length > 0 ? trimmed : null;
+}
+
+function isRecurringType(recurrenceType: MissionRequest['recurrenceType']): boolean {
+  return recurrenceType === 'DAILY' || recurrenceType === 'WEEKLY';
+}
+
+function formatCompletionWindowHelper(completionWindowDays: number): string {
+  if (completionWindowDays === 0) {
+    return 'A criança deve concluir no mesmo dia da ocorrência.';
+  }
+
+  return `A criança terá ${completionWindowDays} ${completionWindowDays === 1 ? 'dia' : 'dias'} para concluir.`;
 }
 
 export function getResponsibleMissionFormKeyboardBehavior(platformOS: string): KeyboardAvoidingViewProps['behavior'] {
@@ -416,6 +486,10 @@ const styles = StyleSheet.create({
   },
   form: {
     gap: spacing.lg,
+  },
+  assignmentHelper: {
+    ...typography.body,
+    color: colors.textSecondary,
   },
   input: {
     ...typography.body,

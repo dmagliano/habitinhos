@@ -133,6 +133,7 @@ function mission(
     missionId: id.replace('mission', 'template'),
     childId: joaquim.id,
     status: 'PENDING',
+    scheduledDate: dueDate ?? '2026-06-01',
     dueDate,
     completedAt: null,
     approvedAt: null,
@@ -143,6 +144,7 @@ function mission(
     snapshotCoinValue: 5,
     snapshotRequiresApproval: false,
     snapshotRecurrenceType: 'ONCE',
+    snapshotCompletionWindowDays: 0,
     createdAt,
     updatedAt: createdAt,
   };

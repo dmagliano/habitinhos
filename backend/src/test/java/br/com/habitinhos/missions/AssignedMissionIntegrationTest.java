@@ -171,6 +171,57 @@ class AssignedMissionIntegrationTest extends AbstractIntegrationTest {
   }
 
   @Test
+  void listingChildMissionsCreatesCurrentRecurringOccurrenceWhenPreviousExpiredUnfinished() throws Exception {
+    String token = registerToken("responsavel@example.com", "Familia Demo");
+    UUID childId = createChild(token, new ChildRequest("Lia", 8, "star", null));
+    LocalDate yesterday = LocalDate.now().minusDays(1);
+    UUID expiredAssignmentId = assignMission(
+        token,
+        childId,
+        new MissionRequest("Arrumar cama", "Deixar quarto organizado", 3, false, RecurrenceType.DAILY),
+        yesterday);
+
+    String response = mockMvc.perform(get("/children/{childId}/missions", childId)
+            .header("Authorization", "Bearer " + token))
+        .andExpect(status().isOk())
+        .andExpect(jsonPath("$[0].status").value("PENDING"))
+        .andExpect(jsonPath("$[0].scheduledDate").value(LocalDate.now().toString()))
+        .andExpect(jsonPath("$[0].dueDate").value(LocalDate.now().toString()))
+        .andExpect(jsonPath("$[0].snapshotRecurrenceType").value("DAILY"))
+        .andExpect(jsonPath("$[1]").doesNotExist())
+        .andReturn()
+        .getResponse()
+        .getContentAsString();
+
+    UUID visibleAssignmentId = UUID.fromString(objectMapper.readTree(response).get(0).get("id").asText());
+    assertThat(visibleAssignmentId).isNotEqualTo(expiredAssignmentId);
+    assertThat(assignedMissionRepository.findById(expiredAssignmentId).orElseThrow().getStatus())
+        .isEqualTo(AssignedMissionStatus.PENDING);
+    assertThat(assignedMissionRepository.findAll()).hasSize(2);
+  }
+
+  @Test
+  void assigningRecurringMissionUsesCompletionWindowAsRepeatedDueDateOffset() throws Exception {
+    String token = registerToken("responsavel@example.com", "Familia Demo");
+    UUID childId = createChild(token, new ChildRequest("Lia", 8, "star", null));
+    LocalDate today = LocalDate.now();
+
+    assignMission(
+        token,
+        childId,
+        new MissionRequest("Arrumar cama", "Deixar quarto organizado", 3, false, RecurrenceType.DAILY, 2),
+        null);
+
+    mockMvc.perform(get("/children/{childId}/missions", childId)
+            .header("Authorization", "Bearer " + token))
+        .andExpect(status().isOk())
+        .andExpect(jsonPath("$[0].scheduledDate").value(today.toString()))
+        .andExpect(jsonPath("$[0].dueDate").value(today.plusDays(2).toString()))
+        .andExpect(jsonPath("$[0].snapshotCompletionWindowDays").value(2))
+        .andExpect(jsonPath("$[1]").doesNotExist());
+  }
+
+  @Test
   void completeApprovalRequiredMissionWaitsForApprovalWithoutCredit() throws Exception {
     String token = registerToken("responsavel@example.com", "Familia Demo");
     UUID childId = createChild(token, new ChildRequest("Lia", 8, "star", null));

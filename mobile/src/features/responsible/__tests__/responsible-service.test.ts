@@ -181,6 +181,7 @@ describe('responsibleService', () => {
       coinValue: 5,
       requiresApproval: true,
       recurrenceType: 'DAILY',
+      completionWindowDays: 2,
       active: true,
       createdAt: '2026-06-01T10:00:00Z',
       updatedAt: '2026-06-01T10:00:00Z',
@@ -191,6 +192,7 @@ describe('responsibleService', () => {
       coinValue: 5,
       requiresApproval: true,
       recurrenceType: 'DAILY' as const,
+      completionWindowDays: 2,
     };
     const assignments = [
       {
@@ -198,6 +200,7 @@ describe('responsibleService', () => {
         missionId: 'mission-1',
         childId: 'child-1',
         status: 'PENDING',
+        scheduledDate: '2026-06-01',
         dueDate: null,
         completedAt: null,
         approvedAt: null,
@@ -208,6 +211,7 @@ describe('responsibleService', () => {
         snapshotCoinValue: 5,
         snapshotRequiresApproval: true,
         snapshotRecurrenceType: 'DAILY',
+        snapshotCompletionWindowDays: 2,
         createdAt: '2026-06-01T10:00:00Z',
         updatedAt: '2026-06-01T10:00:00Z',
       },
@@ -278,6 +282,7 @@ describe('responsibleService', () => {
         missionId: 'mission-1',
         childId: 'child-1',
         status: 'AWAITING_APPROVAL',
+        scheduledDate: '2026-06-01',
         dueDate: null,
         completedAt: '2026-06-02T10:00:00Z',
         approvedAt: null,
@@ -288,6 +293,7 @@ describe('responsibleService', () => {
         snapshotCoinValue: 4,
         snapshotRequiresApproval: true,
         snapshotRecurrenceType: 'ONCE',
+        snapshotCompletionWindowDays: 0,
         createdAt: '2026-06-01T10:00:00Z',
         updatedAt: '2026-06-02T10:00:00Z',
       },

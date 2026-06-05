@@ -169,6 +169,7 @@ function approval(): AssignedMissionResponse {
     missionId: 'mission-1',
     childId: child.id,
     status: 'AWAITING_APPROVAL',
+    scheduledDate: '2026-06-01',
     dueDate: null,
     completedAt: '2026-06-02T10:00:00Z',
     approvedAt: null,
@@ -179,6 +180,7 @@ function approval(): AssignedMissionResponse {
     snapshotCoinValue: 4,
     snapshotRequiresApproval: true,
     snapshotRecurrenceType: 'ONCE',
+    snapshotCompletionWindowDays: 0,
     createdAt: '2026-06-01T10:00:00Z',
     updatedAt: '2026-06-02T10:00:00Z',
   };

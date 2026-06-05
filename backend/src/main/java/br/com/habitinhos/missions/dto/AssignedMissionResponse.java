@@ -11,6 +11,7 @@ public record AssignedMissionResponse(
     UUID missionId,
     UUID childId,
     AssignedMissionStatus status,
+    LocalDate scheduledDate,
     LocalDate dueDate,
     Instant completedAt,
     Instant approvedAt,
@@ -21,6 +22,7 @@ public record AssignedMissionResponse(
     int snapshotCoinValue,
     boolean snapshotRequiresApproval,
     RecurrenceType snapshotRecurrenceType,
+    int snapshotCompletionWindowDays,
     Instant createdAt,
     Instant updatedAt) {
 }

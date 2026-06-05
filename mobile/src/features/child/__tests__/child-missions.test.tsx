@@ -317,6 +317,7 @@ function assignedMission({
     missionId: id.replace('assigned', 'mission'),
     childId: child.id,
     status: 'PENDING',
+    scheduledDate: '2026-06-01',
     dueDate,
     completedAt: null,
     approvedAt: null,
@@ -327,6 +328,7 @@ function assignedMission({
     snapshotCoinValue: coinValue,
     snapshotRequiresApproval: requiresApproval,
     snapshotRecurrenceType: 'ONCE',
+    snapshotCompletionWindowDays: 0,
     createdAt: '2026-06-01T10:00:00Z',
     updatedAt: '2026-06-01T10:00:00Z',
   };

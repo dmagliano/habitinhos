@@ -33,6 +33,7 @@ public class MissionService {
         request.coinValue(),
         request.requiresApproval(),
         request.recurrenceType(),
+        request.completionWindowDays(),
         currentUser.userId());
     missionRepository.saveAndFlush(mission);
     log.info("Mission created: familyUnitId={} missionId={}", currentUser.familyUnitId(), mission.getId());
@@ -75,7 +76,8 @@ public class MissionService {
         normalizeOptional(request.description()),
         request.coinValue(),
         request.requiresApproval(),
-        request.recurrenceType());
+        request.recurrenceType(),
+        request.completionWindowDays());
     log.info("Mission updated: familyUnitId={} missionId={}", currentUser.familyUnitId(), id);
     return toResponse(mission);
   }
@@ -113,6 +115,7 @@ public class MissionService {
         mission.getCoinValue(),
         mission.isRequiresApproval(),
         mission.getRecurrenceType(),
+        mission.getCompletionWindowDays(),
         mission.isActive(),
         mission.getCreatedAt(),
         mission.getUpdatedAt());

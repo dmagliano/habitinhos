@@ -154,8 +154,9 @@ describe('ResponsibleMissionFormScreen', () => {
   });
 
   it('creates a mission, starts assignment with no child preselected, then assigns selected children', async () => {
+    const createdRecurringMission = { ...activeMission, recurrenceType: 'DAILY' as const, completionWindowDays: 2 };
     jest.mocked(responsibleService.listChildren).mockResolvedValue([activeChild, inactiveChild]);
-    jest.mocked(responsibleService.createMission).mockResolvedValue(activeMission);
+    jest.mocked(responsibleService.createMission).mockResolvedValue(createdRecurringMission);
     jest.mocked(responsibleService.assignMission).mockResolvedValue([
       assignedMission({ id: 'assigned-1', missionId: activeMission.id }),
     ]);
@@ -178,6 +179,8 @@ describe('ResponsibleMissionFormScreen', () => {
     fireEvent.changeText(screen.getByLabelText('Descrição opcional'), 'Organizar a sala');
     fireEvent.changeText(screen.getByLabelText('Recompensa em moedas'), '4');
     fireEvent.press(screen.getByRole('button', { name: 'Selecionar recorrência Diária' }));
+    expect(screen.getByText('Prazo para concluir')).toBeOnTheScreen();
+    fireEvent.press(screen.getByRole('button', { name: 'Selecionar prazo 2 dias' }));
     fireEvent.press(screen.getByRole('button', { name: 'Salvar missão' }));
 
     await waitFor(() =>
@@ -187,6 +190,7 @@ describe('ResponsibleMissionFormScreen', () => {
         coinValue: 4,
         requiresApproval: true,
         recurrenceType: 'DAILY',
+        completionWindowDays: 2,
       }),
     );
 
@@ -196,13 +200,14 @@ describe('ResponsibleMissionFormScreen', () => {
     expect(screen.queryByText('Noah')).toBeNull();
 
     fireEvent.press(screen.getByRole('button', { name: 'Selecionar Lia' }));
-    fireEvent.changeText(screen.getByLabelText('Data limite opcional'), '2026-06-10');
+    expect(screen.getByText('Prazo da recorrência')).toBeOnTheScreen();
+    expect(screen.queryByLabelText('Data limite opcional')).toBeNull();
     fireEvent.press(screen.getByRole('button', { name: 'Atribuir missão' }));
 
     await waitFor(() =>
       expect(responsibleService.assignMission).toHaveBeenCalledWith('jwt-token', 'mission-active', {
         childIds: ['child-1'],
-        dueDate: '2026-06-10',
+        dueDate: null,
       }),
     );
     expect(navigate).toHaveBeenCalledWith('ResponsibleTabs');
@@ -261,6 +266,7 @@ describe('ResponsibleMissionFormScreen', () => {
         coinValue: 4,
         requiresApproval: true,
         recurrenceType: 'ONCE',
+        completionWindowDays: 0,
       }),
     );
   });
@@ -337,6 +343,7 @@ function mission({
     coinValue,
     requiresApproval,
     recurrenceType: 'ONCE',
+    completionWindowDays: 0,
     active,
     createdAt: '2026-06-01T10:00:00Z',
     updatedAt: '2026-06-01T10:00:00Z',
@@ -349,6 +356,7 @@ function assignedMission({ id, missionId }: { id: string; missionId: string }): 
     missionId,
     childId: 'child-1',
     status: 'AWAITING_APPROVAL' as const,
+    scheduledDate: '2026-06-01',
     dueDate: null,
     completedAt: '2026-06-02T10:00:00Z',
     approvedAt: null,
@@ -359,6 +367,7 @@ function assignedMission({ id, missionId }: { id: string; missionId: string }): 
     snapshotCoinValue: 4,
     snapshotRequiresApproval: true,
     snapshotRecurrenceType: 'ONCE',
+    snapshotCompletionWindowDays: 0,
     createdAt: '2026-06-01T10:00:00Z',
     updatedAt: '2026-06-02T10:00:00Z',
   };

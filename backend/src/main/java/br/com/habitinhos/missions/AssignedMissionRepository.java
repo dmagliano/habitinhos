@@ -27,6 +27,9 @@ public interface AssignedMissionRepository extends JpaRepository<AssignedMission
       @Param("status") AssignedMissionStatus status,
       @Param("today") LocalDate today);
 
+  List<AssignedMission> findAllByFamilyUnitIdAndChildIdAndSnapshotRecurrenceTypeIn(
+      UUID familyUnitId, UUID childId, List<RecurrenceType> recurrenceTypes);
+
   List<AssignedMission> findAllByFamilyUnitIdAndChildIdIn(
       UUID familyUnitId, List<UUID> childIds);
 
@@ -38,4 +41,7 @@ public interface AssignedMissionRepository extends JpaRepository<AssignedMission
 
   boolean existsByFamilyUnitIdAndMissionIdAndChildIdAndStatusIn(
       UUID familyUnitId, UUID missionId, UUID childId, List<AssignedMissionStatus> statuses);
+
+  boolean existsByFamilyUnitIdAndMissionIdAndChildIdAndScheduledDate(
+      UUID familyUnitId, UUID missionId, UUID childId, LocalDate scheduledDate);
 }

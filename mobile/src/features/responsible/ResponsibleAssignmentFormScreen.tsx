@@ -83,7 +83,7 @@ export function ResponsibleAssignmentFormScreen({ navigation, route }: Props) {
     try {
       await responsibleService.assignMission(token, mission.id, {
         childIds: selectedChildIds,
-        dueDate: normalizeDueDate(dueDate),
+        dueDate: isRecurringMission(mission) ? null : normalizeDueDate(dueDate),
       });
       navigation.navigate('ResponsibleTabs');
     } catch {
@@ -128,16 +128,27 @@ export function ResponsibleAssignmentFormScreen({ navigation, route }: Props) {
               <ChildPicker childrenOptions={activeChildren} onToggle={toggleChild} selectedIds={selectedChildIds} />
             </ResponsibleFormSection>
 
-            <ResponsibleFormSection helper="Use o formato AAAA-MM-DD ou deixe em branco." title="Prazo opcional">
-              <TextInput
-                accessibilityLabel="Data limite opcional"
-                onChangeText={setDueDate}
-                placeholder="2026-06-10"
-                placeholderTextColor={colors.textMuted}
-                style={styles.input}
-                value={dueDate}
-              />
-            </ResponsibleFormSection>
+            {isRecurringMission(mission) ? (
+              <ResponsibleFormSection
+                helper={formatCompletionWindowHelper(mission.completionWindowDays)}
+                title="Prazo da recorrência"
+              >
+                <Text style={styles.assignmentHelper}>
+                  A primeira ocorrência começa hoje e repete esse prazo em cada nova missão.
+                </Text>
+              </ResponsibleFormSection>
+            ) : (
+              <ResponsibleFormSection helper="Use o formato AAAA-MM-DD ou deixe em branco." title="Prazo opcional">
+                <TextInput
+                  accessibilityLabel="Data limite opcional"
+                  onChangeText={setDueDate}
+                  placeholder="2026-06-10"
+                  placeholderTextColor={colors.textMuted}
+                  style={styles.input}
+                  value={dueDate}
+                />
+              </ResponsibleFormSection>
+            )}
 
             <PrimaryButton
               disabled={submitting}
@@ -157,6 +168,18 @@ function normalizeDueDate(value: string): string | null {
   return trimmed.length > 0 ? trimmed : null;
 }
 
+function isRecurringMission(mission: MissionResponse): boolean {
+  return mission.recurrenceType === 'DAILY' || mission.recurrenceType === 'WEEKLY';
+}
+
+function formatCompletionWindowHelper(completionWindowDays: number): string {
+  if (completionWindowDays === 0) {
+    return 'A criança deve concluir no mesmo dia da ocorrência.';
+  }
+
+  return `A criança terá ${completionWindowDays} ${completionWindowDays === 1 ? 'dia' : 'dias'} para concluir.`;
+}
+
 export function getResponsibleAssignmentKeyboardBehavior(platformOS: string): KeyboardAvoidingViewProps['behavior'] {
   return platformOS === 'ios' ? 'padding' : 'height';
 }
@@ -164,6 +187,10 @@ export function getResponsibleAssignmentKeyboardBehavior(platformOS: string): Ke
 const styles = StyleSheet.create({
   form: {
     gap: spacing.lg,
+  },
+  assignmentHelper: {
+    ...typography.body,
+    color: colors.textSecondary,
   },
   input: {
     ...typography.body,

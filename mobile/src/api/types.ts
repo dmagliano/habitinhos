@@ -72,6 +72,7 @@ export type AssignedMissionResponse = {
   missionId: string;
   childId: string;
   status: AssignedMissionStatus;
+  scheduledDate: string;
   dueDate: string | null;
   completedAt: string | null;
   approvedAt: string | null;
@@ -82,6 +83,7 @@ export type AssignedMissionResponse = {
   snapshotCoinValue: number;
   snapshotRequiresApproval: boolean;
   snapshotRecurrenceType: MissionResponse['recurrenceType'];
+  snapshotCompletionWindowDays: number;
   createdAt: string;
   updatedAt: string;
 };
@@ -125,6 +127,7 @@ export type MissionResponse = {
   coinValue: number;
   requiresApproval: boolean;
   recurrenceType: 'ONCE' | 'DAILY' | 'WEEKLY' | 'CUSTOM';
+  completionWindowDays: number;
   active: boolean;
   createdAt: string;
   updatedAt: string;
@@ -136,6 +139,7 @@ export type MissionRequest = {
   coinValue: number;
   requiresApproval: boolean;
   recurrenceType: MissionResponse['recurrenceType'];
+  completionWindowDays: number;
 };
 
 export type AssignMissionRequest = {
