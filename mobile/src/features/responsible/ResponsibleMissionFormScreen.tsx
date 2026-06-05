@@ -25,12 +25,7 @@ type FormErrors = {
   assignment?: string;
 };
 
-const recurrenceOptions: { label: string; value: MissionRequest['recurrenceType'] }[] = [
-  { label: 'Uma vez', value: 'ONCE' },
-  { label: 'Diária', value: 'DAILY' },
-  { label: 'Semanal', value: 'WEEKLY' },
-  { label: 'Personalizada', value: 'CUSTOM' },
-];
+const MVP_RECURRENCE_TYPE: MissionRequest['recurrenceType'] = 'ONCE';
 
 export function ResponsibleMissionFormScreen({ navigation, route }: Props) {
   const { session } = useAuth();
@@ -41,7 +36,6 @@ export function ResponsibleMissionFormScreen({ navigation, route }: Props) {
   const [description, setDescription] = useState('');
   const [coinValue, setCoinValue] = useState('1');
   const [requiresApproval, setRequiresApproval] = useState(true);
-  const [recurrenceType, setRecurrenceType] = useState<MissionRequest['recurrenceType']>('ONCE');
   const [children, setChildren] = useState<ChildResponse[]>([]);
   const [selectedChildIds, setSelectedChildIds] = useState<string[]>([]);
   const [dueDate, setDueDate] = useState('');
@@ -75,7 +69,6 @@ export function ResponsibleMissionFormScreen({ navigation, route }: Props) {
         setDescription(mission.description ?? '');
         setCoinValue(String(mission.coinValue));
         setRequiresApproval(mission.requiresApproval);
-        setRecurrenceType(mission.recurrenceType);
       }
 
       setLoadState('ready');
@@ -97,7 +90,7 @@ export function ResponsibleMissionFormScreen({ navigation, route }: Props) {
     description: description.trim(),
     coinValue: parsedCoinValue,
     requiresApproval,
-    recurrenceType,
+    recurrenceType: MVP_RECURRENCE_TYPE,
   });
 
   const validateDetails = () => {
@@ -206,9 +199,7 @@ export function ResponsibleMissionFormScreen({ navigation, route }: Props) {
             onChangeCoinValue={setCoinValue}
             onChangeDescription={setDescription}
             onChangeTitle={setTitle}
-            onSelectRecurrence={setRecurrenceType}
             onSubmit={handleSaveDetails}
-            recurrenceType={recurrenceType}
             requiresApproval={requiresApproval}
             submitting={submitting}
             title={title}
@@ -262,9 +253,7 @@ function MissionDetailsForm({
   onChangeCoinValue,
   onChangeDescription,
   onChangeTitle,
-  onSelectRecurrence,
   onSubmit,
-  recurrenceType,
   requiresApproval,
   submitting,
   title,
@@ -277,9 +266,7 @@ function MissionDetailsForm({
   onChangeCoinValue: (value: string) => void;
   onChangeDescription: (value: string) => void;
   onChangeTitle: (value: string) => void;
-  onSelectRecurrence: (value: MissionRequest['recurrenceType']) => void;
   onSubmit: () => void;
-  recurrenceType: MissionRequest['recurrenceType'];
   requiresApproval: boolean;
   submitting: boolean;
   title: string;
@@ -321,24 +308,6 @@ function MissionDetailsForm({
             style={[styles.input, styles.textArea]}
             value={description}
           />
-        </View>
-      </ResponsibleFormSection>
-
-      <ResponsibleFormSection helper="A frequência orienta como a família enxerga a missão." title="Frequência">
-        <View style={styles.segmented}>
-          {recurrenceOptions.map((option) => (
-            <Pressable
-              accessibilityLabel={`Selecionar frequência ${option.label}`}
-              accessibilityRole="button"
-              key={option.value}
-              onPress={() => onSelectRecurrence(option.value)}
-              style={[styles.segment, recurrenceType === option.value && styles.segmentSelected]}
-            >
-              <Text style={[styles.segmentLabel, recurrenceType === option.value && styles.segmentLabelSelected]}>
-                {option.label}
-              </Text>
-            </Pressable>
-          ))}
         </View>
       </ResponsibleFormSection>
 
@@ -424,31 +393,6 @@ const styles = StyleSheet.create({
   label: {
     ...typography.label,
     color: colors.textSecondary,
-  },
-  segmented: {
-    flexDirection: 'row',
-    flexWrap: 'wrap',
-    gap: spacing.sm,
-  },
-  segment: {
-    backgroundColor: colors.surfaceSoft,
-    borderColor: colors.border,
-    borderRadius: radius.full,
-    borderWidth: 1,
-    minHeight: 40,
-    paddingHorizontal: spacing.md,
-    paddingVertical: spacing.sm,
-  },
-  segmentLabel: {
-    ...typography.label,
-    color: colors.textSecondary,
-  },
-  segmentLabelSelected: {
-    color: colors.primaryDark,
-  },
-  segmentSelected: {
-    backgroundColor: colors.primarySoft,
-    borderColor: colors.primary,
   },
   stateCard: {
     alignItems: 'flex-start',

@@ -52,11 +52,17 @@ export function ResponsibleChildrenScreen({ navigation }: Props) {
 
   const openCreate = () => navigation.navigate('ResponsibleChildForm');
   const openEdit = (childId: string) => navigation.navigate('ResponsibleChildForm', { childId });
+  const returnHome = () => navigation.navigate('ResponsibleTabs');
 
   return (
     <AppScreen>
       <AppHeader
-        action={<PrimaryButton label="Cadastrar criança" onPress={openCreate} />}
+        action={
+          <View style={styles.headerActions}>
+            <SecondaryButton label="Retornar ao início" onPress={returnHome} />
+            <PrimaryButton label="Cadastrar criança" onPress={openCreate} />
+          </View>
+        }
         emoji="⭐"
         subtitle="Veja crianças ativas e inativas da família."
         title="Crianças"
@@ -118,6 +124,9 @@ function sortChildren(children: ChildResponse[]): ChildResponse[] {
 }
 
 const styles = StyleSheet.create({
+  headerActions: {
+    gap: spacing.sm,
+  },
   list: {
     gap: spacing.md,
   },

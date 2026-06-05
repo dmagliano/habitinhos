@@ -25,7 +25,7 @@ const Tab = createBottomTabNavigator<ChildTabParamList>();
 
 export function ChildTabsScreen({ navigation, route }: Props) {
   const { child } = route.params;
-  const { logout, session } = useAuth();
+  const { session } = useAuth();
 
   return (
     <Tab.Navigator
@@ -61,7 +61,6 @@ export function ChildTabsScreen({ navigation, route }: Props) {
             familyName={session?.family.name}
             avatarKey={child.avatarKey}
             onManageFamily={() => navigation.navigate('ResponsibleTabs', { activeChild: child })}
-            onLogout={logout}
             onSwitchChild={() => navigation.navigate('ChildProfileSelect')}
           />
         )}
@@ -75,14 +74,12 @@ function ProfileTab({
   childName,
   familyName,
   onManageFamily,
-  onLogout,
   onSwitchChild,
 }: {
   avatarKey: string;
   childName: string;
   familyName?: string;
   onManageFamily: () => void;
-  onLogout: () => void | Promise<void>;
   onSwitchChild: () => void;
 }) {
   return (
@@ -102,7 +99,6 @@ function ProfileTab({
       <View style={styles.profileActions}>
         <SecondaryButton label="Trocar criança" onPress={onSwitchChild} />
         <SecondaryButton label="Gerenciar família" onPress={onManageFamily} />
-        <SecondaryButton destructive label="Sair da conta" onPress={onLogout} />
       </View>
     </AppScreen>
   );

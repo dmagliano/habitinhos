@@ -34,7 +34,7 @@ export function ResponsibleTabsScreen({ navigation, route }: Props) {
       tabBar={(props) => <ResponsibleTabBar {...props} />}
     >
       <Tab.Screen name="ResponsibleHome" options={{ title: 'Início' }}>
-        {() => (
+        {({ navigation: tabNavigation }) => (
           <ResponsibleHomeScreen
             navigation={{
               navigate: (route, params) => {
@@ -47,12 +47,20 @@ export function ResponsibleTabsScreen({ navigation, route }: Props) {
                   navigation.navigate(route);
                 }
 
+                if (route === 'ResponsibleChildren') {
+                  navigation.navigate(route);
+                }
+
                 if (route === 'ChildProfileSelect') {
                   navigation.navigate(route);
                 }
 
                 if (route === 'ResponsibleMissionForm') {
                   navigation.navigate(route);
+                }
+
+                if (route === 'ResponsibleMissions') {
+                  tabNavigation.navigate(route);
                 }
 
                 if (route === 'ResponsibleApprovals') {
@@ -114,7 +122,7 @@ const tabCopy: Record<keyof ResponsibleTabParamList, { emoji: string; label: str
 
 function ResponsibleTabBar({ descriptors, navigation, state }: BottomTabBarProps) {
   const insets = useSafeAreaInsets();
-  const bottomPadding = Math.max(insets.bottom + spacing.sm, spacing.lg);
+  const bottomPadding = getResponsibleTabBottomPadding(insets.bottom);
 
   return (
     <View style={[styles.tabContainer, { paddingBottom: bottomPadding }]}>
@@ -153,6 +161,10 @@ function ResponsibleTabBar({ descriptors, navigation, state }: BottomTabBarProps
       })}
     </View>
   );
+}
+
+export function getResponsibleTabBottomPadding(insetBottom: number): number {
+  return Math.min(Math.max(insetBottom, spacing.xs), spacing.sm);
 }
 
 const styles = StyleSheet.create({

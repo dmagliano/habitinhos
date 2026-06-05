@@ -17,10 +17,12 @@ type ResponsibleHomeScreenProps = {
     navigate: (
       route:
         | 'ResponsibleApprovals'
+        | 'ResponsibleChildren'
         | 'ResponsibleChildDetail'
         | 'ResponsibleChildForm'
         | 'ChildProfileSelect'
         | 'ResponsibleMissionForm'
+        | 'ResponsibleMissions'
         | 'ResponsibleRewardForm',
       params?: { childId: string },
     ) => void;
@@ -74,11 +76,17 @@ export function ResponsibleHomeScreen({ navigation }: ResponsibleHomeScreenProps
   const openChildForm = () => {
     navigation?.navigate('ResponsibleChildForm');
   };
+  const openChildren = () => {
+    navigation?.navigate('ResponsibleChildren');
+  };
   const returnToChildren = () => {
     navigation?.navigate('ChildProfileSelect');
   };
   const openMissionForm = () => {
     navigation?.navigate('ResponsibleMissionForm');
+  };
+  const openMissions = () => {
+    navigation?.navigate('ResponsibleMissions');
   };
   const openApprovals = () => {
     navigation?.navigate('ResponsibleApprovals');
@@ -161,15 +169,20 @@ export function ResponsibleHomeScreen({ navigation }: ResponsibleHomeScreenProps
         <>
           <View style={styles.metricGrid}>
             {metrics.map((metric) => {
-              const isRecentRedemptions = metric.label === 'Resgates recentes';
+              const action = getMetricAction(metric.label, {
+                focusRecentRedemptions,
+                openApprovals,
+                openChildren,
+                openMissions,
+              });
 
               return (
                 <MetricSummaryCard
-                  accessibilityLabel={isRecentRedemptions ? 'Ver resgates recentes' : undefined}
-                  helper={isRecentRedemptions ? 'Ver resgates recentes' : undefined}
+                  accessibilityLabel={action.accessibilityLabel}
+                  helper={action.helper}
                   key={metric.label}
                   label={metric.label}
-                  onPress={isRecentRedemptions ? focusRecentRedemptions : undefined}
+                  onPress={action.onPress}
                   value={metric.value}
                 />
               );
@@ -304,6 +317,50 @@ function getMetrics(dashboard: ResponsibleDashboardResponse | null): { label: st
     { label: 'Missões abertas', value: String(openMissions) },
     { label: 'Resgates recentes', value: String(redemptions) },
   ];
+}
+
+function getMetricAction(
+  label: string,
+  actions: {
+    focusRecentRedemptions: () => void;
+    openApprovals: () => void;
+    openChildren: () => void;
+    openMissions: () => void;
+  },
+): { accessibilityLabel?: string; helper?: string; onPress?: () => void } {
+  if (label === 'Crianças') {
+    return {
+      accessibilityLabel: 'Abrir gestão de crianças',
+      helper: 'Gerenciar crianças',
+      onPress: actions.openChildren,
+    };
+  }
+
+  if (label === 'Aprovações') {
+    return {
+      accessibilityLabel: 'Abrir aprovações pendentes',
+      helper: 'Ver aprovações',
+      onPress: actions.openApprovals,
+    };
+  }
+
+  if (label === 'Missões abertas') {
+    return {
+      accessibilityLabel: 'Abrir missões',
+      helper: 'Ver missões',
+      onPress: actions.openMissions,
+    };
+  }
+
+  if (label === 'Resgates recentes') {
+    return {
+      accessibilityLabel: 'Ver resgates recentes',
+      helper: 'Ver resgates recentes',
+      onPress: actions.focusRecentRedemptions,
+    };
+  }
+
+  return {};
 }
 
 function isDelivered(redemption: ResponsibleDashboardRedemption): boolean {
