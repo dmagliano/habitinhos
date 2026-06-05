@@ -3,8 +3,8 @@ gsd_state_version: 1.0
 milestone: v1.0
 milestone_name: milestone
 status: ready_to_plan
-last_updated: 2026-06-05T15:29:55.000Z
-last_activity: 2026-06-05 -- Quick task 260605-gr5 complete
+last_updated: 2026-06-05T15:44:11.000Z
+last_activity: 2026-06-05 -- Quick task 260605-hif complete
 progress:
   total_phases: 9
   completed_phases: 8
@@ -115,9 +115,9 @@ None yet.
 
 ## Session Continuity
 
-Last session: 2026-06-05T15:29:55.000Z
-Stopped at: Completed quick task 260605-gr5
-Resume file: .planning/quick/260605-gr5-criar-recorrencia-de-tarefas-e-permitir-/260605-gr5-SUMMARY.md
+Last session: 2026-06-05T15:44:11.000Z
+Stopped at: Completed quick task 260605-hif
+Resume file: .planning/quick/260605-hif-corrigir-listagem-para-ocultar-missoes-e/260605-hif-SUMMARY.md
 
 ## Quick Tasks Completed
 
@@ -129,3 +129,4 @@ Resume file: .planning/quick/260605-gr5-criar-recorrencia-de-tarefas-e-permitir-
 | 2026-06-05 | apply-phase-6-03-ui-testing-fixes | complete | `.planning/quick/260604-vfp-apply-phase-6-03-ui-testing-fixes/260604-vfp-PLAN.md`, `.planning/quick/260604-vfp-apply-phase-6-03-ui-testing-fixes/260604-vfp-SUMMARY.md`, `.planning/quick/260604-vfp-apply-phase-6-03-ui-testing-fixes/260604-vfp-VERIFICATION.md` |
 | 2026-06-05 | adicionar-pin-de-respons-vel-para-acessa | complete | `.planning/quick/260604-wme-adicionar-pin-de-respons-vel-para-acessa/260604-wme-PLAN.md`, `.planning/quick/260604-wme-adicionar-pin-de-respons-vel-para-acessa/260604-wme-SUMMARY.md`, `.planning/quick/260604-wme-adicionar-pin-de-respons-vel-para-acessa/260604-wme-VERIFICATION.md` |
 | 2026-06-05 | criar-recorrencia-de-tarefas-e-permitir- | complete | `.planning/quick/260605-gr5-criar-recorrencia-de-tarefas-e-permitir-/260605-gr5-CONTEXT.md`, `.planning/quick/260605-gr5-criar-recorrencia-de-tarefas-e-permitir-/260605-gr5-PLAN.md`, `.planning/quick/260605-gr5-criar-recorrencia-de-tarefas-e-permitir-/260605-gr5-SUMMARY.md` |
+| 2026-06-05 | corrigir-listagem-para-ocultar-missoes-e | complete | `.planning/quick/260605-hif-corrigir-listagem-para-ocultar-missoes-e/260605-hif-PLAN.md`, `.planning/quick/260605-hif-corrigir-listagem-para-ocultar-missoes-e/260605-hif-SUMMARY.md` |
