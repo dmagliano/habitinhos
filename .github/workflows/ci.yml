@@ -57,4 +57,4 @@ jobs:
 
       - name: Test
         timeout-minutes: 10
-        run: npm test -- --runInBand
+        run: npm run test:ci
