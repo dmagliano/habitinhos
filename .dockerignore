@@ -1,0 +1,11 @@
+.git
+.github
+.planning
+.idea
+.vscode
+docs
+mobile
+backend/target
+backend/.m2
+backend/.mvn/apache-maven-*
+*.log

@@ -1,4 +1,4 @@
-import { fireEvent, render, screen, waitFor } from '@testing-library/react-native';
+import { act, fireEvent, render, screen, waitFor } from '@testing-library/react-native';
 
 import { RootNavigator } from '../../../navigation/RootNavigator';
 import { AuthWelcomeScreen } from '../AuthWelcomeScreen';
@@ -113,9 +113,15 @@ describe('AuthWelcomeScreen', () => {
 describe('RootNavigator auth entry', () => {
   beforeEach(() => {
     jest.clearAllMocks();
+    jest.useRealTimers();
   });
 
-  it('renders the welcome entry before any login-only form for unauthenticated users', () => {
+  afterEach(() => {
+    jest.useRealTimers();
+  });
+
+  it('renders the welcome entry before any login-only form for unauthenticated users', async () => {
+    jest.useFakeTimers();
     jest.mocked(useAuth).mockReturnValue({
       status: 'unauthenticated',
       session: null,
@@ -128,8 +134,12 @@ describe('RootNavigator auth entry', () => {
 
     render(<RootNavigator />);
 
+    await act(async () => {
+      jest.advanceTimersByTime(3000);
+    });
+
+    await waitFor(() => expect(screen.getByRole('button', { name: 'Login' })).toBeOnTheScreen());
     expect(screen.getByText('Habitinhos')).toBeOnTheScreen();
-    expect(screen.getByRole('button', { name: 'Login' })).toBeOnTheScreen();
     expect(screen.getByRole('button', { name: 'Registro' })).toBeOnTheScreen();
     expect(screen.queryByLabelText('E-mail')).not.toBeOnTheScreen();
     expect(screen.queryByLabelText('Senha')).not.toBeOnTheScreen();
