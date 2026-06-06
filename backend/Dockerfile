@@ -16,7 +16,9 @@ FROM eclipse-temurin:17-jre-jammy AS runtime
 
 WORKDIR /app
 
-RUN useradd --create-home --uid 10001 appuser
+RUN if ! getent group 1000 >/dev/null; then groupadd --gid 1000 render-secrets; fi \
+    && useradd --create-home --uid 10001 appuser \
+    && usermod --append --groups 1000 appuser
 
 COPY --from=build /workspace/backend/target/habitinhos-backend-0.0.1-SNAPSHOT.jar /app/app.jar
 COPY docker-entrypoint.sh /app/docker-entrypoint.sh
