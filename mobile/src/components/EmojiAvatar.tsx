@@ -24,6 +24,13 @@ const emojiSizeMap = {
   xl: 36,
 } as const;
 
+const emojiLineHeightMap = {
+  sm: 24,
+  md: 32,
+  lg: 40,
+  xl: 52,
+} as const;
+
 export function EmojiAvatar({ emoji, label, size = 'md' }: EmojiAvatarProps) {
   const dimension = sizeMap[size];
 
@@ -33,7 +40,9 @@ export function EmojiAvatar({ emoji, label, size = 'md' }: EmojiAvatarProps) {
       accessible
       style={[styles.avatar, { height: dimension, width: dimension }]}
     >
-      <Text style={[styles.emoji, { fontSize: emojiSizeMap[size] }]}>{emoji}</Text>
+      <Text style={[styles.emoji, { fontSize: emojiSizeMap[size], lineHeight: emojiLineHeightMap[size] }]}>
+        {emoji}
+      </Text>
     </View>
   );
 }
@@ -49,5 +58,8 @@ const styles = StyleSheet.create({
   },
   emoji: {
     ...typography.body,
+    includeFontPadding: false,
+    textAlign: 'center',
+    textAlignVertical: 'center',
   },
 });

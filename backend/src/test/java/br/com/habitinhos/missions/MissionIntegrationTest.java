@@ -71,6 +71,45 @@ class MissionIntegrationTest extends AbstractIntegrationTest {
   }
 
   @Test
+  void listMissionsCanIncludeInactiveWithoutLeakingOtherFamilies() throws Exception {
+    String familyAToken = registerToken("responsavel.a@example.com", "Familia A");
+    String familyBToken = registerToken("responsavel.b@example.com", "Familia B");
+
+    UUID activeMissionId = createMission(
+        familyAToken,
+        new MissionRequest("Guardar brinquedos", "Organizar a sala", 4, true, RecurrenceType.DAILY));
+    UUID inactiveMissionId = createMission(
+        familyAToken,
+        new MissionRequest("Regar plantas", "Cuidar das plantas", 2, false, RecurrenceType.WEEKLY));
+    createMission(
+        familyBToken,
+        new MissionRequest("Missão de outra família", "Não deve aparecer", 9, true, RecurrenceType.ONCE));
+
+    mockMvc.perform(patch("/missions/{id}/deactivate", inactiveMissionId)
+            .header("Authorization", "Bearer " + familyAToken))
+        .andExpect(status().isOk())
+        .andExpect(jsonPath("$.active").value(false));
+
+    mockMvc.perform(get("/missions")
+            .header("Authorization", "Bearer " + familyAToken))
+        .andExpect(status().isOk())
+        .andExpect(jsonPath("$").isArray())
+        .andExpect(jsonPath("$.length()").value(1))
+        .andExpect(jsonPath("$[0].id").value(activeMissionId.toString()))
+        .andExpect(jsonPath("$[0].active").value(true));
+
+    mockMvc.perform(get("/missions")
+            .queryParam("includeInactive", "true")
+            .header("Authorization", "Bearer " + familyAToken))
+        .andExpect(status().isOk())
+        .andExpect(jsonPath("$.length()").value(2))
+        .andExpect(jsonPath("$[0].id").value(activeMissionId.toString()))
+        .andExpect(jsonPath("$[0].active").value(true))
+        .andExpect(jsonPath("$[1].id").value(inactiveMissionId.toString()))
+        .andExpect(jsonPath("$[1].active").value(false));
+  }
+
+  @Test
   void createMissionRejectsNonPositiveCoinValue() throws Exception {
     String token = registerToken("responsavel@example.com", "Familia Demo");
 
@@ -115,7 +154,7 @@ class MissionIntegrationTest extends AbstractIntegrationTest {
     String response = mockMvc.perform(post("/auth/register")
             .contentType(MediaType.APPLICATION_JSON)
             .content(objectMapper.writeValueAsString(
-                new RegisterRequest("Responsavel Demo", email, "senha123", familyName))))
+                new RegisterRequest("Responsavel Demo", email, "senha123", familyName, "1234"))))
         .andExpect(status().isCreated())
         .andReturn()
         .getResponse()

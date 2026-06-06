@@ -35,6 +35,9 @@ public class AssignedMission extends BaseEntity {
   @Column(name = "due_date")
   private LocalDate dueDate;
 
+  @Column(name = "scheduled_date", nullable = false)
+  private LocalDate scheduledDate;
+
   @Column(name = "completed_at")
   private Instant completedAt;
 
@@ -59,23 +62,36 @@ public class AssignedMission extends BaseEntity {
   @Column(name = "snapshot_requires_approval", nullable = false)
   private boolean snapshotRequiresApproval;
 
-  public AssignedMission(UUID familyUnitId, UUID missionId, UUID childId, LocalDate dueDate,
+  @Enumerated(EnumType.STRING)
+  @Column(name = "snapshot_recurrence_type", nullable = false, length = 24)
+  private RecurrenceType snapshotRecurrenceType = RecurrenceType.ONCE;
+
+  @Column(name = "snapshot_completion_window_days", nullable = false)
+  private int snapshotCompletionWindowDays;
+
+  public AssignedMission(UUID familyUnitId, UUID missionId, UUID childId, LocalDate scheduledDate, LocalDate dueDate,
       Mission mission) {
     this.familyUnitId = familyUnitId;
     this.missionId = missionId;
     this.childId = childId;
+    this.scheduledDate = scheduledDate;
     this.dueDate = dueDate;
     // Snapshot from the mission template at assignment time
     this.snapshotTitle = mission.getTitle();
     this.snapshotDescription = mission.getDescription();
     this.snapshotCoinValue = mission.getCoinValue();
     this.snapshotRequiresApproval = mission.isRequiresApproval();
+    this.snapshotRecurrenceType = mission.getRecurrenceType();
+    this.snapshotCompletionWindowDays = mission.getCompletionWindowDays();
   }
 
   // --- Domain methods ---
 
   public void markCompleted() {
     this.completedAt = Instant.now();
+    this.approvedAt = null;
+    this.rejectedAt = null;
+    this.rejectionReason = null;
     if (this.snapshotRequiresApproval) {
       this.status = AssignedMissionStatus.AWAITING_APPROVAL;
     } else {
@@ -92,6 +108,14 @@ public class AssignedMission extends BaseEntity {
     this.rejectedAt = Instant.now();
     this.rejectionReason = reason;
     this.status = AssignedMissionStatus.REJECTED;
+  }
+
+  public void rejectAndReturnToPending(String reason) {
+    this.completedAt = null;
+    this.approvedAt = null;
+    this.rejectedAt = Instant.now();
+    this.rejectionReason = reason;
+    this.status = AssignedMissionStatus.PENDING;
   }
 
   public void cancel() {

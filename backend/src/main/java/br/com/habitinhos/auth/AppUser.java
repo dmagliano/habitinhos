@@ -33,14 +33,18 @@ public class AppUser extends BaseEntity {
   @Column(name = "password_hash", nullable = false)
   private String passwordHash;
 
+  @Column(name = "responsible_pin_hash")
+  private String responsiblePinHash;
+
   @Column(nullable = false)
   private boolean active = true;
 
-  public AppUser(UUID familyUnitId, String name, String email, UserRole role, String passwordHash) {
+  public AppUser(UUID familyUnitId, String name, String email, UserRole role, String passwordHash, String responsiblePinHash) {
     this.familyUnitId = familyUnitId;
     this.name = name;
     this.email = email;
     this.role = role;
     this.passwordHash = passwordHash;
+    this.responsiblePinHash = responsiblePinHash;
   }
 }

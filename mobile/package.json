@@ -1,6 +1,6 @@
 {
   "name": "habitinhos-mobile",
-  "version": "1.0.0",
+  "version": "0.0.1",
   "main": "index.ts",
   "dependencies": {
     "@react-navigation/bottom-tabs": "^7.16.2",
@@ -16,7 +16,7 @@
   },
   "devDependencies": {
     "@testing-library/react-native": "^13.3.3",
-    "@types/jest": "^30.0.0",
+    "@types/jest": "29.5.14",
     "@types/react": "~19.2.2",
     "eslint": "^9.39.4",
     "eslint-config-expo": "~56.0.4",
@@ -32,13 +32,15 @@
     "web": "expo start --web",
     "lint": "expo lint",
     "typecheck": "tsc --noEmit",
-    "test": "jest"
+    "test": "jest",
+    "test:ci": "jest --ci --runInBand --forceExit"
   },
   "jest": {
     "preset": "jest-expo",
     "setupFilesAfterEnv": [
       "<rootDir>/jest.setup.ts"
-    ]
+    ],
+    "testTimeout": 15000
   },
   "private": true
 }

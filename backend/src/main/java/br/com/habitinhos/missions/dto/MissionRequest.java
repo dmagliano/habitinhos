@@ -5,6 +5,7 @@ import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
+import jakarta.validation.constraints.Max;
 
 public record MissionRequest(
     @NotBlank(message = "Título é obrigatório.")
@@ -21,5 +22,18 @@ public record MissionRequest(
     Boolean requiresApproval,
 
     @NotNull(message = "recurrenceType é obrigatório.")
-    RecurrenceType recurrenceType) {
+    RecurrenceType recurrenceType,
+
+    @Min(value = 0, message = "Prazo para concluir não pode ser negativo.")
+    @Max(value = 30, message = "Prazo para concluir deve ter no máximo 30 dias.")
+    int completionWindowDays) {
+
+  public MissionRequest(
+      String title,
+      String description,
+      int coinValue,
+      Boolean requiresApproval,
+      RecurrenceType recurrenceType) {
+    this(title, description, coinValue, requiresApproval, recurrenceType, 0);
+  }
 }

@@ -24,6 +24,14 @@ export type AuthResponse = {
   family: FamilySummary;
 };
 
+export type RegisterRequest = {
+  name: string;
+  email: string;
+  password: string;
+  familyName: string;
+  responsiblePin: string;
+};
+
 export type MeResponse = UserSummary & {
   familyId: string;
   familyName: string;
@@ -37,6 +45,12 @@ export type ChildResponse = {
   active: boolean;
   createdAt: string;
   updatedAt: string;
+};
+
+export type ChildProfileRequest = {
+  name: string;
+  age: number;
+  avatarKey: string;
 };
 
 export type WalletResponse = {
@@ -58,6 +72,7 @@ export type AssignedMissionResponse = {
   missionId: string;
   childId: string;
   status: AssignedMissionStatus;
+  scheduledDate: string;
   dueDate: string | null;
   completedAt: string | null;
   approvedAt: string | null;
@@ -67,6 +82,8 @@ export type AssignedMissionResponse = {
   snapshotDescription: string;
   snapshotCoinValue: number;
   snapshotRequiresApproval: boolean;
+  snapshotRecurrenceType: MissionResponse['recurrenceType'];
+  snapshotCompletionWindowDays: number;
   createdAt: string;
   updatedAt: string;
 };
@@ -81,7 +98,13 @@ export type RewardResponse = {
   updatedAt: string;
 };
 
-export type RewardRedemptionStatus = 'REDEEMED';
+export type RewardRequest = {
+  title: string;
+  description: string;
+  cost: number;
+};
+
+export type RewardRedemptionStatus = 'REDEEMED' | 'DELIVERED' | 'CANCELLED';
 
 export type RewardRedemptionResponse = {
   id: string;
@@ -92,8 +115,80 @@ export type RewardRedemptionResponse = {
   snapshotTitle: string;
   snapshotCost: number;
   coinTransactionId: string;
+  deliveredAt: string | null;
   createdAt: string;
   updatedAt: string;
+};
+
+export type MissionResponse = {
+  id: string;
+  title: string;
+  description: string;
+  coinValue: number;
+  requiresApproval: boolean;
+  recurrenceType: 'ONCE' | 'DAILY' | 'WEEKLY' | 'CUSTOM';
+  completionWindowDays: number;
+  active: boolean;
+  createdAt: string;
+  updatedAt: string;
+};
+
+export type MissionRequest = {
+  title: string;
+  description: string;
+  coinValue: number;
+  requiresApproval: boolean;
+  recurrenceType: MissionResponse['recurrenceType'];
+  completionWindowDays: number;
+};
+
+export type AssignMissionRequest = {
+  childIds: string[];
+  dueDate?: string | null;
+};
+
+export type RejectAssignedMissionRequest = {
+  reason?: string;
+  returnToPending?: boolean;
+};
+
+export type ResponsibleDashboardMissionCounts = Record<AssignedMissionStatus, number>;
+
+export type ResponsibleDashboardChildSummary = {
+  id: string;
+  name: string;
+  age: number;
+  avatarKey: string;
+  balance: number;
+  missionCounts: ResponsibleDashboardMissionCounts;
+};
+
+export type ResponsibleDashboardApproval = {
+  id: string;
+  childId: string;
+  childName: string;
+  missionTitle: string;
+  coinValue: number;
+  completedAt: string | null;
+};
+
+export type ResponsibleDashboardRedemption = {
+  id: string;
+  rewardId: string;
+  childId: string;
+  childName: string;
+  rewardTitle: string;
+  rewardCost: number;
+  status: RewardRedemptionStatus;
+  deliveredAt: string | null;
+  redeemedAt: string;
+};
+
+export type ResponsibleDashboardResponse = {
+  children: ResponsibleDashboardChildSummary[];
+  pendingApprovalCount: number;
+  approvalPreview: ResponsibleDashboardApproval[];
+  recentRedemptions: ResponsibleDashboardRedemption[];
 };
 
 export class ApiError extends Error {

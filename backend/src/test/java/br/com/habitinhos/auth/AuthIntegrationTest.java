@@ -14,6 +14,7 @@ import br.com.habitinhos.family.FamilyUnitRepository;
 import br.com.habitinhos.shared.AbstractIntegrationTest;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import java.util.Map;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
@@ -40,7 +41,7 @@ class AuthIntegrationTest extends AbstractIntegrationTest {
   private PasswordEncoder passwordEncoder;
 
   @Test
-  void registerCreatesFamilyAndResponsibleWithHashedPassword() throws Exception {
+  void registerCreatesFamilyAndResponsibleWithHashedPasswordAndPin() throws Exception {
     mockMvc.perform(post("/auth/register")
             .contentType(MediaType.APPLICATION_JSON)
             .content(objectMapper.writeValueAsString(registerRequest("Resp@example.com"))))
@@ -55,7 +56,42 @@ class AuthIntegrationTest extends AbstractIntegrationTest {
     assertThat(user.getRole()).isEqualTo(UserRole.RESPONSIBLE);
     assertThat(user.getPasswordHash()).isNotEqualTo(RAW_PASSWORD);
     assertThat(passwordEncoder.matches(RAW_PASSWORD, user.getPasswordHash())).isTrue();
+    assertThat(user.getResponsiblePinHash()).isNotEqualTo("1234");
+    assertThat(passwordEncoder.matches("1234", user.getResponsiblePinHash())).isTrue();
     assertThat(familyUnitRepository.findById(user.getFamilyUnitId())).isPresent();
+  }
+
+  @Test
+  void registerRejectsInvalidResponsiblePin() throws Exception {
+    mockMvc.perform(post("/auth/register")
+            .contentType(MediaType.APPLICATION_JSON)
+            .content(objectMapper.writeValueAsString(new RegisterRequest(
+                "Responsavel Demo",
+                "responsavel@example.com",
+                RAW_PASSWORD,
+                "Familia Demo",
+                "12a4"))))
+        .andExpect(status().isBadRequest())
+        .andExpect(jsonPath("$.code").value("VALIDATION_ERROR"))
+        .andExpect(jsonPath("$.details.responsiblePin").value("PIN do responsável deve ter 4 dígitos."));
+  }
+
+  @Test
+  void verifyResponsiblePinAllowsValidPinAndRejectsInvalidPin() throws Exception {
+    String token = register("responsavel@example.com");
+
+    mockMvc.perform(post("/auth/responsible-pin/verify")
+            .header("Authorization", "Bearer " + token)
+            .contentType(MediaType.APPLICATION_JSON)
+            .content(objectMapper.writeValueAsString(Map.of("pin", "1234"))))
+        .andExpect(status().isNoContent());
+
+    mockMvc.perform(post("/auth/responsible-pin/verify")
+            .header("Authorization", "Bearer " + token)
+            .contentType(MediaType.APPLICATION_JSON)
+            .content(objectMapper.writeValueAsString(Map.of("pin", "9999"))))
+        .andExpect(status().isForbidden())
+        .andExpect(jsonPath("$.code").value("INVALID_RESPONSIBLE_PIN"));
   }
 
   @Test
@@ -132,6 +168,7 @@ class AuthIntegrationTest extends AbstractIntegrationTest {
         "Responsavel Demo",
         email,
         RAW_PASSWORD,
-        "Familia Demo");
+        "Familia Demo",
+        "1234");
   }
 }

@@ -6,6 +6,8 @@ import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMock
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.testcontainers.service.connection.ServiceConnection;
 import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.test.context.DynamicPropertyRegistry;
+import org.springframework.test.context.DynamicPropertySource;
 import org.testcontainers.containers.PostgreSQLContainer;
 import org.testcontainers.junit.jupiter.Testcontainers;
 
@@ -20,6 +22,11 @@ public abstract class AbstractIntegrationTest {
 
   static {
     POSTGRES.start();
+  }
+
+  @DynamicPropertySource
+  static void registerSecurityProperties(DynamicPropertyRegistry registry) {
+    registry.add("habitinhos.security.jwt.secret", () -> "0".repeat(64));
   }
 
   @Autowired

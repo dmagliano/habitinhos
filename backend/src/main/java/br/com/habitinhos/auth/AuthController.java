@@ -4,6 +4,7 @@ import br.com.habitinhos.auth.dto.AuthResponse;
 import br.com.habitinhos.auth.dto.LoginRequest;
 import br.com.habitinhos.auth.dto.MeResponse;
 import br.com.habitinhos.auth.dto.RegisterRequest;
+import br.com.habitinhos.auth.dto.VerifyResponsiblePinRequest;
 import jakarta.validation.Valid;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -38,6 +39,14 @@ public class AuthController {
   public AuthResponse login(@Valid @RequestBody LoginRequest request) {
     log.info("Auth login request received");
     return authService.login(request);
+  }
+
+  @PostMapping("/auth/responsible-pin/verify")
+  @ResponseStatus(HttpStatus.NO_CONTENT)
+  public void verifyResponsiblePin(@Valid @RequestBody VerifyResponsiblePinRequest request) {
+    CurrentUser currentUser = currentUserProvider.getCurrentUser();
+    log.info("Responsible PIN verification request received for userId={}", currentUser.userId());
+    authService.verifyResponsiblePin(currentUser, request);
   }
 
   @GetMapping("/me")

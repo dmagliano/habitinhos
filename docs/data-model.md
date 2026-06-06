@@ -71,6 +71,7 @@ Mission/task template created by a responsible adult.
 | description | Optional detail |
 | coinValue | Positive integer |
 | recurrenceType | `ONCE`, `DAILY`, `WEEKLY`, `CUSTOM` |
+| completionWindowDays | Days allowed to complete each recurring occurrence |
 | requiresApproval | Whether responsible approval is needed |
 | active | Soft activation flag |
 | createdByUserId | Responsible creator |
@@ -88,11 +89,18 @@ Mission assigned to a specific child.
 | missionId | Mission reference |
 | childId | Child assignee |
 | status | `PENDING`, `AWAITING_APPROVAL`, `COMPLETED`, `REJECTED`, `CANCELLED` |
-| dueDate | Optional due date |
+| scheduledDate | Date this occurrence belongs to |
+| dueDate | Optional due date; for recurrence, `scheduledDate + snapshotCompletionWindowDays` |
 | completedAt | Completion timestamp |
 | approvedAt | Approval timestamp |
 | rejectedAt | Rejection timestamp |
 | rejectionReason | Optional rejection note |
+| snapshotTitle | Mission title copied at assignment time |
+| snapshotDescription | Mission description copied at assignment time |
+| snapshotCoinValue | Coin value copied at assignment time |
+| snapshotRequiresApproval | Approval rule copied at assignment time |
+| snapshotRecurrenceType | Recurrence rule copied at assignment time |
+| snapshotCompletionWindowDays | Completion window copied at assignment time |
 | coinsCredited | Amount credited when completed/approved |
 | createdAt | Creation timestamp |
 | updatedAt | Update timestamp |

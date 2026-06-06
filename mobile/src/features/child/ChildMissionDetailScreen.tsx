@@ -118,6 +118,13 @@ export function ChildMissionDetailScreen({ navigation, route }: Props) {
         </Card>
       ) : null}
 
+      {mission.status === 'PENDING' && mission.rejectionReason ? (
+        <Card style={styles.infoCard}>
+          <Text style={styles.infoLabel}>Responsável pediu ajuste</Text>
+          <Text style={styles.rejectionReason}>{mission.rejectionReason}</Text>
+        </Card>
+      ) : null}
+
       {mission.status === 'PENDING' ? (
         <PrimaryButton
           label="Marcar como concluída"
@@ -210,6 +217,10 @@ const styles = StyleSheet.create({
   infoBody: {
     ...typography.body,
     color: colors.textSecondary,
+  },
+  rejectionReason: {
+    ...typography.body,
+    color: colors.error,
   },
   completeButton: {
     marginTop: spacing.lg,
