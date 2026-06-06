@@ -56,4 +56,5 @@ jobs:
         run: npm run typecheck
 
       - name: Test
+        timeout-minutes: 10
         run: npm test -- --runInBand

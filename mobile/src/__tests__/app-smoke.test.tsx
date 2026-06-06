@@ -1,4 +1,4 @@
-import { act, render, screen } from '@testing-library/react-native';
+import { act, cleanup, render, screen } from '@testing-library/react-native';
 
 import App from '../../App';
 import { tokenStorage } from '../storage/tokenStorage';
@@ -13,16 +13,18 @@ jest.mock('../storage/tokenStorage', () => ({
 
 describe('App', () => {
   beforeEach(() => {
-    jest.useRealTimers();
     jest.clearAllMocks();
-    jest.mocked(tokenStorage.getToken).mockImplementation(() => new Promise(() => undefined));
+    jest.mocked(tokenStorage.getToken).mockResolvedValue(null);
   });
 
   afterEach(() => {
+    cleanup();
     jest.useRealTimers();
   });
 
   it('renders the initial Habitinhos loading shell', () => {
+    jest.useFakeTimers();
+
     render(<App />);
 
     expect(screen.getByText('Habitinhos')).toBeOnTheScreen();
