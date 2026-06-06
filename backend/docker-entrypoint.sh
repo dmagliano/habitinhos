@@ -1,6 +1,19 @@
 #!/bin/sh
 set -eu
 
+load_secret_file() {
+  secret_file="${HABITINHOS_SECRETS_FILE:-/etc/secrets/habitinhos-api.secrets.env}"
+
+  if [ ! -f "$secret_file" ]; then
+    return 0
+  fi
+
+  set -a
+  # shellcheck disable=SC1090
+  . "$secret_file"
+  set +a
+}
+
 normalize_database_url() {
   case "${DATABASE_URL:-}" in
     "")
@@ -34,6 +47,7 @@ normalize_database_url() {
   esac
 }
 
+load_secret_file
 normalize_database_url
 
 exec java -jar /app/app.jar

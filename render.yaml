@@ -30,8 +30,8 @@ services:
         fromDatabase:
           name: habitinhos-db
           property: password
-      - key: HABITINHOS_JWT_SECRET
-        generateValue: true
+      - key: HABITINHOS_SECRETS_FILE
+        value: /etc/secrets/habitinhos-api.secrets.env
       - key: HABITINHOS_JWT_ISSUER
         value: habitinhos-production
       - key: HABITINHOS_JWT_EXPIRATION_MINUTES
@@ -48,3 +48,4 @@ databases:
     postgresMajorVersion: "16"
     databaseName: habitinhos
     user: habitinhos
+    ipAllowList: []
