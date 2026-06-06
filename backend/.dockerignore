@@ -1,0 +1,4 @@
+.m2
+.mvn/apache-maven-*
+target
+*.log
