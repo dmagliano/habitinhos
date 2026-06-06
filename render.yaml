@@ -1,0 +1,51 @@
+services:
+  - type: web
+    name: habitinhos-api
+    runtime: docker
+    plan: starter
+    region: virginia
+    branch: master
+    dockerfilePath: backend/Dockerfile
+    dockerContext: .
+    autoDeployTrigger: checksPass
+    healthCheckPath: /actuator/health
+    buildFilter:
+      paths:
+        - backend/**
+        - render.yaml
+        - .dockerignore
+      ignoredPaths:
+        - mobile/**
+        - docs/**
+        - .planning/**
+    envVars:
+      - key: DATABASE_URL
+        fromDatabase:
+          name: habitinhos-db
+          property: connectionString
+      - key: SPRING_DATASOURCE_USERNAME
+        fromDatabase:
+          name: habitinhos-db
+          property: user
+      - key: SPRING_DATASOURCE_PASSWORD
+        fromDatabase:
+          name: habitinhos-db
+          property: password
+      - key: HABITINHOS_JWT_SECRET
+        generateValue: true
+      - key: HABITINHOS_JWT_ISSUER
+        value: habitinhos-production
+      - key: HABITINHOS_JWT_EXPIRATION_MINUTES
+        value: "120"
+      - key: LOG_LEVEL_APP
+        value: INFO
+      - key: JAVA_TOOL_OPTIONS
+        value: -XX:MaxRAMPercentage=70 -XX:+UseContainerSupport
+
+databases:
+  - name: habitinhos-db
+    plan: basic-256mb
+    region: virginia
+    postgresMajorVersion: "16"
+    databaseName: habitinhos
+    user: habitinhos
