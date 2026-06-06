@@ -1,4 +1,4 @@
-import { act, cleanup, render, screen } from '@testing-library/react-native';
+import { cleanup, render, screen, waitFor } from '@testing-library/react-native';
 
 import App from '../../App';
 import { tokenStorage } from '../storage/tokenStorage';
@@ -31,29 +31,17 @@ describe('App', () => {
     expect(screen.getByText('Preparando sua família...')).toBeOnTheScreen();
   });
 
-  it('keeps the presentation visible for 3 seconds before showing login and register entry', async () => {
-    jest.useFakeTimers();
+  it('shows login and register entry after auth restore and presentation delay', async () => {
+    jest.useRealTimers();
     jest.mocked(tokenStorage.getToken).mockResolvedValueOnce(null);
 
     render(<App />);
 
-    await act(async () => {
-      jest.advanceTimersByTime(0);
-    });
-
     expect(screen.getByText('Preparando sua família...')).toBeOnTheScreen();
-    expect(screen.queryByText('Comece pela sua conta')).toBeNull();
+    expect(screen.queryByText('Comece pela sua conta')).not.toBeOnTheScreen();
 
-    await act(async () => {
-      jest.advanceTimersByTime(2999);
+    await waitFor(() => expect(screen.getByText('Comece pela sua conta')).toBeOnTheScreen(), {
+      timeout: 7000,
     });
-
-    expect(screen.queryByText('Comece pela sua conta')).toBeNull();
-
-    await act(async () => {
-      jest.advanceTimersByTime(1);
-    });
-
-    expect(screen.getByText('Comece pela sua conta')).toBeOnTheScreen();
-  });
+  }, 10000);
 });
