@@ -36,6 +36,8 @@ services:
         value: habitinhos-production
       - key: HABITINHOS_JWT_EXPIRATION_MINUTES
         value: "120"
+      - key: SERVER_ADDRESS
+        value: 0.0.0.0
       - key: LOG_LEVEL_APP
         value: INFO
       - key: JAVA_TOOL_OPTIONS
