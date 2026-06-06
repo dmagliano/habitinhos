@@ -1,5 +1,6 @@
 package br.com.habitinhos.wallet;
 
+import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 import jakarta.persistence.LockModeType;
@@ -11,6 +12,8 @@ import org.springframework.data.repository.query.Param;
 public interface WalletRepository extends JpaRepository<Wallet, UUID> {
 
   Optional<Wallet> findByChildIdAndFamilyUnitId(UUID childId, UUID familyUnitId);
+
+  List<Wallet> findAllByFamilyUnitIdAndChildIdIn(UUID familyUnitId, List<UUID> childIds);
 
   @Lock(LockModeType.PESSIMISTIC_WRITE)
   @Query("""

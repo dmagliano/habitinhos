@@ -6,6 +6,8 @@ import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
 import jakarta.persistence.Table;
+import java.time.Instant;
+import java.time.temporal.ChronoUnit;
 import java.util.UUID;
 import lombok.AccessLevel;
 import lombok.Getter;
@@ -42,6 +44,9 @@ public class RewardRedemption extends BaseEntity {
   @Column(name = "coin_transaction_id")
   private UUID coinTransactionId;
 
+  @Column(name = "delivered_at")
+  private Instant deliveredAt;
+
   public RewardRedemption(UUID familyUnitId, UUID childId, UUID walletId, Reward reward) {
     this.familyUnitId = familyUnitId;
     this.rewardId = reward.getId();
@@ -57,5 +62,13 @@ public class RewardRedemption extends BaseEntity {
 
   public void cancel() {
     this.status = RewardRedemptionStatus.CANCELLED;
+  }
+
+  public void markDelivered(Instant deliveredAt) {
+    if (this.status == RewardRedemptionStatus.DELIVERED) {
+      return;
+    }
+    this.status = RewardRedemptionStatus.DELIVERED;
+    this.deliveredAt = deliveredAt.truncatedTo(ChronoUnit.MICROS);
   }
 }

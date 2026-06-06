@@ -56,6 +56,10 @@ Start the backend:
 
 ```bash
 cd backend
+export SPRING_DATASOURCE_URL=jdbc:postgresql://localhost:5432/habitinhos
+export SPRING_DATASOURCE_USERNAME="$(docker compose -f ../docker-compose.yml exec -T postgres printenv POSTGRES_USER)"
+export SPRING_DATASOURCE_PASSWORD="$(docker compose -f ../docker-compose.yml exec -T postgres printenv POSTGRES_PASSWORD)"
+export HABITINHOS_JWT_SECRET="$(openssl rand -base64 32)"
 ./mvnw spring-boot:run
 ```
 

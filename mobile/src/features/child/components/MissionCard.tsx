@@ -42,6 +42,10 @@ export function MissionCard({ completing = false, mission, onComplete, onOpenDet
 
       {mission.dueDate ? <Text style={styles.dueDate}>Para {formatDate(mission.dueDate)}</Text> : null}
 
+      {isPending && mission.rejectionReason ? (
+        <Text style={styles.rejectionReason}>Responsável pediu ajuste: {mission.rejectionReason}</Text>
+      ) : null}
+
       {isPending ? (
         <View style={styles.actions}>
           <PrimaryButton
@@ -112,5 +116,9 @@ const styles = StyleSheet.create({
   },
   actionButton: {
     alignSelf: 'stretch',
+  },
+  rejectionReason: {
+    ...typography.body,
+    color: colors.error,
   },
 });

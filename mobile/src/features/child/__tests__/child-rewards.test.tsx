@@ -42,6 +42,7 @@ describe('ChildRewardsScreen', () => {
       session,
       errorMessage: null,
       login: jest.fn(),
+      register: jest.fn(),
       logout: jest.fn(),
       retryRestore: jest.fn(),
     });
@@ -60,7 +61,8 @@ describe('ChildRewardsScreen', () => {
     expect(screen.getByText('O que você quer resgatar?')).toBeOnTheScreen();
     expect(screen.getByText('Cinema em família')).toBeOnTheScreen();
     expect(screen.getByText('Bicicleta nova')).toBeOnTheScreen();
-    expect(screen.getByText('Custa 30 moedas')).toBeOnTheScreen();
+    expect(screen.getByText('30 moedas')).toBeOnTheScreen();
+    expect(screen.queryByText('Custa 30 moedas')).toBeNull();
 
     expect(screen.getByRole('button', { name: 'Resgatar recompensa Cinema em família' })).not.toBeDisabled();
     expect(screen.getByRole('button', { name: 'Resgatar recompensa Bicicleta nova' })).toBeDisabled();
@@ -83,6 +85,7 @@ describe('ChildRewardsScreen', () => {
       snapshotTitle: cinema.title,
       snapshotCost: cinema.cost,
       coinTransactionId: 'transaction-1',
+      deliveredAt: null,
       createdAt: '2026-06-02T10:00:00Z',
       updatedAt: '2026-06-02T10:00:00Z',
     });

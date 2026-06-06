@@ -65,6 +65,10 @@ public class AssignedMissionController {
       @Valid @RequestBody RejectAssignedMissionRequest request) {
     var currentUser = currentUserProvider.getCurrentUser();
     log.info("Reject assigned mission request: familyUnitId={} assignedMissionId={}", currentUser.familyUnitId(), id);
-    return assignedMissionService.reject(currentUser, id, request.reason());
+    return assignedMissionService.reject(
+        currentUser,
+        id,
+        request.reason(),
+        Boolean.TRUE.equals(request.returnToPending()));
   }
 }

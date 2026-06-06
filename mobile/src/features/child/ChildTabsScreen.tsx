@@ -1,11 +1,13 @@
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
+import { useState } from 'react';
 import { StyleSheet, Text, View } from 'react-native';
 
 import { AppHeader, AppScreen, Card, EmojiAvatar, SecondaryButton } from '../../components';
 import { RootStackParamList } from '../../navigation/routes';
 import { colors, spacing, typography } from '../../theme';
 import { useAuth } from '../auth/AuthContext';
+import { ResponsiblePinPrompt } from '../auth/ResponsiblePinPrompt';
 
 import { ChildHomeScreen } from './ChildHomeScreen';
 import { ChildMissionsScreen } from './ChildMissionsScreen';
@@ -25,7 +27,7 @@ const Tab = createBottomTabNavigator<ChildTabParamList>();
 
 export function ChildTabsScreen({ navigation, route }: Props) {
   const { child } = route.params;
-  const { logout, session } = useAuth();
+  const { session } = useAuth();
 
   return (
     <Tab.Navigator
@@ -60,9 +62,9 @@ export function ChildTabsScreen({ navigation, route }: Props) {
             childName={child.name}
             familyName={session?.family.name}
             avatarKey={child.avatarKey}
-            onBackToFamily={() => navigation.navigate('FamilyHub')}
-            onLogout={logout}
+            onManageFamily={() => navigation.navigate('ResponsibleTabs', { activeChild: child })}
             onSwitchChild={() => navigation.navigate('ChildProfileSelect')}
+            token={session?.token ?? null}
           />
         )}
       </Tab.Screen>
@@ -74,17 +76,19 @@ function ProfileTab({
   avatarKey,
   childName,
   familyName,
-  onBackToFamily,
-  onLogout,
+  onManageFamily,
   onSwitchChild,
+  token,
 }: {
   avatarKey: string;
   childName: string;
   familyName?: string;
-  onBackToFamily: () => void;
-  onLogout: () => void | Promise<void>;
+  onManageFamily: () => void;
   onSwitchChild: () => void;
+  token: string | null;
 }) {
+  const [showResponsiblePin, setShowResponsiblePin] = useState(false);
+
   return (
     <AppScreen>
       <AppHeader emoji="🙂" title="Perfil" />
@@ -101,9 +105,16 @@ function ProfileTab({
 
       <View style={styles.profileActions}>
         <SecondaryButton label="Trocar criança" onPress={onSwitchChild} />
-        <SecondaryButton label="Voltar para família" onPress={onBackToFamily} />
-        <SecondaryButton destructive label="Sair da conta" onPress={onLogout} />
+        <SecondaryButton label="Gerenciar família" onPress={() => setShowResponsiblePin(true)} />
       </View>
+
+      {showResponsiblePin ? (
+        <ResponsiblePinPrompt
+          onCancel={() => setShowResponsiblePin(false)}
+          onVerified={onManageFamily}
+          token={token}
+        />
+      ) : null}
     </AppScreen>
   );
 }

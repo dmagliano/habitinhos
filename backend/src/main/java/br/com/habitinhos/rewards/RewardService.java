@@ -15,6 +15,7 @@ import br.com.habitinhos.wallet.CoinTransaction;
 import br.com.habitinhos.wallet.Wallet;
 import br.com.habitinhos.wallet.WalletRepository;
 import br.com.habitinhos.wallet.WalletService;
+import java.time.Instant;
 import java.util.List;
 import java.util.UUID;
 import org.slf4j.Logger;
@@ -61,12 +62,19 @@ public class RewardService {
   }
 
   @Transactional(readOnly = true)
-  public List<RewardResponse> listActive(CurrentUser currentUser) {
-    List<RewardResponse> rewards = rewardRepository.findAllByFamilyUnitIdAndActiveTrueOrderByCreatedAtAsc(currentUser.familyUnitId())
+  public List<RewardResponse> list(CurrentUser currentUser, boolean includeInactive) {
+    var rewardEntities = includeInactive
+        ? rewardRepository.findAllByFamilyUnitIdOrderByActiveDescCreatedAtAsc(currentUser.familyUnitId())
+        : rewardRepository.findAllByFamilyUnitIdAndActiveTrueOrderByCreatedAtAsc(currentUser.familyUnitId());
+    List<RewardResponse> rewards = rewardEntities
         .stream()
         .map(this::toResponse)
         .toList();
-    log.debug("Rewards listed: familyUnitId={} count={}", currentUser.familyUnitId(), rewards.size());
+    log.debug(
+        "Rewards listed: familyUnitId={} includeInactive={} count={}",
+        currentUser.familyUnitId(),
+        includeInactive,
+        rewards.size());
     return rewards;
   }
 
@@ -135,6 +143,20 @@ public class RewardService {
     return toResponse(redemption);
   }
 
+  @Transactional
+  public RewardRedemptionResponse markDelivered(CurrentUser currentUser, UUID redemptionId) {
+    requireResponsible(currentUser);
+    RewardRedemption redemption = rewardRedemptionRepository
+        .findByIdAndFamilyUnitId(redemptionId, currentUser.familyUnitId())
+        .orElseThrow(this::rewardRedemptionNotFound);
+    redemption.markDelivered(Instant.now());
+    log.info(
+        "Reward redemption delivered: familyUnitId={} redemptionId={}",
+        currentUser.familyUnitId(),
+        redemptionId);
+    return toResponse(redemption);
+  }
+
   private void requireResponsible(CurrentUser currentUser) {
     if (currentUser.role() != UserRole.RESPONSIBLE) {
       log.warn("Access denied: non-responsible role={} familyUnitId={}", currentUser.role(), currentUser.familyUnitId());
@@ -148,6 +170,10 @@ public class RewardService {
 
   private NotFoundException rewardNotFound() {
     return new NotFoundException("REWARD_NOT_FOUND", "Recompensa não encontrada.");
+  }
+
+  private NotFoundException rewardRedemptionNotFound() {
+    return new NotFoundException("REWARD_REDEMPTION_NOT_FOUND", "Resgate de recompensa não encontrado.");
   }
 
   private NotFoundException childNotFound() {
@@ -179,6 +205,7 @@ public class RewardService {
         redemption.getSnapshotTitle(),
         redemption.getSnapshotCost(),
         redemption.getCoinTransactionId(),
+        redemption.getDeliveredAt(),
         redemption.getCreatedAt(),
         redemption.getUpdatedAt());
   }

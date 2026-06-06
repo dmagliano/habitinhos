@@ -48,6 +48,17 @@ Phase 1 child endpoints are responsible-only. Children are not authenticatable `
 | PATCH | `/missions/{id}/deactivate` | Soft deactivate mission |
 | POST | `/missions/{id}/assign` | Assign mission to one or more children |
 
+`recurrenceType` accepts `ONCE`, `DAILY`, `WEEKLY`, and `CUSTOM`; the MVP mobile
+UI exposes only `ONCE`, `DAILY`, and `WEEKLY`. `completionWindowDays` defines
+how many days the child has to complete each recurring occurrence. For recurring
+missions, a null assignment `dueDate` schedules the first occurrence for today
+and sets `dueDate = scheduledDate + completionWindowDays`.
+
+Recurring missions create the next occurrence after automatic mission credit or
+responsible approval. They also guarantee a current occurrence when the child
+mission list is loaded and the previous pending occurrence has expired without
+completion. There is no background scheduler in the MVP.
+
 ## Assigned Missions
 
 | Method | Path | Purpose |
@@ -57,6 +68,29 @@ Phase 1 child endpoints are responsible-only. Children are not authenticatable `
 | POST | `/assigned-missions/{id}/complete` | Child marks assigned mission complete |
 | POST | `/assigned-missions/{id}/approve` | Responsible approves mission |
 | POST | `/assigned-missions/{id}/reject` | Responsible rejects mission |
+
+`GET /children/{childId}/missions` returns only visible pending assignments for
+the child. Assignments with no `dueDate` remain visible; assignments due today
+or in the future remain visible; assignments with `dueDate` before the current
+date are omitted from the child list without changing their stored status.
+
+Assigned mission responses include `scheduledDate`, optional `dueDate`, and
+snapshot fields from the assignment moment: `snapshotTitle`,
+`snapshotDescription`, `snapshotCoinValue`, `snapshotRequiresApproval`,
+`snapshotRecurrenceType`, and `snapshotCompletionWindowDays`.
+
+Reject request body:
+
+```json
+{
+  "reason": "Faltou guardar os carrinhos",
+  "returnToPending": true
+}
+```
+
+When `returnToPending` is `true`, the assignment returns to `PENDING` without
+crediting coins and keeps `rejectionReason` visible to the child. When omitted
+or `false`, the assignment remains `REJECTED`.
 
 ## Rewards
 

@@ -4,9 +4,11 @@ import br.com.habitinhos.auth.dto.AuthResponse;
 import br.com.habitinhos.auth.dto.LoginRequest;
 import br.com.habitinhos.auth.dto.MeResponse;
 import br.com.habitinhos.auth.dto.RegisterRequest;
+import br.com.habitinhos.auth.dto.VerifyResponsiblePinRequest;
 import br.com.habitinhos.family.FamilyUnit;
 import br.com.habitinhos.family.FamilyUnitRepository;
 import br.com.habitinhos.shared.error.ConflictException;
+import br.com.habitinhos.shared.error.ForbiddenException;
 import br.com.habitinhos.shared.error.NotFoundException;
 import br.com.habitinhos.shared.error.UnauthorizedException;
 import java.util.Locale;
@@ -51,11 +53,28 @@ public class AuthService {
         request.name().trim(),
         email,
         UserRole.RESPONSIBLE,
-        passwordEncoder.encode(request.password()));
+        passwordEncoder.encode(request.password()),
+        passwordEncoder.encode(request.responsiblePin()));
     appUserRepository.saveAndFlush(user);
     log.info("Register succeeded: userId={} familyUnitId={}", user.getId(), family.getId());
 
     return toAuthResponse(user, family);
+  }
+
+  @Transactional(readOnly = true)
+  public void verifyResponsiblePin(CurrentUser currentUser, VerifyResponsiblePinRequest request) {
+    log.debug("Verifying responsible PIN for userId={} familyUnitId={}", currentUser.userId(), currentUser.familyUnitId());
+    AppUser user = appUserRepository.findById(currentUser.userId())
+        .filter(AppUser::isActive)
+        .filter(found -> found.getRole() == UserRole.RESPONSIBLE)
+        .orElseThrow(() -> new ForbiddenException(
+            "RESPONSIBLE_ACCESS_DENIED",
+            "Acesso do responsável não permitido."));
+
+    if (user.getResponsiblePinHash() == null || !passwordEncoder.matches(request.pin(), user.getResponsiblePinHash())) {
+      log.warn("Responsible PIN rejected for userId={} familyUnitId={}", currentUser.userId(), currentUser.familyUnitId());
+      throw new ForbiddenException("INVALID_RESPONSIBLE_PIN", "PIN inválido. Tente novamente.");
+    }
   }
 
   @Transactional(readOnly = true)

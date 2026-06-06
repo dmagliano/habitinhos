@@ -1,5 +1,5 @@
 import { apiRequest } from '../../api/client';
-import { AuthResponse, MeResponse } from '../../api/types';
+import { AuthResponse, MeResponse, RegisterRequest } from '../../api/types';
 
 import { AuthSession } from './authTypes';
 
@@ -20,6 +20,27 @@ export const authService = {
       user: response.user,
       family: response.family,
     };
+  },
+
+  async register(body: RegisterRequest): Promise<AuthSession> {
+    const response = await apiRequest<AuthResponse>('/auth/register', {
+      method: 'POST',
+      body,
+    });
+
+    return {
+      token: response.token,
+      user: response.user,
+      family: response.family,
+    };
+  },
+
+  async verifyResponsiblePin(token: string, pin: string): Promise<void> {
+    await apiRequest<void>('/auth/responsible-pin/verify', {
+      method: 'POST',
+      token,
+      body: { pin },
+    });
   },
 
   async me(token: string): Promise<AuthSession> {

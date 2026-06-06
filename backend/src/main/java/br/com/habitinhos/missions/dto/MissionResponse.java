@@ -11,6 +11,7 @@ public record MissionResponse(
     int coinValue,
     boolean requiresApproval,
     RecurrenceType recurrenceType,
+    int completionWindowDays,
     boolean active,
     Instant createdAt,
     Instant updatedAt) {

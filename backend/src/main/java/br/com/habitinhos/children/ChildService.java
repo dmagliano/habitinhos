@@ -52,13 +52,24 @@ public class ChildService {
 
   @Transactional(readOnly = true)
   public List<ChildResponse> list(CurrentUser currentUser) {
+    return list(currentUser, false);
+  }
+
+  @Transactional(readOnly = true)
+  public List<ChildResponse> list(CurrentUser currentUser, boolean includeInactive) {
     requireResponsible(currentUser);
-    List<ChildResponse> children = childProfileRepository
-        .findAllByFamilyUnitIdAndActiveTrueOrderByCreatedAtAsc(currentUser.familyUnitId())
+    var childrenQuery = includeInactive
+        ? childProfileRepository.findAllByFamilyUnitIdOrderByCreatedAtAsc(currentUser.familyUnitId())
+        : childProfileRepository.findAllByFamilyUnitIdAndActiveTrueOrderByCreatedAtAsc(currentUser.familyUnitId());
+    List<ChildResponse> children = childrenQuery
         .stream()
         .map(this::toResponse)
         .toList();
-    log.debug("Children listed: familyUnitId={} count={}", currentUser.familyUnitId(), children.size());
+    log.debug(
+        "Children listed: familyUnitId={} includeInactive={} count={}",
+        currentUser.familyUnitId(),
+        includeInactive,
+        children.size());
     return children;
   }
 

@@ -42,6 +42,7 @@ describe('ChildHomeScreen', () => {
       session,
       errorMessage: null,
       login: jest.fn(),
+      register: jest.fn(),
       logout: jest.fn(),
       retryRestore: jest.fn(),
     });
@@ -132,6 +133,7 @@ function mission(
     missionId: id.replace('mission', 'template'),
     childId: joaquim.id,
     status: 'PENDING',
+    scheduledDate: dueDate ?? '2026-06-01',
     dueDate,
     completedAt: null,
     approvedAt: null,
@@ -141,6 +143,8 @@ function mission(
     snapshotDescription: `${title} com carinho`,
     snapshotCoinValue: 5,
     snapshotRequiresApproval: false,
+    snapshotRecurrenceType: 'ONCE',
+    snapshotCompletionWindowDays: 0,
     createdAt,
     updatedAt: createdAt,
   };

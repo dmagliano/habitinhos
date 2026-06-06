@@ -1,6 +1,7 @@
 package br.com.habitinhos.missions;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.hamcrest.Matchers.nullValue;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
@@ -104,6 +105,82 @@ class MissionApprovalIntegrationTest extends AbstractIntegrationTest {
   }
 
   @Test
+  void responsibleCanReturnRejectedMissionToPendingWithVisibleReason() throws Exception {
+    String token = registerToken("responsavel@example.com", "Familia Demo");
+    UUID childId = createChild(token, new ChildRequest("Lia", 8, "star", null));
+    UUID assignedMissionId = assignMission(
+        token,
+        childId,
+        new MissionRequest("Guardar brinquedos", "Organizar caixas", 5, true, RecurrenceType.ONCE));
+    complete(token, assignedMissionId);
+
+    mockMvc.perform(post("/assigned-missions/{id}/reject", assignedMissionId)
+            .header("Authorization", "Bearer " + token)
+            .contentType(MediaType.APPLICATION_JSON)
+            .content(objectMapper.writeValueAsString(Map.of(
+                "reason", "Faltou guardar os carrinhos",
+                "returnToPending", true))))
+        .andExpect(status().isOk())
+        .andExpect(jsonPath("$.status").value("PENDING"))
+        .andExpect(jsonPath("$.rejectedAt").exists())
+        .andExpect(jsonPath("$.rejectionReason").value("Faltou guardar os carrinhos"))
+        .andExpect(jsonPath("$.completedAt").value(nullValue()));
+
+    AssignedMission returnedAssignment = assignedMissionRepository.findById(assignedMissionId).orElseThrow();
+    assertThat(returnedAssignment.getStatus()).isEqualTo(AssignedMissionStatus.PENDING);
+    assertThat(returnedAssignment.getRejectionReason()).isEqualTo("Faltou guardar os carrinhos");
+    assertThat(walletRepository.findByChildIdAndFamilyUnitId(childId, returnedAssignment.getFamilyUnitId())
+        .orElseThrow()
+        .getBalance()).isZero();
+    assertThat(coinTransactionRepository.findAll()).isEmpty();
+
+    mockMvc.perform(get("/children/{childId}/missions", childId)
+            .header("Authorization", "Bearer " + token))
+        .andExpect(status().isOk())
+        .andExpect(jsonPath("$[0].id").value(assignedMissionId.toString()))
+        .andExpect(jsonPath("$[0].status").value("PENDING"))
+        .andExpect(jsonPath("$[0].rejectionReason").value("Faltou guardar os carrinhos"));
+
+    mockMvc.perform(post("/assigned-missions/{id}/complete", assignedMissionId)
+            .header("Authorization", "Bearer " + token))
+        .andExpect(status().isOk())
+        .andExpect(jsonPath("$.status").value("AWAITING_APPROVAL"))
+        .andExpect(jsonPath("$.rejectionReason").value(nullValue()))
+        .andExpect(jsonPath("$.rejectedAt").value(nullValue()));
+  }
+
+  @Test
+  void approvingRecurringMissionCreatesNextPendingOccurrence() throws Exception {
+    String token = registerToken("responsavel@example.com", "Familia Demo");
+    UUID childId = createChild(token, new ChildRequest("Lia", 8, "star", null));
+    LocalDate assignedDueDate = LocalDate.now().plusDays(1);
+    UUID assignedMissionId = assignMission(
+        token,
+        childId,
+        new MissionRequest("Ler livro", "Ler por 20 minutos", 6, true, RecurrenceType.WEEKLY),
+        assignedDueDate);
+    complete(token, assignedMissionId);
+
+    mockMvc.perform(post("/assigned-missions/{id}/approve", assignedMissionId)
+            .header("Authorization", "Bearer " + token))
+        .andExpect(status().isOk())
+        .andExpect(jsonPath("$.status").value("COMPLETED"));
+
+    List<AssignedMission> assignments = assignedMissionRepository.findAll();
+    assertThat(assignments).hasSize(2);
+    AssignedMission nextAssignment = assignments.stream()
+        .filter(assignment -> !assignment.getId().equals(assignedMissionId))
+        .findFirst()
+        .orElseThrow();
+    assertThat(nextAssignment.getStatus()).isEqualTo(AssignedMissionStatus.PENDING);
+    assertThat(nextAssignment.getChildId()).isEqualTo(childId);
+    assertThat(nextAssignment.getMissionId()).isEqualTo(
+        assignedMissionRepository.findById(assignedMissionId).orElseThrow().getMissionId());
+    assertThat(nextAssignment.getDueDate()).isEqualTo(assignedDueDate.plusWeeks(1));
+    assertThat(nextAssignment.getSnapshotRecurrenceType()).isEqualTo(RecurrenceType.WEEKLY);
+  }
+
+  @Test
   void crossFamilyApprovalAndRejectionReturnSafeNotFound() throws Exception {
     String familyAToken = registerToken("responsavel.a@example.com", "Familia A");
     String familyBToken = registerToken("responsavel.b@example.com", "Familia B");
@@ -137,7 +214,7 @@ class MissionApprovalIntegrationTest extends AbstractIntegrationTest {
     String response = mockMvc.perform(post("/auth/register")
             .contentType(MediaType.APPLICATION_JSON)
             .content(objectMapper.writeValueAsString(
-                new RegisterRequest("Responsavel Demo", email, "senha123", familyName))))
+                new RegisterRequest("Responsavel Demo", email, "senha123", familyName, "1234"))))
         .andExpect(status().isCreated())
         .andReturn()
         .getResponse()
@@ -159,12 +236,16 @@ class MissionApprovalIntegrationTest extends AbstractIntegrationTest {
   }
 
   private UUID assignMission(String token, UUID childId, MissionRequest missionRequest) throws Exception {
+    return assignMission(token, childId, missionRequest, LocalDate.now());
+  }
+
+  private UUID assignMission(String token, UUID childId, MissionRequest missionRequest, LocalDate dueDate) throws Exception {
     UUID missionId = createMission(token, missionRequest);
     String response = mockMvc.perform(post("/missions/{id}/assign", missionId)
             .header("Authorization", "Bearer " + token)
             .contentType(MediaType.APPLICATION_JSON)
             .content(objectMapper.writeValueAsString(
-                new AssignMissionRequest(List.of(childId), LocalDate.of(2026, 6, 1)))))
+                new AssignMissionRequest(List.of(childId), dueDate))))
         .andExpect(status().isCreated())
         .andReturn()
         .getResponse()

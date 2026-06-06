@@ -2,14 +2,21 @@ import { NavigationContainer } from '@react-navigation/native';
 import { fireEvent, render, screen, waitFor } from '@testing-library/react-native';
 
 import { ChildResponse } from '../../../api/types';
+import { RootNavigator } from '../../../navigation/RootNavigator';
 import { useAuth } from '../../auth/AuthContext';
-import { FamilyHubScreen } from '../../family/FamilyHubScreen';
+import { authService } from '../../auth/authService';
 import { childService } from '../childService';
 import { ChildProfileSelectScreen } from '../ChildProfileSelectScreen';
 import { ChildTabsScreen } from '../ChildTabsScreen';
 
 jest.mock('../../auth/AuthContext', () => ({
   useAuth: jest.fn(),
+}));
+
+jest.mock('../../auth/authService', () => ({
+  authService: {
+    verifyResponsiblePin: jest.fn(),
+  },
 }));
 
 jest.mock('../childService', () => ({
@@ -61,6 +68,7 @@ describe('child navigation flow', () => {
       session,
       errorMessage: null,
       login: jest.fn(),
+      register: jest.fn(),
       logout,
       retryRestore: jest.fn(),
     });
@@ -71,15 +79,20 @@ describe('child navigation flow', () => {
       updatedAt: '2026-06-01T10:00:00Z',
     });
     jest.mocked(childService.listPendingMissions).mockResolvedValue([]);
+    jest.mocked(authService.verifyResponsiblePin).mockResolvedValue(undefined);
   });
 
-  it('opens backend child profile selection from FamilyHub', () => {
-    render(<FamilyHubScreen navigation={navigation} route={{ key: 'FamilyHub', name: 'FamilyHub' }} />);
+  it('starts authenticated sessions in child profile selection instead of the family hub', async () => {
+    jest.mocked(childService.listChildren).mockResolvedValue([joaquim]);
 
-    fireEvent.press(screen.getByRole('button', { name: 'Sou criança' }));
+    render(<RootNavigator />);
 
-    expect(navigate).toHaveBeenCalledWith('ChildProfileSelect');
-    expect(screen.getByText('Escolha um perfil para brincar com as missões da família.')).toBeOnTheScreen();
+    expect(await screen.findByText('Quem vai brincar agora?')).toBeOnTheScreen();
+    expect(screen.getByText('Escolha um perfil da família.')).toBeOnTheScreen();
+    expect(screen.queryByText('Escolha como quer entrar')).toBeNull();
+    expect(screen.queryByRole('button', { name: 'Sou responsável' })).toBeNull();
+    expect(screen.queryByRole('button', { name: 'Sou criança' })).toBeNull();
+    await waitFor(() => expect(childService.listChildren).toHaveBeenCalledWith('jwt-token'));
   });
 
   it('loads active children, requires selection, and navigates with selected child state', async () => {
@@ -96,6 +109,8 @@ describe('child navigation flow', () => {
     expect(screen.getByText('Escolha um perfil da família.')).toBeOnTheScreen();
     expect(await screen.findByText('Joaquim')).toBeOnTheScreen();
     expect(screen.queryByText('Ana')).toBeNull();
+    expect(screen.getByRole('button', { name: 'Gerenciar família' })).toBeOnTheScreen();
+    expect(screen.queryByRole('button', { name: 'Voltar para família' })).toBeNull();
     expect(childService.listChildren).toHaveBeenCalledWith('jwt-token');
 
     const enterButton = screen.getByRole('button', { name: 'Entrar no perfil' });
@@ -107,6 +122,35 @@ describe('child navigation flow', () => {
     fireEvent.press(enterButton);
 
     expect(navigate).toHaveBeenCalledWith('ChildTabs', { child: joaquim });
+    expect(navigate).not.toHaveBeenCalledWith('ResponsibleTabs');
+
+    fireEvent.press(screen.getByRole('button', { name: 'Gerenciar família' }));
+    expect(screen.getByText('PIN do responsável')).toBeOnTheScreen();
+    fireEvent.changeText(screen.getByLabelText('PIN do responsável'), '1234');
+    fireEvent.press(screen.getByRole('button', { name: 'Confirmar PIN' }));
+
+    await waitFor(() => expect(authService.verifyResponsiblePin).toHaveBeenCalledWith('jwt-token', '1234'));
+    expect(navigate).toHaveBeenCalledWith('ResponsibleTabs');
+  });
+
+  it('keeps the child selector open when the responsible PIN is rejected', async () => {
+    jest.mocked(childService.listChildren).mockResolvedValue([joaquim]);
+    jest.mocked(authService.verifyResponsiblePin).mockRejectedValueOnce(new Error('PIN inválido. Tente novamente.'));
+
+    render(
+      <ChildProfileSelectScreen
+        navigation={navigation}
+        route={{ key: 'ChildProfileSelect', name: 'ChildProfileSelect' }}
+      />,
+    );
+
+    expect(await screen.findByText('Joaquim')).toBeOnTheScreen();
+    fireEvent.press(screen.getByRole('button', { name: 'Gerenciar família' }));
+    fireEvent.changeText(screen.getByLabelText('PIN do responsável'), '9999');
+    fireEvent.press(screen.getByRole('button', { name: 'Confirmar PIN' }));
+
+    expect(await screen.findByText('PIN inválido. Tente novamente.')).toBeOnTheScreen();
+    expect(navigate).not.toHaveBeenCalledWith('ResponsibleTabs');
   });
 
   it('shows empty, error, and retry states without fake child data', async () => {
@@ -156,23 +200,26 @@ describe('child navigation flow', () => {
     expect(screen.getByRole('button', { name: 'Abrir Missões' })).toBeOnTheScreen();
     expect(screen.getByRole('button', { name: 'Abrir Recompensas' })).toBeOnTheScreen();
     expect(screen.getByRole('button', { name: 'Abrir Perfil' })).toBeOnTheScreen();
+    expect(screen.getByText('Recompensas').props.numberOfLines).toBe(1);
 
     fireEvent.press(screen.getByRole('button', { name: 'Abrir Perfil' }));
 
     expect(await screen.findByRole('button', { name: 'Trocar criança' })).toBeOnTheScreen();
     expect(screen.getByText('Joaquim')).toBeOnTheScreen();
     expect(screen.getByText('Família Silva')).toBeOnTheScreen();
-    expect(screen.getByRole('button', { name: 'Voltar para família' })).toBeOnTheScreen();
-    expect(screen.getByRole('button', { name: 'Sair da conta' })).toBeOnTheScreen();
+    expect(screen.getByRole('button', { name: 'Gerenciar família' })).toBeOnTheScreen();
+    expect(screen.queryByRole('button', { name: 'Sair da conta' })).toBeNull();
     expect(screen.queryByText('jwt-token')).toBeNull();
     expect(screen.queryByText('family-1')).toBeNull();
 
     fireEvent.press(screen.getByRole('button', { name: 'Trocar criança' }));
-    fireEvent.press(screen.getByRole('button', { name: 'Voltar para família' }));
-    fireEvent.press(screen.getByRole('button', { name: 'Sair da conta' }));
+    fireEvent.press(screen.getByRole('button', { name: 'Gerenciar família' }));
+    fireEvent.changeText(screen.getByLabelText('PIN do responsável'), '1234');
+    fireEvent.press(screen.getByRole('button', { name: 'Confirmar PIN' }));
 
     expect(navigate).toHaveBeenCalledWith('ChildProfileSelect');
-    expect(navigate).toHaveBeenCalledWith('FamilyHub');
-    expect(logout).toHaveBeenCalledTimes(1);
+    await waitFor(() => expect(authService.verifyResponsiblePin).toHaveBeenCalledWith('jwt-token', '1234'));
+    expect(navigate).toHaveBeenCalledWith('ResponsibleTabs', { activeChild: joaquim });
+    expect(logout).not.toHaveBeenCalled();
   });
 });

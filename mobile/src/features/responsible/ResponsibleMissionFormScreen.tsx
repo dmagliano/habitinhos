@@ -1,0 +1,550 @@
+import { NativeStackScreenProps } from '@react-navigation/native-stack';
+import { useCallback, useEffect, useMemo, useState } from 'react';
+import { ActivityIndicator, KeyboardAvoidingView, Platform, Pressable, StyleSheet, Text, TextInput, View } from 'react-native';
+import type { KeyboardAvoidingViewProps } from 'react-native';
+
+import { ChildResponse, MissionRequest, MissionResponse } from '../../api/types';
+import { AppHeader, AppScreen, Card, PrimaryButton, SecondaryButton } from '../../components';
+import { RootStackParamList } from '../../navigation/routes';
+import { colors, radius, spacing, typography } from '../../theme';
+import { useAuth } from '../auth/AuthContext';
+
+import { ChildPicker } from './components/ChildPicker';
+import { CoinValueControl } from './components/CoinValueControl';
+import { FeedbackBanner } from './components/FeedbackBanner';
+import { ResponsibleFormSection } from './components/ResponsibleFormSection';
+import { responsibleService } from './responsibleService';
+
+type Props = NativeStackScreenProps<RootStackParamList, 'ResponsibleMissionForm'>;
+type LoadState = 'loading' | 'ready' | 'error';
+type Step = 'details' | 'assignment';
+
+type FormErrors = {
+  title?: string;
+  coinValue?: string;
+  assignment?: string;
+};
+
+const RECURRENCE_OPTIONS: {
+  label: string;
+  helper: string;
+  value: MissionRequest['recurrenceType'];
+}[] = [
+  { label: 'Uma vez', helper: 'A missão termina depois de concluída.', value: 'ONCE' },
+  { label: 'Diária', helper: 'Cria uma nova ocorrência para cada dia.', value: 'DAILY' },
+  { label: 'Semanal', helper: 'Cria uma nova ocorrência para cada semana.', value: 'WEEKLY' },
+];
+
+const COMPLETION_WINDOW_OPTIONS = [
+  { label: 'Mesmo dia', value: 0 },
+  { label: '1 dia', value: 1 },
+  { label: '2 dias', value: 2 },
+  { label: '7 dias', value: 7 },
+];
+
+export function ResponsibleMissionFormScreen({ navigation, route }: Props) {
+  const { session } = useAuth();
+  const token = session?.token ?? null;
+  const missionId = route.params?.missionId;
+  const isEditMode = Boolean(missionId);
+  const [title, setTitle] = useState('');
+  const [description, setDescription] = useState('');
+  const [coinValue, setCoinValue] = useState('1');
+  const [requiresApproval, setRequiresApproval] = useState(true);
+  const [recurrenceType, setRecurrenceType] = useState<MissionRequest['recurrenceType']>('ONCE');
+  const [completionWindowDays, setCompletionWindowDays] = useState('0');
+  const [children, setChildren] = useState<ChildResponse[]>([]);
+  const [selectedChildIds, setSelectedChildIds] = useState<string[]>([]);
+  const [dueDate, setDueDate] = useState('');
+  const [createdMission, setCreatedMission] = useState<MissionResponse | null>(null);
+  const [step, setStep] = useState<Step>('details');
+  const [errors, setErrors] = useState<FormErrors>({});
+  const [feedback, setFeedback] = useState<string | null>(null);
+  const [loadState, setLoadState] = useState<LoadState>(isEditMode ? 'loading' : 'ready');
+  const [submitting, setSubmitting] = useState(false);
+
+  const parsedCoinValue = useMemo(() => Number.parseInt(coinValue, 10), [coinValue]);
+  const parsedCompletionWindowDays = useMemo(
+    () => Number.parseInt(completionWindowDays, 10),
+    [completionWindowDays],
+  );
+  const activeChildren = useMemo(() => children.filter((child) => child.active), [children]);
+
+  const loadInitialData = useCallback(async () => {
+    if (!token) {
+      setLoadState('error');
+      return;
+    }
+
+    setLoadState(isEditMode ? 'loading' : 'ready');
+
+    try {
+      const [childResponse, mission] = await Promise.all([
+        responsibleService.listChildren(token, false),
+        missionId ? responsibleService.getMission(token, missionId) : Promise.resolve(null),
+      ]);
+      setChildren(childResponse);
+
+      if (mission) {
+        setTitle(mission.title);
+        setDescription(mission.description ?? '');
+        setCoinValue(String(mission.coinValue));
+        setRequiresApproval(mission.requiresApproval);
+        setRecurrenceType(mission.recurrenceType === 'CUSTOM' ? 'ONCE' : mission.recurrenceType);
+        setCompletionWindowDays(String(mission.completionWindowDays));
+      }
+
+      setLoadState('ready');
+    } catch {
+      setLoadState('error');
+    }
+  }, [isEditMode, missionId, token]);
+
+  useEffect(() => {
+    const loadTimeout = setTimeout(() => {
+      void loadInitialData();
+    }, 0);
+
+    return () => clearTimeout(loadTimeout);
+  }, [loadInitialData]);
+
+  const missionBody = (): MissionRequest => ({
+    title: title.trim(),
+    description: description.trim(),
+    coinValue: parsedCoinValue,
+    requiresApproval,
+    recurrenceType,
+    completionWindowDays: isRecurringType(recurrenceType) && Number.isFinite(parsedCompletionWindowDays)
+        ? parsedCompletionWindowDays
+        : 0,
+  });
+
+  const validateDetails = () => {
+    const nextErrors: FormErrors = {};
+
+    if (!title.trim()) {
+      nextErrors.title = 'Informe o título da missão.';
+    }
+
+    if (!Number.isFinite(parsedCoinValue) || parsedCoinValue < 1) {
+      nextErrors.coinValue = 'Informe ao menos 1 moeda.';
+    }
+
+    setErrors(nextErrors);
+    return Object.keys(nextErrors).length === 0;
+  };
+
+  const handleSaveDetails = async () => {
+    if (!token || submitting || !validateDetails()) {
+      return;
+    }
+
+    setSubmitting(true);
+
+    try {
+      if (missionId) {
+        await responsibleService.updateMission(token, missionId, missionBody());
+        navigation.navigate('ResponsibleTabs');
+        return;
+      }
+
+      const mission = await responsibleService.createMission(token, missionBody());
+      setCreatedMission(mission);
+      setFeedback(null);
+      setStep('assignment');
+    } catch {
+      setErrors({ title: 'Não conseguimos salvar a missão. Revise as informações e tente novamente.' });
+    } finally {
+      setSubmitting(false);
+    }
+  };
+
+  const handleAssignCreatedMission = async () => {
+    if (!token || submitting || !createdMission) {
+      return;
+    }
+
+    if (selectedChildIds.length === 0) {
+      setErrors({ assignment: 'Selecione ao menos uma criança ou volte para atribuir depois.' });
+      return;
+    }
+
+    setSubmitting(true);
+
+    try {
+      await responsibleService.assignMission(token, createdMission.id, {
+        childIds: selectedChildIds,
+        dueDate: isRecurringType(createdMission.recurrenceType) ? null : normalizeDueDate(dueDate),
+      });
+      navigation.navigate('ResponsibleTabs');
+    } catch {
+      setFeedback('Missão criada. A atribuição ficou pendente; tente atribuir novamente.');
+    } finally {
+      setSubmitting(false);
+    }
+  };
+
+  const toggleChild = (childId: string) => {
+    setSelectedChildIds((current) =>
+      current.includes(childId) ? current.filter((selectedId) => selectedId !== childId) : [...current, childId],
+    );
+    setErrors((current) => ({ ...current, assignment: undefined }));
+  };
+
+  return (
+    <KeyboardAvoidingView behavior={getResponsibleMissionFormKeyboardBehavior(Platform.OS)} style={styles.keyboardAvoider}>
+      <AppScreen>
+        <AppHeader
+          action={<SecondaryButton label="Cancelar" onPress={navigation.goBack} />}
+          emoji="📋"
+          subtitle={isEditMode ? 'Alterações valem para novas atribuições.' : 'Crie a missão e escolha quem deve fazer.'}
+          title={isEditMode ? 'Editar missão' : 'Nova missão'}
+        />
+
+        {loadState === 'loading' ? (
+          <Card style={styles.stateCard} variant="highlight">
+            <ActivityIndicator color={colors.primaryDark} />
+            <Text style={styles.stateTitle}>Carregando missão...</Text>
+          </Card>
+        ) : null}
+
+        {loadState === 'error' ? (
+          <Card style={styles.stateCard}>
+            <Text style={styles.stateEmoji}>🛟</Text>
+            <Text style={styles.stateTitle}>Não conseguimos carregar esta missão.</Text>
+            <SecondaryButton label="Tentar novamente" onPress={loadInitialData} />
+          </Card>
+        ) : null}
+
+        {loadState === 'ready' && step === 'details' ? (
+          <MissionDetailsForm
+            coinValue={coinValue}
+            description={description}
+            errors={errors}
+            isEditMode={isEditMode}
+            onChangeCoinValue={setCoinValue}
+            onChangeDescription={setDescription}
+            onChangeTitle={setTitle}
+            onSubmit={handleSaveDetails}
+            requiresApproval={requiresApproval}
+            completionWindowDays={completionWindowDays}
+            setCompletionWindowDays={setCompletionWindowDays}
+            recurrenceType={recurrenceType}
+            setRecurrenceType={setRecurrenceType}
+            submitting={submitting}
+            title={title}
+            toggleApproval={() => setRequiresApproval((current) => !current)}
+          />
+        ) : null}
+
+        {loadState === 'ready' && step === 'assignment' && createdMission ? (
+          <Card style={styles.form}>
+            {feedback ? <FeedbackBanner title={feedback} variant="warning" /> : null}
+            <ResponsibleFormSection
+              helper={`${createdMission.title} · ${createdMission.coinValue} moedas · ${
+                createdMission.requiresApproval ? 'precisa de aprovação' : 'crédito automático'
+              }`}
+              title="Quem deve fazer?"
+            >
+              <ChildPicker childrenOptions={activeChildren} onToggle={toggleChild} selectedIds={selectedChildIds} />
+              {errors.assignment ? <Text style={styles.error}>{errors.assignment}</Text> : null}
+            </ResponsibleFormSection>
+
+            {isRecurringType(createdMission.recurrenceType) ? (
+              <ResponsibleFormSection
+                helper={formatCompletionWindowHelper(createdMission.completionWindowDays)}
+                title="Prazo da recorrência"
+              >
+                <Text style={styles.assignmentHelper}>
+                  A primeira ocorrência começa hoje e repete esse prazo em cada nova missão.
+                </Text>
+              </ResponsibleFormSection>
+            ) : (
+              <ResponsibleFormSection helper="Use o formato AAAA-MM-DD ou deixe em branco." title="Prazo opcional">
+                <TextInput
+                  accessibilityLabel="Data limite opcional"
+                  onChangeText={setDueDate}
+                  placeholder="2026-06-10"
+                  placeholderTextColor={colors.textMuted}
+                  style={styles.input}
+                  value={dueDate}
+                />
+              </ResponsibleFormSection>
+            )}
+
+            <PrimaryButton
+              disabled={submitting}
+              label={submitting ? 'Atribuindo missão' : 'Atribuir missão'}
+              loading={submitting}
+              onPress={handleAssignCreatedMission}
+            />
+            <SecondaryButton label="Atribuir depois" onPress={() => navigation.navigate('ResponsibleTabs')} />
+          </Card>
+        ) : null}
+      </AppScreen>
+    </KeyboardAvoidingView>
+  );
+}
+
+function MissionDetailsForm({
+  coinValue,
+  description,
+  errors,
+  isEditMode,
+  onChangeCoinValue,
+  onChangeDescription,
+  onChangeTitle,
+  onSubmit,
+  requiresApproval,
+  completionWindowDays,
+  setCompletionWindowDays,
+  recurrenceType,
+  setRecurrenceType,
+  submitting,
+  title,
+  toggleApproval,
+}: {
+  coinValue: string;
+  description: string;
+  errors: FormErrors;
+  isEditMode: boolean;
+  onChangeCoinValue: (value: string) => void;
+  onChangeDescription: (value: string) => void;
+  onChangeTitle: (value: string) => void;
+  onSubmit: () => void;
+  requiresApproval: boolean;
+  completionWindowDays: string;
+  setCompletionWindowDays: (value: string) => void;
+  recurrenceType: MissionRequest['recurrenceType'];
+  setRecurrenceType: (value: MissionRequest['recurrenceType']) => void;
+  submitting: boolean;
+  title: string;
+  toggleApproval: () => void;
+}) {
+  return (
+    <Card style={styles.form}>
+      {isEditMode ? (
+        <FeedbackBanner
+          message="Missões já atribuídas mantêm o registro anterior."
+          title="Alterações valem para novas atribuições."
+          variant="warning"
+        />
+      ) : null}
+
+      <ResponsibleFormSection helper="Use um título claro para a criança entender a tarefa." title="Dados da missão">
+        <View style={styles.field}>
+          <Text style={styles.label}>Título</Text>
+          <TextInput
+            accessibilityLabel="Título"
+            autoCapitalize="sentences"
+            onChangeText={onChangeTitle}
+            placeholder="Arrumar a cama"
+            placeholderTextColor={colors.textMuted}
+            style={styles.input}
+            value={title}
+          />
+          {errors.title ? <Text style={styles.error}>{errors.title}</Text> : null}
+        </View>
+
+        <View style={styles.field}>
+          <Text style={styles.label}>Descrição (opcional)</Text>
+          <TextInput
+            accessibilityLabel="Descrição opcional"
+            multiline
+            onChangeText={onChangeDescription}
+            placeholder="Detalhe o combinado da família"
+            placeholderTextColor={colors.textMuted}
+            style={[styles.input, styles.textArea]}
+            value={description}
+          />
+        </View>
+      </ResponsibleFormSection>
+
+      <ResponsibleFormSection helper="Defina quanto a criança ganha ao concluir." title="Moedas">
+        <CoinValueControl error={errors.coinValue} onChange={onChangeCoinValue} value={coinValue} />
+      </ResponsibleFormSection>
+
+      <ResponsibleFormSection
+        helper="Com aprovação, a criança envia para revisão. Sem aprovação, o crédito é automático."
+        title="Precisa aprovar antes de pagar moedas?"
+      >
+        <Pressable
+          accessibilityLabel="Alternar exigência de aprovação"
+          accessibilityRole="switch"
+          accessibilityState={{ checked: requiresApproval }}
+          onPress={toggleApproval}
+          style={[styles.approvalToggle, requiresApproval && styles.approvalToggleSelected]}
+        >
+          <Text style={styles.toggleTitle}>{requiresApproval ? 'Sim, revisar antes' : 'Não, creditar automático'}</Text>
+          <Text style={styles.toggleHelper}>
+            {requiresApproval
+              ? 'A missão entra na fila de aprovações.'
+              : 'As moedas entram quando a criança concluir.'}
+          </Text>
+        </Pressable>
+      </ResponsibleFormSection>
+
+      <ResponsibleFormSection
+        helper="Escolha se a missão aparece uma vez ou se tem novas ocorrências."
+        title="Recorrência"
+      >
+        <View style={styles.recurrenceList}>
+          {RECURRENCE_OPTIONS.map((option) => {
+            const selected = recurrenceType === option.value;
+            return (
+              <Pressable
+                accessibilityLabel={`Selecionar recorrência ${option.label}`}
+                accessibilityRole="button"
+                accessibilityState={{ selected }}
+                key={option.value}
+                onPress={() => setRecurrenceType(option.value)}
+                style={[styles.recurrenceOption, selected && styles.recurrenceOptionSelected]}
+              >
+                <Text style={styles.toggleTitle}>{option.label}</Text>
+                <Text style={styles.toggleHelper}>{option.helper}</Text>
+              </Pressable>
+            );
+          })}
+        </View>
+      </ResponsibleFormSection>
+
+      {isRecurringType(recurrenceType) ? (
+        <ResponsibleFormSection
+          helper="Esse prazo se repete em cada ocorrência da missão."
+          title="Prazo para concluir"
+        >
+          <View style={styles.recurrenceList}>
+            {COMPLETION_WINDOW_OPTIONS.map((option) => {
+              const selected = completionWindowDays === String(option.value);
+              return (
+                <Pressable
+                  accessibilityLabel={`Selecionar prazo ${option.label}`}
+                  accessibilityRole="button"
+                  accessibilityState={{ selected }}
+                  key={option.value}
+                  onPress={() => setCompletionWindowDays(String(option.value))}
+                  style={[styles.recurrenceOption, selected && styles.recurrenceOptionSelected]}
+                >
+                  <Text style={styles.toggleTitle}>{option.label}</Text>
+                </Pressable>
+              );
+            })}
+          </View>
+        </ResponsibleFormSection>
+      ) : null}
+
+      <PrimaryButton
+        disabled={submitting}
+        label={submitting ? 'Salvando missão' : 'Salvar missão'}
+        loading={submitting}
+        onPress={onSubmit}
+      />
+    </Card>
+  );
+}
+
+function normalizeDueDate(value: string): string | null {
+  const trimmed = value.trim();
+  return trimmed.length > 0 ? trimmed : null;
+}
+
+function isRecurringType(recurrenceType: MissionRequest['recurrenceType']): boolean {
+  return recurrenceType === 'DAILY' || recurrenceType === 'WEEKLY';
+}
+
+function formatCompletionWindowHelper(completionWindowDays: number): string {
+  if (completionWindowDays === 0) {
+    return 'A criança deve concluir no mesmo dia da ocorrência.';
+  }
+
+  return `A criança terá ${completionWindowDays} ${completionWindowDays === 1 ? 'dia' : 'dias'} para concluir.`;
+}
+
+export function getResponsibleMissionFormKeyboardBehavior(platformOS: string): KeyboardAvoidingViewProps['behavior'] {
+  return platformOS === 'ios' ? 'padding' : 'height';
+}
+
+const styles = StyleSheet.create({
+  approvalToggle: {
+    backgroundColor: colors.surface,
+    borderColor: colors.border,
+    borderRadius: radius.md,
+    borderWidth: 1,
+    gap: spacing.xs,
+    padding: spacing.md,
+  },
+  approvalToggleSelected: {
+    backgroundColor: colors.primarySoft,
+    borderColor: colors.primary,
+  },
+  error: {
+    ...typography.body,
+    color: colors.error,
+  },
+  field: {
+    gap: spacing.xs,
+  },
+  form: {
+    gap: spacing.lg,
+  },
+  assignmentHelper: {
+    ...typography.body,
+    color: colors.textSecondary,
+  },
+  input: {
+    ...typography.body,
+    backgroundColor: colors.surface,
+    borderColor: colors.border,
+    borderRadius: radius.md,
+    borderWidth: 1,
+    color: colors.textPrimary,
+    minHeight: 56,
+    paddingHorizontal: spacing.md,
+  },
+  keyboardAvoider: {
+    flex: 1,
+  },
+  label: {
+    ...typography.label,
+    color: colors.textSecondary,
+  },
+  recurrenceList: {
+    gap: spacing.sm,
+  },
+  recurrenceOption: {
+    backgroundColor: colors.surface,
+    borderColor: colors.border,
+    borderRadius: radius.md,
+    borderWidth: 1,
+    gap: spacing.xs,
+    padding: spacing.md,
+  },
+  recurrenceOptionSelected: {
+    backgroundColor: colors.primarySoft,
+    borderColor: colors.primary,
+  },
+  stateCard: {
+    alignItems: 'flex-start',
+    gap: spacing.md,
+  },
+  stateEmoji: {
+    fontSize: 28,
+  },
+  stateTitle: {
+    ...typography.heading,
+    color: colors.textPrimary,
+  },
+  textArea: {
+    minHeight: 96,
+    paddingTop: spacing.md,
+    textAlignVertical: 'top',
+  },
+  toggleHelper: {
+    ...typography.body,
+    color: colors.textSecondary,
+  },
+  toggleTitle: {
+    ...typography.label,
+    color: colors.textPrimary,
+  },
+});

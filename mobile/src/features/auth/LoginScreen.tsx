@@ -1,5 +1,14 @@
 import { useState } from 'react';
-import { KeyboardAvoidingView, Platform, StyleSheet, Text, TextInput, View } from 'react-native';
+import {
+  KeyboardAvoidingView,
+  Platform,
+  Pressable,
+  StyleSheet,
+  Text,
+  TextInput,
+  View,
+} from 'react-native';
+import type { KeyboardAvoidingViewProps } from 'react-native';
 
 import { AppScreen, Card, PrimaryButton, SecondaryButton, StatusBadge } from '../../components';
 import { colors, radius, spacing, typography } from '../../theme';
@@ -10,6 +19,7 @@ export function LoginScreen() {
   const { errorMessage, login, retryRestore, status } = useAuth();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [rememberSession, setRememberSession] = useState(false);
   const isLoading = status === 'loading';
   const showRetry = status === 'error' && Boolean(errorMessage);
 
@@ -18,63 +28,92 @@ export function LoginScreen() {
       return;
     }
 
-    await login(email.trim(), password);
+    await login(email.trim(), password, rememberSession);
   }
 
   return (
-    <AppScreen>
-      <KeyboardAvoidingView behavior={Platform.OS === 'ios' ? 'padding' : undefined} style={styles.keyboard}>
-        <View style={styles.hero}>
-          <Text style={styles.brand}>Habitinhos</Text>
-          <Text style={styles.headline}>Transforme tarefas em pequenas conquistas</Text>
-          <Text style={styles.supporting}>Entre para acompanhar missões, moedas e recompensas da família.</Text>
+    <KeyboardAvoidingView behavior={getLoginKeyboardBehavior(Platform.OS)} style={styles.keyboardAvoider}>
+      <AppScreen>
+        <View style={styles.content}>
+          <View style={styles.hero}>
+            <Text style={styles.brand}>Habitinhos</Text>
+            <Text style={styles.headline}>Transforme tarefas em pequenas conquistas</Text>
+            <Text style={styles.supporting}>Entre para acompanhar missões, moedas e recompensas da família.</Text>
+          </View>
+
+          <Card style={styles.form}>
+            <View style={styles.field}>
+              <Text style={styles.label}>E-mail</Text>
+              <TextInput
+                accessibilityLabel="E-mail"
+                autoCapitalize="none"
+                keyboardType="email-address"
+                onChangeText={setEmail}
+                placeholder="voce@email.com"
+                placeholderTextColor={colors.textMuted}
+                style={styles.input}
+                value={email}
+              />
+            </View>
+
+            <View style={styles.field}>
+              <Text style={styles.label}>Senha</Text>
+              <TextInput
+                accessibilityLabel="Senha"
+                onChangeText={setPassword}
+                placeholder="Sua senha"
+                placeholderTextColor={colors.textMuted}
+                secureTextEntry
+                style={styles.input}
+                value={password}
+              />
+            </View>
+
+            <Pressable
+              accessibilityLabel="Mantenha-me conectado"
+              accessibilityRole="checkbox"
+              accessibilityState={{ checked: rememberSession }}
+              disabled={isLoading}
+              onPress={() => setRememberSession((current) => !current)}
+              style={({ pressed }) => [
+                styles.rememberRow,
+                pressed && styles.rememberRowPressed,
+                isLoading && styles.rememberRowDisabled,
+              ]}
+            >
+              <View style={[styles.checkbox, rememberSession && styles.checkboxChecked]}>
+                {rememberSession ? <Text style={styles.checkboxMark}>✓</Text> : null}
+              </View>
+              <Text style={styles.rememberLabel}>Mantenha-me conectado</Text>
+            </Pressable>
+
+            {errorMessage ? <Text style={styles.error}>{errorMessage}</Text> : null}
+
+            <PrimaryButton
+              label={isLoading ? 'Entrando...' : 'Entrar na conta'}
+              loading={isLoading}
+              onPress={handleSubmit}
+            />
+
+            {showRetry ? <SecondaryButton label="Tentar novamente" onPress={retryRestore} /> : null}
+          </Card>
+
+          <StatusBadge emoji="🪙" label="Missões, moedas e recompensas em família" variant="selected" />
         </View>
-
-        <Card style={styles.form}>
-          <View style={styles.field}>
-            <Text style={styles.label}>E-mail</Text>
-            <TextInput
-              accessibilityLabel="E-mail"
-              autoCapitalize="none"
-              keyboardType="email-address"
-              onChangeText={setEmail}
-              placeholder="voce@email.com"
-              style={styles.input}
-              value={email}
-            />
-          </View>
-
-          <View style={styles.field}>
-            <Text style={styles.label}>Senha</Text>
-            <TextInput
-              accessibilityLabel="Senha"
-              onChangeText={setPassword}
-              placeholder="Sua senha"
-              secureTextEntry
-              style={styles.input}
-              value={password}
-            />
-          </View>
-
-          {errorMessage ? <Text style={styles.error}>{errorMessage}</Text> : null}
-
-          <PrimaryButton
-            label={isLoading ? 'Entrando...' : 'Entrar na conta'}
-            loading={isLoading}
-            onPress={handleSubmit}
-          />
-
-          {showRetry ? <SecondaryButton label="Tentar novamente" onPress={retryRestore} /> : null}
-        </Card>
-
-        <StatusBadge emoji="🪙" label="Missões, moedas e recompensas em família" variant="selected" />
-      </KeyboardAvoidingView>
-    </AppScreen>
+      </AppScreen>
+    </KeyboardAvoidingView>
   );
 }
 
+export function getLoginKeyboardBehavior(platformOS: string): KeyboardAvoidingViewProps['behavior'] {
+  return platformOS === 'ios' ? 'padding' : 'height';
+}
+
 const styles = StyleSheet.create({
-  keyboard: {
+  keyboardAvoider: {
+    flex: 1,
+  },
+  content: {
     flex: 1,
     gap: spacing.lg,
     justifyContent: 'center',
@@ -115,6 +154,41 @@ const styles = StyleSheet.create({
     color: colors.textPrimary,
     minHeight: 48,
     paddingHorizontal: spacing.md,
+  },
+  rememberRow: {
+    alignItems: 'center',
+    borderRadius: radius.md,
+    flexDirection: 'row',
+    gap: spacing.sm,
+    minHeight: 48,
+  },
+  rememberRowPressed: {
+    opacity: 0.82,
+  },
+  rememberRowDisabled: {
+    opacity: 0.56,
+  },
+  checkbox: {
+    alignItems: 'center',
+    borderColor: colors.borderStrong,
+    borderRadius: radius.sm,
+    borderWidth: 2,
+    height: 24,
+    justifyContent: 'center',
+    width: 24,
+  },
+  checkboxChecked: {
+    backgroundColor: colors.primary,
+    borderColor: colors.primary,
+  },
+  checkboxMark: {
+    ...typography.label,
+    color: colors.textInverse,
+    lineHeight: 20,
+  },
+  rememberLabel: {
+    ...typography.body,
+    color: colors.textSecondary,
   },
   error: {
     ...typography.body,

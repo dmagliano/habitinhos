@@ -71,6 +71,45 @@ class RewardIntegrationTest extends AbstractIntegrationTest {
   }
 
   @Test
+  void listRewardsCanIncludeInactiveWithoutLeakingOtherFamilies() throws Exception {
+    String familyAToken = registerToken("responsavel.a@example.com", "Familia A");
+    String familyBToken = registerToken("responsavel.b@example.com", "Familia B");
+
+    UUID activeRewardId = createReward(
+        familyAToken,
+        new CreateRewardRequest("Cinema", "Sessão de sábado", 20));
+    UUID inactiveRewardId = createReward(
+        familyAToken,
+        new CreateRewardRequest("Sorvete", "Casquinha", 8));
+    createReward(
+        familyBToken,
+        new CreateRewardRequest("Recompensa de outra família", "Não deve aparecer", 15));
+
+    mockMvc.perform(patch("/rewards/{id}/deactivate", inactiveRewardId)
+            .header("Authorization", "Bearer " + familyAToken))
+        .andExpect(status().isOk())
+        .andExpect(jsonPath("$.active").value(false));
+
+    mockMvc.perform(get("/rewards")
+            .header("Authorization", "Bearer " + familyAToken))
+        .andExpect(status().isOk())
+        .andExpect(jsonPath("$").isArray())
+        .andExpect(jsonPath("$.length()").value(1))
+        .andExpect(jsonPath("$[0].id").value(activeRewardId.toString()))
+        .andExpect(jsonPath("$[0].active").value(true));
+
+    mockMvc.perform(get("/rewards")
+            .queryParam("includeInactive", "true")
+            .header("Authorization", "Bearer " + familyAToken))
+        .andExpect(status().isOk())
+        .andExpect(jsonPath("$.length()").value(2))
+        .andExpect(jsonPath("$[0].id").value(activeRewardId.toString()))
+        .andExpect(jsonPath("$[0].active").value(true))
+        .andExpect(jsonPath("$[1].id").value(inactiveRewardId.toString()))
+        .andExpect(jsonPath("$[1].active").value(false));
+  }
+
+  @Test
   void createRewardRejectsNonPositiveCost() throws Exception {
     String token = registerToken("responsavel@example.com", "Familia Demo");
 
@@ -115,7 +154,7 @@ class RewardIntegrationTest extends AbstractIntegrationTest {
     String response = mockMvc.perform(post("/auth/register")
             .contentType(MediaType.APPLICATION_JSON)
             .content(objectMapper.writeValueAsString(
-                new RegisterRequest("Responsavel Demo", email, "senha123", familyName))))
+                new RegisterRequest("Responsavel Demo", email, "senha123", familyName, "1234"))))
         .andExpect(status().isCreated())
         .andReturn()
         .getResponse()

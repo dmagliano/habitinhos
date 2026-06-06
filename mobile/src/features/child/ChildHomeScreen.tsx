@@ -96,17 +96,17 @@ export function ChildHomeScreen({ child, onOpenMissions }: ChildHomeScreenProps)
             <View style={styles.missionList}>
               {visibleMissions.map((mission) => (
                 <Card key={mission.id} style={styles.missionCard}>
-                  <View style={styles.missionHeader}>
+                  <View style={styles.missionRewardRow}>
                     <Text style={styles.missionEmoji}>✅</Text>
-                    <View style={styles.missionCopy}>
-                      <Text style={styles.missionTitle} testID="home-mission-title">
-                        {mission.snapshotTitle}
-                      </Text>
-                      {mission.snapshotDescription ? (
-                        <Text style={styles.missionDescription}>{mission.snapshotDescription}</Text>
-                      ) : null}
-                    </View>
                     <CoinBadge amount={mission.snapshotCoinValue} />
+                  </View>
+                  <View style={styles.missionCopy}>
+                    <Text style={styles.missionTitle} testID="home-mission-title">
+                      {mission.snapshotTitle}
+                    </Text>
+                    {mission.snapshotDescription ? (
+                      <Text style={styles.missionDescription}>{mission.snapshotDescription}</Text>
+                    ) : null}
                   </View>
                   {mission.dueDate ? (
                     <Text style={styles.missionDueDate}>Para {formatDate(mission.dueDate)}</Text>
@@ -232,16 +232,15 @@ const styles = StyleSheet.create({
   missionCard: {
     gap: spacing.sm,
   },
-  missionHeader: {
-    alignItems: 'flex-start',
+  missionRewardRow: {
+    alignItems: 'center',
     flexDirection: 'row',
-    gap: spacing.md,
+    justifyContent: 'space-between',
   },
   missionEmoji: {
     fontSize: 24,
   },
   missionCopy: {
-    flex: 1,
     gap: spacing.xs,
   },
   missionTitle: {

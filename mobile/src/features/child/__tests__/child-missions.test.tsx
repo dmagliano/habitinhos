@@ -45,6 +45,7 @@ describe('ChildMissionsScreen', () => {
       session,
       errorMessage: null,
       login: jest.fn(),
+      register: jest.fn(),
       logout: jest.fn(),
       retryRestore: jest.fn(),
     });
@@ -77,6 +78,20 @@ describe('ChildMissionsScreen', () => {
     expect(onOpenMissionDetail).toHaveBeenCalledWith(mission);
     expect(childService.getWallet).toHaveBeenCalledWith('jwt-token', 'child-1');
     expect(childService.listPendingMissions).toHaveBeenCalledWith('jwt-token', 'child-1');
+  });
+
+  it('shows responsible rejection reason for missions returned to pending', async () => {
+    const mission = assignedMission({
+      id: 'assigned-returned',
+      title: 'Guardar brinquedos',
+      rejectionReason: 'Faltou guardar os carrinhos',
+    });
+    mockInitialLoad(wallet(12), [mission]);
+
+    render(<ChildMissionsScreen child={child} onOpenMissionDetail={onOpenMissionDetail} />);
+
+    expect(await screen.findByText('Guardar brinquedos')).toBeOnTheScreen();
+    expect(screen.getByText('Responsável pediu ajuste: Faltou guardar os carrinhos')).toBeOnTheScreen();
   });
 
   it('blocks duplicate submits, disables only the pressed mission, then shows auto-credit feedback and refreshed balance', async () => {
@@ -174,6 +189,7 @@ describe('ChildMissionDetailScreen', () => {
       session,
       errorMessage: null,
       login: jest.fn(),
+      register: jest.fn(),
       logout: jest.fn(),
       retryRestore: jest.fn(),
     });
@@ -187,6 +203,7 @@ describe('ChildMissionDetailScreen', () => {
       coinValue: 6,
       dueDate: '2026-06-04',
       requiresApproval: true,
+      rejectionReason: 'Molhe também os vasos pequenos',
     });
     jest.mocked(childService.completeMission).mockResolvedValue({
       ...mission,
@@ -209,6 +226,8 @@ describe('ChildMissionDetailScreen', () => {
     expect(screen.getByText('6 moedas')).toBeOnTheScreen();
     expect(screen.getByText('Para 04/06')).toBeOnTheScreen();
     expect(screen.getByText('Um responsável vai revisar antes das moedas entrarem.')).toBeOnTheScreen();
+    expect(screen.getByText('Responsável pediu ajuste')).toBeOnTheScreen();
+    expect(screen.getByText('Molhe também os vasos pequenos')).toBeOnTheScreen();
 
     fireEvent.press(screen.getByRole('button', { name: 'Marcar como concluída' }));
     fireEvent.press(screen.getByRole('button', { name: 'Marcar como concluída' }));
@@ -283,6 +302,7 @@ function assignedMission({
   coinValue = 5,
   dueDate = null,
   requiresApproval = false,
+  rejectionReason = null,
 }: {
   id: string;
   title: string;
@@ -290,21 +310,25 @@ function assignedMission({
   coinValue?: number;
   dueDate?: string | null;
   requiresApproval?: boolean;
+  rejectionReason?: string | null;
 }): AssignedMissionResponse {
   return {
     id,
     missionId: id.replace('assigned', 'mission'),
     childId: child.id,
     status: 'PENDING',
+    scheduledDate: '2026-06-01',
     dueDate,
     completedAt: null,
     approvedAt: null,
     rejectedAt: null,
-    rejectionReason: null,
+    rejectionReason,
     snapshotTitle: title,
     snapshotDescription: description,
     snapshotCoinValue: coinValue,
     snapshotRequiresApproval: requiresApproval,
+    snapshotRecurrenceType: 'ONCE',
+    snapshotCompletionWindowDays: 0,
     createdAt: '2026-06-01T10:00:00Z',
     updatedAt: '2026-06-01T10:00:00Z',
   };
