@@ -5,9 +5,9 @@ spring:
   application:
     name: habitinhos-backend
   datasource:
-    url: ${SPRING_DATASOURCE_URL:${DATABASE_URL:jdbc:postgresql://localhost:5432/habitinhos}}
-    username: ${SPRING_DATASOURCE_USERNAME:${DATABASE_USERNAME:habitinhos}}
-    password: ${SPRING_DATASOURCE_PASSWORD:${DATABASE_PASSWORD:habitinhos}}
+    url: ${SPRING_DATASOURCE_URL:${DATABASE_URL}}
+    username: ${SPRING_DATASOURCE_USERNAME:${DATABASE_USERNAME}}
+    password: ${SPRING_DATASOURCE_PASSWORD:${DATABASE_PASSWORD}}
   flyway:
     enabled: true
   jpa:
@@ -34,4 +34,4 @@ habitinhos:
     jwt:
       issuer: ${HABITINHOS_JWT_ISSUER:habitinhos}
       expiration-minutes: ${HABITINHOS_JWT_EXPIRATION_MINUTES:120}
-      secret: ${HABITINHOS_JWT_SECRET:dev-only-change-this-secret-with-at-least-32-bytes}
+      secret: ${HABITINHOS_JWT_SECRET}
