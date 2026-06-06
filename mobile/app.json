@@ -12,10 +12,16 @@
       "adaptiveIcon": {
         "backgroundColor": "#F5FBF8"
       },
+      "package": "com.habitinhos.app",
       "predictiveBackGestureEnabled": false
     },
     "plugins": [
       "expo-secure-store"
-    ]
+    ],
+    "extra": {
+      "eas": {
+        "projectId": "cf972c35-6fd4-4e0e-896e-2add2af9ab59"
+      }
+    }
   }
 }
