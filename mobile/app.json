@@ -4,6 +4,7 @@
     "slug": "habitinhos",
     "version": "0.0.1",
     "orientation": "portrait",
+    "icon": "./assets/icon.png",
     "userInterfaceStyle": "light",
     "ios": {
       "supportsTablet": true
@@ -11,8 +12,11 @@
     "android": {
       "package": "com.habitinhos.app",
       "versionCode": 1,
+      "icon": "./assets/icon.png",
       "adaptiveIcon": {
-        "backgroundColor": "#F5FBF8"
+        "foregroundImage": "./assets/adaptive-icon.png",
+        "backgroundColor": "#F5FBF8",
+        "monochromeImage": "./assets/adaptive-icon-monochrome.png"
       },
       "predictiveBackGestureEnabled": false
     },
