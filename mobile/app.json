@@ -4,20 +4,35 @@
     "slug": "habitinhos",
     "version": "0.0.1",
     "orientation": "portrait",
+    "icon": "./assets/icon.png",
     "userInterfaceStyle": "light",
     "ios": {
       "supportsTablet": true
     },
     "android": {
-      "package": "br.com.habitinhos.app",
+      "package": "com.habitinhos.app",
       "versionCode": 1,
+      "icon": "./assets/icon.png",
       "adaptiveIcon": {
-        "backgroundColor": "#F5FBF8"
+        "foregroundImage": "./assets/adaptive-icon.png",
+        "backgroundColor": "#F5FBF8",
+        "monochromeImage": "./assets/adaptive-icon-monochrome.png"
       },
       "predictiveBackGestureEnabled": false
     },
     "plugins": [
       "expo-secure-store"
-    ]
+    ],
+    "extra": {
+      "eas": {
+        "projectId": "cf972c35-6fd4-4e0e-896e-2add2af9ab59"
+      }
+    },
+    "runtimeVersion": {
+      "policy": "appVersion"
+    },
+    "updates": {
+      "url": "https://u.expo.dev/cf972c35-6fd4-4e0e-896e-2add2af9ab59"
+    }
   }
 }
