@@ -19,7 +19,9 @@ jest.mock('../childService', () => ({
 }));
 
 const onOpenMissionDetail = jest.fn();
+const onMissionCompleted = jest.fn();
 const goBack = jest.fn();
+const navigate = jest.fn();
 
 const session = {
   token: 'jwt-token',
@@ -46,6 +48,7 @@ describe('ChildMissionsScreen', () => {
       errorMessage: null,
       login: jest.fn(),
       register: jest.fn(),
+      deleteAccount: jest.fn(),
       logout: jest.fn(),
       retryRestore: jest.fn(),
     });
@@ -61,7 +64,13 @@ describe('ChildMissionsScreen', () => {
     });
     mockInitialLoad(wallet(12), [mission]);
 
-    render(<ChildMissionsScreen child={child} onOpenMissionDetail={onOpenMissionDetail} />);
+    render(
+      <ChildMissionsScreen
+        child={child}
+        onMissionCompleted={onMissionCompleted}
+        onOpenMissionDetail={onOpenMissionDetail}
+      />,
+    );
 
     expect(await screen.findByText('Suas missões')).toBeOnTheScreen();
     expect(await screen.findByText('12 moedas')).toBeOnTheScreen();
@@ -88,7 +97,13 @@ describe('ChildMissionsScreen', () => {
     });
     mockInitialLoad(wallet(12), [mission]);
 
-    render(<ChildMissionsScreen child={child} onOpenMissionDetail={onOpenMissionDetail} />);
+    render(
+      <ChildMissionsScreen
+        child={child}
+        onMissionCompleted={onMissionCompleted}
+        onOpenMissionDetail={onOpenMissionDetail}
+      />,
+    );
 
     expect(await screen.findByText('Guardar brinquedos')).toBeOnTheScreen();
     expect(screen.getByText('Responsável pediu ajuste: Faltou guardar os carrinhos')).toBeOnTheScreen();
@@ -109,7 +124,13 @@ describe('ChildMissionsScreen', () => {
     jest.mocked(childService.getWallet).mockResolvedValueOnce(wallet(15));
     jest.mocked(childService.listPendingMissions).mockResolvedValueOnce([otherMission]);
 
-    render(<ChildMissionsScreen child={child} onOpenMissionDetail={onOpenMissionDetail} />);
+    render(
+      <ChildMissionsScreen
+        child={child}
+        onMissionCompleted={onMissionCompleted}
+        onOpenMissionDetail={onOpenMissionDetail}
+      />,
+    );
 
     const completeButton = await screen.findByRole('button', {
       name: 'Concluir missão Arrumar a cama',
@@ -131,6 +152,27 @@ describe('ChildMissionsScreen', () => {
     expect(screen.getByText('Saldo atualizado: 15 moedas')).toBeOnTheScreen();
     expect(childService.getWallet).toHaveBeenCalledTimes(2);
     expect(childService.listPendingMissions).toHaveBeenCalledTimes(2);
+    expect(onMissionCompleted).toHaveBeenCalledWith('assigned-1');
+    expect(screen.queryByText('Arrumar a cama')).toBeNull();
+    expect(screen.getByText('Separar uniforme')).toBeOnTheScreen();
+  });
+
+  it('hides a completed mission when returning from the detail screen', async () => {
+    const mission = assignedMission({ id: 'assigned-1', title: 'Arrumar a cama' });
+    const otherMission = assignedMission({ id: 'assigned-2', title: 'Separar uniforme' });
+    mockInitialLoad(wallet(10), [mission, otherMission]);
+
+    render(
+      <ChildMissionsScreen
+        child={child}
+        completedMissionIds={['assigned-1']}
+        onOpenMissionDetail={onOpenMissionDetail}
+      />,
+    );
+
+    expect(await screen.findByText('Separar uniforme')).toBeOnTheScreen();
+    expect(screen.queryByText('Arrumar a cama')).toBeNull();
+    expect(screen.getByText('Você tem 1 missão pendente para hoje.')).toBeOnTheScreen();
   });
 
   it('shows approval-required feedback without implying coins were credited', async () => {
@@ -190,6 +232,7 @@ describe('ChildMissionDetailScreen', () => {
       errorMessage: null,
       login: jest.fn(),
       register: jest.fn(),
+      deleteAccount: jest.fn(),
       logout: jest.fn(),
       retryRestore: jest.fn(),
     });
@@ -215,7 +258,7 @@ describe('ChildMissionDetailScreen', () => {
 
     render(
       <ChildMissionDetailScreen
-        navigation={{ goBack } as never}
+        navigation={{ goBack, navigate } as never}
         route={{ key: 'ChildMissionDetail', name: 'ChildMissionDetail', params: { child, mission } }}
       />,
     );
@@ -235,9 +278,11 @@ describe('ChildMissionDetailScreen', () => {
     expect(childService.completeMission).toHaveBeenCalledTimes(1);
     expect(await screen.findByText('Missão enviada! Um responsável vai revisar.')).toBeOnTheScreen();
     expect(screen.queryByText(/\+6 moedas/)).toBeNull();
+    expect(screen.queryByRole('button', { name: 'Marcar como concluída' })).toBeNull();
 
     fireEvent.press(screen.getByRole('button', { name: 'Voltar' }));
-    expect(goBack).toHaveBeenCalledTimes(1);
+    expect(navigate).toHaveBeenCalledWith('ChildTabs', { child, completedMissionId: 'assigned-detail' });
+    expect(goBack).not.toHaveBeenCalled();
   });
 
   it('keeps completed detail feedback when post-completion refresh fails', async () => {
@@ -256,7 +301,7 @@ describe('ChildMissionDetailScreen', () => {
 
     render(
       <ChildMissionDetailScreen
-        navigation={{ goBack } as never}
+        navigation={{ goBack, navigate } as never}
         route={{ key: 'ChildMissionDetail', name: 'ChildMissionDetail', params: { child, mission } }}
       />,
     );

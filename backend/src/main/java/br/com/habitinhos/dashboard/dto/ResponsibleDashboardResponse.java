@@ -1,5 +1,6 @@
 package br.com.habitinhos.dashboard.dto;
 
+import br.com.habitinhos.missions.AssignedMissionStatus;
 import br.com.habitinhos.rewards.RewardRedemptionStatus;
 import java.time.Instant;
 import java.util.List;
@@ -17,7 +18,8 @@ public record ResponsibleDashboardResponse(
       Integer age,
       String avatarKey,
       int balance,
-      ResponsibleDashboardMissionCounts missionCounts) {
+      ResponsibleDashboardMissionCounts missionCounts,
+      List<ResponsibleDashboardMissionPreview> missionPreviews) {
   }
 
   public record ResponsibleDashboardMissionCounts(
@@ -26,6 +28,12 @@ public record ResponsibleDashboardResponse(
       int COMPLETED,
       int REJECTED,
       int CANCELLED) {
+  }
+
+  public record ResponsibleDashboardMissionPreview(
+      UUID id,
+      String title,
+      AssignedMissionStatus status) {
   }
 
   public record ResponsibleDashboardApproval(

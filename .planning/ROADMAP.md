@@ -14,6 +14,7 @@ Habitinhos will be built as a monorepo MVP in seven phases: backend foundation, 
 - [x] **Phase 6: Fluxo do responsável** - Build dashboard, children, missions, assignments, rewards, approvals, and child detail views. (completed 2026-06-03)
 - [x] **Phase 06.1: Ajustes pós-UAT dos fluxos de entrada, troca de modo e entrega de resgates** - Refine unauthenticated entry, login/register/session persistence, child-first mode switching, dashboard links, and delivered reward redemptions. (INSERTED) (completed 2026-06-03)
 - [x] **Phase 06.2: Ajustes pós-UAT de cadastro, seletor de crianças e navegação responsável** - Remove registration stale-session copy, clarify child creation copy, eliminate entry-mode selection, add family-management access from child selector, and add responsible-home return to children. (INSERTED) (completed 2026-06-04)
+- [x] **Phase 06.3: Recuperação de acesso e exclusão de conta** - Add password reset by email, responsible PIN reset by email, and deliberate account deletion from API through mobile UI. (INSERTED) (completed 2026-06-08)
 - [ ] **Phase 7: Polimento para demonstração do TCC** - Add demo seeds, visual polish, README, architecture docs, presentation script, and final testing.
 
 ## Phase Details
@@ -257,10 +258,37 @@ Plans:
 
 - [x] 06.2-01: Ajustes de copy e navegação pós-UAT
 
+### Phase 06.3: Recuperação de acesso e exclusão de conta (INSERTED)
+
+**Goal:** Responsible adults can recover password access by email, recover the responsible PIN by email after password verification, and delete/deactivate their account through a deliberate mobile flow before the final TCC demo polish.
+**Requirements**: AUTH-09, AUTH-10, AUTH-11, MOBL-05, MOBL-06, DOCS-01
+**Depends on:** Phase 06.2
+**Success Criteria** (what must be TRUE):
+
+  1. Password login screen exposes `Esqueci minha senha` and routes to a reset request flow.
+  2. Password reset request returns enumeration-safe feedback and sends recovery email when the account exists.
+  3. Password reset confirmation accepts emailed code/token plus new password and allows login with the new password.
+  4. Responsible PIN prompt exposes `Esqueci meu PIN` and routes to a PIN reset request flow for authenticated responsible users.
+  5. PIN reset request verifies the responsible password before sending an emailed PIN recovery code/token.
+  6. PIN reset confirmation accepts emailed code/token plus a new 4-digit PIN and allows responsible management with the new PIN.
+  7. Account deletion/deactivation is available from the responsible profile/settings area, requires deliberate confirmation, invalidates future login, and preserves historical family data consistently with existing soft-deactivation patterns.
+  8. OpenAPI/Swagger, backend integration tests, mobile service tests, navigation tests, and focused UI tests cover the new flows.
+
+**Plans:** 2/2 plans complete
+
+Plans:
+**Wave 1**
+
+- [x] 06.3-01: Backend reset/delete endpoints, token lifecycle, email delivery integration, OpenAPI, and integration tests
+
+**Wave 2** *(blocked on 06.3-01 completion)*
+
+- [x] 06.3-02: Mobile recovery/delete UI, navigation, service wiring, feedback states, and focused tests
+
 ### Phase 7: Polimento para demonstração do TCC
 
 **Goal**: The MVP is demo-ready with repeatable data, documentation, visual polish, and final verification.
-**Depends on**: Phase 06.2
+**Depends on**: Phase 06.3
 **Requirements**: DOCS-02, DOCS-03, DOCS-04
 **Success Criteria** (what must be TRUE):
 
@@ -282,7 +310,7 @@ Plans:
 ## Progress
 
 **Execution Order:**
-Phases execute in numeric order: 1 → 2 → 3 → 4 → 5 → 6 → 06.1 → 06.2 → 7
+Phases execute in numeric order: 1 → 2 → 3 → 4 → 5 → 6 → 06.1 → 06.2 → 06.3 → 7
 
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
@@ -294,4 +322,5 @@ Phases execute in numeric order: 1 → 2 → 3 → 4 → 5 → 6 → 06.1 → 06
 | 6. Fluxo do responsável | 4/4 | Complete | 2026-06-03 |
 | 06.1 Ajustes pós-UAT dos fluxos de entrada, troca de modo e entrega de resgates | 3/3 | Complete    | 2026-06-03 |
 | 06.2 Ajustes pós-UAT de cadastro, seletor de crianças e navegação responsável | 1/1 | Complete    | 2026-06-04 |
+| 06.3 Recuperação de acesso e exclusão de conta | 2/2 | Complete | 2026-06-08 |
 | 7. Polimento para demonstração do TCC | 0/3 | Not started | - |

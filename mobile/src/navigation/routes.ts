@@ -4,7 +4,9 @@ export type RootStackParamList = {
   AuthWelcome: undefined;
   AuthLogin: undefined;
   AuthRegister: undefined;
+  AuthPasswordReset: undefined;
   ResponsibleTabs: { activeChild?: ChildResponse } | undefined;
+  ResponsiblePinReset: undefined;
   ResponsibleChildren: { feedback?: 'child-created' | 'child-deactivated' } | undefined;
   ResponsibleChildForm: { childId?: string } | undefined;
   ResponsibleChildDetail: { childId: string; feedback?: 'child-updated' | 'child-deactivated' };
@@ -13,6 +15,6 @@ export type RootStackParamList = {
   ResponsibleApprovals: undefined;
   ResponsibleRewardForm: { rewardId?: string } | undefined;
   ChildProfileSelect: undefined;
-  ChildTabs: { child: ChildResponse };
+  ChildTabs: { child: ChildResponse; completedMissionId?: string };
   ChildMissionDetail: { child: ChildResponse; mission: AssignedMissionResponse | null };
 };

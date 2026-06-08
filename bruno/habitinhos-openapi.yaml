@@ -52,6 +52,82 @@ paths:
               schema:
                 $ref: '#/components/schemas/AuthResponse'
 
+  /auth/password-reset/request:
+    post:
+      tags: [Auth]
+      summary: Solicitar recuperação de senha
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PasswordResetRequest'
+      responses:
+        '202':
+          description: Solicitação aceita
+
+  /auth/password-reset/confirm:
+    post:
+      tags: [Auth]
+      summary: Confirmar nova senha
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PasswordResetConfirmRequest'
+      responses:
+        '204':
+          description: Senha atualizada
+
+  /auth/responsible-pin/verify:
+    post:
+      tags: [Auth]
+      summary: Verificar PIN do responsável
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/VerifyResponsiblePinRequest'
+      responses:
+        '204':
+          description: PIN válido
+
+  /auth/responsible-pin/reset/request:
+    post:
+      tags: [Auth]
+      summary: Solicitar recuperação do PIN do responsável
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ResponsiblePinResetRequest'
+      responses:
+        '202':
+          description: Solicitação aceita
+
+  /auth/responsible-pin/reset/confirm:
+    post:
+      tags: [Auth]
+      summary: Confirmar novo PIN do responsável
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ResponsiblePinResetConfirmRequest'
+      responses:
+        '204':
+          description: PIN atualizado
+
   /me:
     get:
       tags: [Auth]
@@ -65,6 +141,20 @@ paths:
             application/json:
               schema:
                 type: object
+    delete:
+      tags: [Auth]
+      summary: Excluir conta autenticada
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/DeleteAccountRequest'
+      responses:
+        '204':
+          description: Conta excluída
 
   /children:
     post:
@@ -478,7 +568,7 @@ components:
   schemas:
     RegisterRequest:
       type: object
-      required: [name, email, password, familyName]
+      required: [name, email, password, familyName, responsiblePin]
       properties:
         name:
           type: string
@@ -498,6 +588,10 @@ components:
           type: string
           maxLength: 160
           example: Família Silva
+        responsiblePin:
+          type: string
+          pattern: '^\d{4}$'
+          example: "1234"
 
     LoginRequest:
       type: object
@@ -507,6 +601,68 @@ components:
           type: string
           format: email
           example: ana@email.com
+        password:
+          type: string
+          example: SenhaForte123
+
+    PasswordResetRequest:
+      type: object
+      required: [email]
+      properties:
+        email:
+          type: string
+          format: email
+          maxLength: 320
+          example: ana@email.com
+
+    PasswordResetConfirmRequest:
+      type: object
+      required: [token, newPassword]
+      properties:
+        token:
+          type: string
+          pattern: '^[A-Za-z0-9]{6}$'
+          example: A1B2C3
+        newPassword:
+          type: string
+          minLength: 8
+          maxLength: 120
+          example: NovaSenha123
+
+    VerifyResponsiblePinRequest:
+      type: object
+      required: [pin]
+      properties:
+        pin:
+          type: string
+          pattern: '^\d{4}$'
+          example: "1234"
+
+    ResponsiblePinResetRequest:
+      type: object
+      required: [password]
+      properties:
+        password:
+          type: string
+          example: SenhaForte123
+
+    ResponsiblePinResetConfirmRequest:
+      type: object
+      required: [token, newPin]
+      properties:
+        token:
+          type: string
+          pattern: '^[A-Za-z0-9]{6}$'
+          example: D4E5F6
+        newPin:
+          type: string
+          pattern: '^\d{4}$'
+          example: "5678"
+
+    DeleteAccountRequest:
+      type: object
+      required: [password]
+      properties:
         password:
           type: string
           example: SenhaForte123

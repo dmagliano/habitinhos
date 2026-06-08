@@ -80,6 +80,7 @@ describe('ResponsibleMissionsScreen', () => {
       errorMessage: null,
       login: jest.fn(),
       register: jest.fn(),
+      deleteAccount: jest.fn(),
       logout: jest.fn(),
       retryRestore: jest.fn(),
     });
@@ -148,6 +149,7 @@ describe('ResponsibleMissionFormScreen', () => {
       errorMessage: null,
       login: jest.fn(),
       register: jest.fn(),
+      deleteAccount: jest.fn(),
       logout: jest.fn(),
       retryRestore: jest.fn(),
     });
@@ -281,6 +283,7 @@ describe('ResponsibleAssignmentFormScreen', () => {
       errorMessage: null,
       login: jest.fn(),
       register: jest.fn(),
+      deleteAccount: jest.fn(),
       logout: jest.fn(),
       retryRestore: jest.fn(),
     });

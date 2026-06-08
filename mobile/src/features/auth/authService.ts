@@ -43,6 +43,44 @@ export const authService = {
     });
   },
 
+  async requestPasswordReset(email: string): Promise<void> {
+    await apiRequest<void>('/auth/password-reset/request', {
+      method: 'POST',
+      body: { email },
+    });
+  },
+
+  async confirmPasswordReset(token: string, newPassword: string): Promise<void> {
+    await apiRequest<void>('/auth/password-reset/confirm', {
+      method: 'POST',
+      body: { token, newPassword },
+    });
+  },
+
+  async requestResponsiblePinReset(token: string, password: string): Promise<void> {
+    await apiRequest<void>('/auth/responsible-pin/reset/request', {
+      method: 'POST',
+      token,
+      body: { password },
+    });
+  },
+
+  async confirmResponsiblePinReset(token: string, resetToken: string, newPin: string): Promise<void> {
+    await apiRequest<void>('/auth/responsible-pin/reset/confirm', {
+      method: 'POST',
+      token,
+      body: { token: resetToken, newPin },
+    });
+  },
+
+  async deleteAccount(token: string, password: string): Promise<void> {
+    await apiRequest<void>('/me', {
+      method: 'DELETE',
+      token,
+      body: { password },
+    });
+  },
+
   async me(token: string): Promise<AuthSession> {
     const response = await apiRequest<MeResponse>('/me', {
       token,

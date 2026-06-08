@@ -18,6 +18,7 @@ public interface AssignedMissionRepository extends JpaRepository<AssignedMission
       where assignedMission.familyUnitId = :familyUnitId
         and assignedMission.childId = :childId
         and assignedMission.status = :status
+        and (assignedMission.scheduledDate is null or assignedMission.scheduledDate <= :today)
         and (assignedMission.dueDate is null or assignedMission.dueDate >= :today)
       order by assignedMission.dueDate asc, assignedMission.createdAt asc
       """)

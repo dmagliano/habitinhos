@@ -154,6 +154,12 @@ export type RejectAssignedMissionRequest = {
 
 export type ResponsibleDashboardMissionCounts = Record<AssignedMissionStatus, number>;
 
+export type ResponsibleDashboardMissionPreview = {
+  id: string;
+  title: string;
+  status: Extract<AssignedMissionStatus, 'PENDING' | 'AWAITING_APPROVAL' | 'COMPLETED'>;
+};
+
 export type ResponsibleDashboardChildSummary = {
   id: string;
   name: string;
@@ -161,6 +167,7 @@ export type ResponsibleDashboardChildSummary = {
   avatarKey: string;
   balance: number;
   missionCounts: ResponsibleDashboardMissionCounts;
+  missionPreviews: ResponsibleDashboardMissionPreview[];
 };
 
 export type ResponsibleDashboardApproval = {

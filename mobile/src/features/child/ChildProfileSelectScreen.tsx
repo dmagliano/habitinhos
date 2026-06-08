@@ -136,6 +136,7 @@ export function ChildProfileSelectScreen({ navigation }: Props) {
       {showResponsiblePin ? (
         <ResponsiblePinPrompt
           onCancel={() => setShowResponsiblePin(false)}
+          onForgotPin={() => navigation.navigate('ResponsiblePinReset')}
           onVerified={() => navigation.navigate('ResponsibleTabs')}
           token={token}
         />

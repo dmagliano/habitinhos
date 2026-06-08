@@ -25,8 +25,9 @@ public abstract class AbstractIntegrationTest {
   }
 
   @DynamicPropertySource
-  static void registerSecurityProperties(DynamicPropertyRegistry registry) {
+  static void registerTestProperties(DynamicPropertyRegistry registry) {
     registry.add("habitinhos.security.jwt.secret", () -> "0".repeat(64));
+    registry.add("habitinhos.email.resend.api-key", () -> "");
   }
 
   @Autowired
@@ -40,6 +41,7 @@ public abstract class AbstractIntegrationTest {
         BEGIN
           IF to_regclass('public.family_units') IS NOT NULL THEN
             TRUNCATE TABLE
+              auth_reset_tokens,
               coin_transactions,
               reward_redemptions,
               assigned_missions,
