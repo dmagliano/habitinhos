@@ -50,6 +50,32 @@ cd backend
 
 The integration tests use PostgreSQL through Testcontainers.
 
+## Mobile API Configuration
+
+The mobile app reads the backend URL from the public Expo variable
+`EXPO_PUBLIC_API_URL`. For the deployed Render backend, configure it as:
+
+```text
+EXPO_PUBLIC_API_URL=https://habitinhos-api.onrender.com
+```
+
+Set it in the same EAS environment used by the build profile:
+
+- `eas build --profile preview` uses the `preview` environment.
+- `eas build --profile production` uses the `production` environment.
+- `eas build --profile development` uses the `development` environment.
+
+Create the value through the Expo dashboard or with EAS CLI:
+
+```bash
+cd mobile
+eas env:create --name EXPO_PUBLIC_API_URL --value https://habitinhos-api.onrender.com --environment preview --visibility plaintext
+eas env:create --name EXPO_PUBLIC_API_URL --value https://habitinhos-api.onrender.com --environment production --visibility plaintext
+```
+
+For local emulator development, if no Expo variable is set, the app falls back to
+`http://10.0.2.2:8080`.
+
 ## Swagger Endpoint Testing
 
 Start the backend:

@@ -3,6 +3,10 @@ import { act, cleanup, render, screen } from '@testing-library/react-native';
 import App from '../../App';
 import { tokenStorage } from '../storage/tokenStorage';
 
+jest.mock('expo-status-bar', () => ({
+  StatusBar: () => null,
+}));
+
 jest.mock('../storage/tokenStorage', () => ({
   tokenStorage: {
     getToken: jest.fn(),
