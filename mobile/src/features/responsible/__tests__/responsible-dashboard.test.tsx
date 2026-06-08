@@ -44,6 +44,23 @@ const dashboardFixture: ResponsibleDashboardResponse = {
         REJECTED: 1,
         CANCELLED: 0,
       },
+      missionPreviews: [
+        {
+          id: 'preview-pending',
+          title: 'Arrumar cama',
+          status: 'PENDING',
+        },
+        {
+          id: 'preview-approval',
+          title: 'Estudar tabuada',
+          status: 'AWAITING_APPROVAL',
+        },
+        {
+          id: 'preview-completed',
+          title: 'Lavar copos',
+          status: 'COMPLETED',
+        },
+      ],
     },
   ],
   pendingApprovalCount: 1,
@@ -81,6 +98,7 @@ describe('responsible dashboard screens', () => {
       errorMessage: null,
       login: jest.fn(),
       register: jest.fn(),
+      deleteAccount: jest.fn(),
       logout: jest.fn(),
       retryRestore: jest.fn(),
     });
@@ -102,6 +120,16 @@ describe('responsible dashboard screens', () => {
     const childCard = screen.getByTestId('child-summary-child-1');
     expect(within(childCard).getByText('Lia')).toBeOnTheScreen();
     expect(within(childCard).getByText('3 pendentes · 1 aguardando')).toBeOnTheScreen();
+    expect(within(childCard).getByText('Últimos 7 dias')).toBeOnTheScreen();
+    expect(within(childCard).queryByText('Arrumar cama')).toBeNull();
+    fireEvent.press(within(childCard).getByRole('button', { name: 'Mostrar pendentes de Lia' }));
+    expect(within(childCard).getByText('Arrumar cama')).toBeOnTheScreen();
+    fireEvent.press(within(childCard).getByRole('button', { name: 'Mostrar aprovações de Lia' }));
+    expect(within(childCard).queryByText('Arrumar cama')).toBeNull();
+    expect(within(childCard).getByText('Estudar tabuada')).toBeOnTheScreen();
+    fireEvent.press(within(childCard).getByRole('button', { name: 'Mostrar concluídas de Lia' }));
+    expect(within(childCard).queryByText('Estudar tabuada')).toBeNull();
+    expect(within(childCard).getByText('Lavar copos')).toBeOnTheScreen();
     expect(within(childCard).getByText('24 moedas')).toBeOnTheScreen();
     expect(within(childCard).getByRole('button', { name: 'Ver detalhes de Lia' })).toBeOnTheScreen();
 

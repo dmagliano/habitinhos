@@ -19,6 +19,7 @@ jest.mock('../authService', () => ({
   authService: {
     login: jest.fn(),
     register: jest.fn(),
+    deleteAccount: jest.fn(),
     me: jest.fn(),
   },
 }));
@@ -184,6 +185,36 @@ describe('AuthProvider', () => {
       responsiblePin: '1234',
     });
     expect(tokenStorage.setToken).toHaveBeenCalledWith('jwt-token');
+  });
+
+  it('deletes the current account, clears the token, and leaves the session', async () => {
+    jest.mocked(tokenStorage.getToken).mockResolvedValueOnce(null);
+    jest.mocked(authService.login).mockResolvedValueOnce(session);
+    jest.mocked(authService.deleteAccount).mockResolvedValueOnce(undefined);
+
+    let latestAuth: ReturnType<typeof useAuth> | undefined;
+
+    render(
+      <AuthProvider>
+        <AuthProbe onReady={(auth) => (latestAuth = auth)} />
+      </AuthProvider>,
+    );
+
+    await waitFor(() => expect(screen.getByText('unauthenticated')).toBeOnTheScreen());
+
+    await act(async () => {
+      await latestAuth?.login('dani@example.com', 'secret', false);
+    });
+
+    await waitFor(() => expect(screen.getByText('authenticated')).toBeOnTheScreen());
+
+    await act(async () => {
+      await latestAuth?.deleteAccount('secret');
+    });
+
+    expect(authService.deleteAccount).toHaveBeenCalledWith('jwt-token', 'secret');
+    expect(tokenStorage.clearToken).toHaveBeenCalled();
+    expect(screen.getByText('unauthenticated')).toBeOnTheScreen();
   });
 });
 

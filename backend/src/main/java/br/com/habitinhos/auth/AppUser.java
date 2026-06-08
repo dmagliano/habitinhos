@@ -47,4 +47,16 @@ public class AppUser extends BaseEntity {
     this.passwordHash = passwordHash;
     this.responsiblePinHash = responsiblePinHash;
   }
+
+  public void changePassword(String passwordHash) {
+    this.passwordHash = passwordHash;
+  }
+
+  public void changeResponsiblePin(String responsiblePinHash) {
+    this.responsiblePinHash = responsiblePinHash;
+  }
+
+  public void deactivate() {
+    this.active = false;
+  }
 }

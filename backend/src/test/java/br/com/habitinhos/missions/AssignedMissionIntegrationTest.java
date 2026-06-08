@@ -102,9 +102,11 @@ class AssignedMissionIntegrationTest extends AbstractIntegrationTest {
     List<String> visibleIds = new ArrayList<>();
     json.forEach(node -> visibleIds.add(node.get("id").asText()));
     assertThat(visibleIds)
-        .contains(todayAssignment.toString(), futureAssignment.toString(), undatedAssignment.toString())
-        .doesNotContain(expiredAssignment.toString());
+        .contains(todayAssignment.toString(), undatedAssignment.toString())
+        .doesNotContain(expiredAssignment.toString(), futureAssignment.toString());
     assertThat(assignedMissionRepository.findById(expiredAssignment).orElseThrow().getStatus())
+        .isEqualTo(AssignedMissionStatus.PENDING);
+    assertThat(assignedMissionRepository.findById(futureAssignment).orElseThrow().getStatus())
         .isEqualTo(AssignedMissionStatus.PENDING);
   }
 
@@ -139,7 +141,7 @@ class AssignedMissionIntegrationTest extends AbstractIntegrationTest {
   }
 
   @Test
-  void completeNoApprovalRecurringMissionCreditsAndCreatesNextPendingOccurrence() throws Exception {
+  void completeNoApprovalRecurringMissionCreditsAndHidesNextFutureOccurrence() throws Exception {
     String token = registerToken("responsavel@example.com", "Familia Demo");
     UUID childId = createChild(token, new ChildRequest("Lia", 8, "star", null));
     LocalDate assignedDueDate = LocalDate.now().plusDays(1);
@@ -164,10 +166,11 @@ class AssignedMissionIntegrationTest extends AbstractIntegrationTest {
     mockMvc.perform(get("/children/{childId}/missions", childId)
             .header("Authorization", "Bearer " + token))
         .andExpect(status().isOk())
-        .andExpect(jsonPath("$[0].status").value("PENDING"))
-        .andExpect(jsonPath("$[0].dueDate").value(assignedDueDate.plusDays(1).toString()))
-        .andExpect(jsonPath("$[0].snapshotRecurrenceType").value("DAILY"))
-        .andExpect(jsonPath("$[1]").doesNotExist());
+        .andExpect(jsonPath("$[0]").doesNotExist());
+
+    assertThat(assignedMissionRepository.findAll())
+        .extracting(AssignedMission::getScheduledDate)
+        .contains(assignedDueDate.plusDays(1));
   }
 
   @Test

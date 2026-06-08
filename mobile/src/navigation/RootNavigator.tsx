@@ -3,10 +3,12 @@ import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import { useEffect, useState } from 'react';
 
 import { AuthLoadingScreen } from '../features/auth/AuthLoadingScreen';
+import { PasswordResetScreen } from '../features/auth/PasswordResetScreen';
 import { AuthWelcomeScreen } from '../features/auth/AuthWelcomeScreen';
 import { LoginScreen } from '../features/auth/LoginScreen';
 import { useAuth } from '../features/auth/AuthContext';
 import { RegisterScreen } from '../features/auth/RegisterScreen';
+import { ResponsiblePinResetScreen } from '../features/auth/ResponsiblePinResetScreen';
 import { ChildMissionDetailScreen } from '../features/child/ChildMissionDetailScreen';
 import { ChildProfileSelectScreen } from '../features/child/ChildProfileSelectScreen';
 import { ChildTabsScreen } from '../features/child/ChildTabsScreen';
@@ -51,6 +53,7 @@ export function RootNavigator() {
             <Stack.Screen component={ChildTabsScreen} name="ChildTabs" />
             <Stack.Screen component={ChildMissionDetailScreen} name="ChildMissionDetail" />
             <Stack.Screen component={ResponsibleTabsScreen} name="ResponsibleTabs" />
+            <Stack.Screen component={ResponsiblePinResetScreen} name="ResponsiblePinReset" />
             <Stack.Screen component={ResponsibleChildrenScreen} name="ResponsibleChildren" />
             <Stack.Screen component={ResponsibleChildFormScreen} name="ResponsibleChildForm" />
             <Stack.Screen component={ResponsibleChildDetailScreen} name="ResponsibleChildDetail" />
@@ -64,6 +67,7 @@ export function RootNavigator() {
             <Stack.Screen component={AuthWelcomeScreen} name="AuthWelcome" />
             <Stack.Screen component={LoginScreen} name="AuthLogin" />
             <Stack.Screen component={RegisterScreen} name="AuthRegister" />
+            <Stack.Screen component={PasswordResetScreen} name="AuthPasswordReset" />
           </>
         )}
       </Stack.Navigator>

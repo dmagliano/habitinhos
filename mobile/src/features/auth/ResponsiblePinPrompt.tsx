@@ -10,10 +10,11 @@ import { authService } from './authService';
 type ResponsiblePinPromptProps = {
   token: string | null;
   onCancel: () => void;
+  onForgotPin?: () => void;
   onVerified: () => void;
 };
 
-export function ResponsiblePinPrompt({ onCancel, onVerified, token }: ResponsiblePinPromptProps) {
+export function ResponsiblePinPrompt({ onCancel, onForgotPin, onVerified, token }: ResponsiblePinPromptProps) {
   const [pin, setPin] = useState('');
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const [submitting, setSubmitting] = useState(false);
@@ -71,6 +72,9 @@ export function ResponsiblePinPrompt({ onCancel, onVerified, token }: Responsibl
           onPress={submit}
         />
         <SecondaryButton disabled={submitting} label="Cancelar" onPress={onCancel} />
+        {onForgotPin ? (
+          <SecondaryButton disabled={submitting} label="Esqueci meu PIN" onPress={onForgotPin} />
+        ) : null}
       </View>
     </Card>
   );

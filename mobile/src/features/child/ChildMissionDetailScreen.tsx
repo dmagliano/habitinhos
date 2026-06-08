@@ -27,6 +27,7 @@ export function ChildMissionDetailScreen({ navigation, route }: Props) {
   const token = session?.token ?? null;
   const completingRef = useRef(false);
   const [completing, setCompleting] = useState(false);
+  const [completedMissionId, setCompletedMissionId] = useState<string | null>(null);
   const [feedback, setFeedback] = useState<DetailFeedback>(null);
 
   if (!mission) {
@@ -53,6 +54,7 @@ export function ChildMissionDetailScreen({ navigation, route }: Props) {
 
     try {
       const completedMission = await childService.completeMission(token, mission.id);
+      setCompletedMissionId(mission.id);
 
       if (completedMission.status === 'AWAITING_APPROVAL') {
         setFeedback({ type: 'awaiting-approval' });
@@ -85,7 +87,7 @@ export function ChildMissionDetailScreen({ navigation, route }: Props) {
   return (
     <AppScreen>
       <AppHeader
-        action={<SecondaryButton label="Voltar" onPress={() => navigation.goBack()} />}
+        action={<SecondaryButton label="Voltar" onPress={() => handleBack(navigation, child, completedMissionId)} />}
         emoji="✅"
         title="Detalhes da missão"
       />
@@ -125,7 +127,7 @@ export function ChildMissionDetailScreen({ navigation, route }: Props) {
         </Card>
       ) : null}
 
-      {mission.status === 'PENDING' ? (
+      {mission.status === 'PENDING' && !completedMissionId ? (
         <PrimaryButton
           label="Marcar como concluída"
           loading={completing}
@@ -135,6 +137,19 @@ export function ChildMissionDetailScreen({ navigation, route }: Props) {
       ) : null}
     </AppScreen>
   );
+}
+
+function handleBack(
+  navigation: Props['navigation'],
+  child: Props['route']['params']['child'],
+  completedMissionId: string | null,
+) {
+  if (completedMissionId) {
+    navigation.navigate('ChildTabs', { child, completedMissionId });
+    return;
+  }
+
+  navigation.goBack();
 }
 
 function DetailFeedbackBanner({ feedback }: { feedback: DetailFeedback }) {

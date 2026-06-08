@@ -2,12 +2,24 @@ import { act, fireEvent, render, screen, waitFor } from '@testing-library/react-
 
 import { RootNavigator } from '../../../navigation/RootNavigator';
 import { AuthWelcomeScreen } from '../AuthWelcomeScreen';
+import { authService } from '../authService';
 import { getLoginKeyboardBehavior, LoginScreen } from '../LoginScreen';
+import { PasswordResetScreen } from '../PasswordResetScreen';
 import { RegisterScreen } from '../RegisterScreen';
+import { ResponsiblePinResetScreen } from '../ResponsiblePinResetScreen';
 import { useAuth } from '../AuthContext';
 
 jest.mock('../AuthContext', () => ({
   useAuth: jest.fn(),
+}));
+
+jest.mock('../authService', () => ({
+  authService: {
+    requestPasswordReset: jest.fn(),
+    confirmPasswordReset: jest.fn(),
+    requestResponsiblePinReset: jest.fn(),
+    confirmResponsiblePinReset: jest.fn(),
+  },
 }));
 
 const login = jest.fn();
@@ -24,6 +36,7 @@ describe('LoginScreen', () => {
       errorMessage: null,
       login,
       register,
+      deleteAccount: jest.fn(),
       logout: jest.fn(),
       retryRestore,
     });
@@ -45,6 +58,14 @@ describe('LoginScreen', () => {
     fireEvent.press(screen.getByRole('button', { name: 'Entrar na conta' }));
 
     await waitFor(() => expect(login).toHaveBeenCalledWith('dani@example.com', 'secret', false));
+  });
+
+  it('offers password recovery from the login form', () => {
+    render(<LoginScreen navigation={{ navigate } as never} route={{ key: 'AuthLogin', name: 'AuthLogin' }} />);
+
+    fireEvent.press(screen.getByRole('button', { name: 'Esqueci minha senha' }));
+
+    expect(navigate).toHaveBeenCalledWith('AuthPasswordReset');
   });
 
   it('toggles the remember-session checkbox and submits the checked state', async () => {
@@ -71,6 +92,7 @@ describe('LoginScreen', () => {
       errorMessage: 'Nao conseguimos conectar ao servidor. Verifique a conexao e tente novamente.',
       login,
       register,
+      deleteAccount: jest.fn(),
       logout: jest.fn(),
       retryRestore,
     });
@@ -84,6 +106,86 @@ describe('LoginScreen', () => {
   it('uses height keyboard avoidance on Android so fields can slide above the keyboard', () => {
     expect(getLoginKeyboardBehavior('android')).toBe('height');
     expect(getLoginKeyboardBehavior('ios')).toBe('padding');
+  });
+});
+
+describe('PasswordResetScreen', () => {
+  beforeEach(() => {
+    jest.clearAllMocks();
+    jest.mocked(authService.requestPasswordReset).mockResolvedValue(undefined);
+    jest.mocked(authService.confirmPasswordReset).mockResolvedValue(undefined);
+  });
+
+  it('requests reset instructions and saves a new password with the received code', async () => {
+    render(
+      <PasswordResetScreen
+        navigation={{ navigate } as never}
+        route={{ key: 'AuthPasswordReset', name: 'AuthPasswordReset' }}
+      />,
+    );
+
+    fireEvent.changeText(screen.getByLabelText('E-mail'), 'dani@example.com');
+    fireEvent.press(screen.getByRole('button', { name: 'Enviar instruções' }));
+
+    await waitFor(() => expect(authService.requestPasswordReset).toHaveBeenCalledWith('dani@example.com'));
+    expect(await screen.findByText('Enviamos as instruções para o e-mail informado.')).toBeOnTheScreen();
+
+    fireEvent.changeText(screen.getByLabelText('Código recebido'), 'abc123');
+    fireEvent.changeText(screen.getByLabelText('Nova senha'), 'novaSenha123');
+    fireEvent.press(screen.getByRole('button', { name: 'Salvar nova senha' }));
+
+    await waitFor(() =>
+      expect(authService.confirmPasswordReset).toHaveBeenCalledWith('ABC123', 'novaSenha123'),
+    );
+    expect(await screen.findByText('Senha atualizada. Você já pode entrar com a nova senha.')).toBeOnTheScreen();
+  });
+});
+
+describe('ResponsiblePinResetScreen', () => {
+  const goBack = jest.fn();
+
+  beforeEach(() => {
+    jest.clearAllMocks();
+    jest.mocked(useAuth).mockReturnValue({
+      status: 'authenticated',
+      session: {
+        token: 'jwt-token',
+        user: { id: 'user-1', name: 'Dani', email: 'dani@example.com', role: 'RESPONSIBLE' },
+        family: { id: 'family-1', name: 'Família Silva' },
+      },
+      errorMessage: null,
+      login,
+      register,
+      deleteAccount: jest.fn(),
+      logout: jest.fn(),
+      retryRestore,
+    });
+    jest.mocked(authService.requestResponsiblePinReset).mockResolvedValue(undefined);
+    jest.mocked(authService.confirmResponsiblePinReset).mockResolvedValue(undefined);
+  });
+
+  it('requests the PIN code with the account password and saves a new PIN', async () => {
+    render(
+      <ResponsiblePinResetScreen
+        navigation={{ goBack } as never}
+        route={{ key: 'ResponsiblePinReset', name: 'ResponsiblePinReset' }}
+      />,
+    );
+
+    fireEvent.changeText(screen.getByLabelText('Senha da conta'), 'secret');
+    fireEvent.press(screen.getByRole('button', { name: 'Enviar código' }));
+
+    await waitFor(() => expect(authService.requestResponsiblePinReset).toHaveBeenCalledWith('jwt-token', 'secret'));
+    expect(await screen.findByText('Enviamos o código para o e-mail da conta.')).toBeOnTheScreen();
+
+    fireEvent.changeText(screen.getByLabelText('Código recebido'), 'pin456');
+    fireEvent.changeText(screen.getByLabelText('Novo PIN'), '5678');
+    fireEvent.press(screen.getByRole('button', { name: 'Salvar novo PIN' }));
+
+    await waitFor(() =>
+      expect(authService.confirmResponsiblePinReset).toHaveBeenCalledWith('jwt-token', 'PIN456', '5678'),
+    );
+    expect(await screen.findByText('PIN atualizado.')).toBeOnTheScreen();
   });
 });
 
@@ -128,6 +230,7 @@ describe('RootNavigator auth entry', () => {
       errorMessage: null,
       login,
       register,
+      deleteAccount: jest.fn(),
       logout: jest.fn(),
       retryRestore,
     });
@@ -152,6 +255,7 @@ describe('RootNavigator auth entry', () => {
       errorMessage: null,
       login,
       register,
+      deleteAccount: jest.fn(),
       logout: jest.fn(),
       retryRestore,
     });
@@ -173,6 +277,7 @@ describe('RegisterScreen', () => {
       errorMessage: null,
       login,
       register,
+      deleteAccount: jest.fn(),
       logout: jest.fn(),
       retryRestore,
     });
@@ -207,6 +312,7 @@ describe('RegisterScreen', () => {
       errorMessage: 'Esse e-mail já está em uso. Entre ou use outro e-mail.',
       login,
       register,
+      deleteAccount: jest.fn(),
       logout: jest.fn(),
       retryRestore,
     });
@@ -227,6 +333,7 @@ describe('RegisterScreen', () => {
       errorMessage: 'Sua sessao terminou. Entre novamente para continuar.',
       login,
       register,
+      deleteAccount: jest.fn(),
       logout: jest.fn(),
       retryRestore,
     });

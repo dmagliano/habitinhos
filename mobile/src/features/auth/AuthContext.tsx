@@ -12,6 +12,7 @@ type AuthContextValue = {
   errorMessage: string | null;
   login: (email: string, password: string, rememberSession: boolean) => Promise<void>;
   register: (body: RegisterRequest) => Promise<void>;
+  deleteAccount: (password: string) => Promise<void>;
   logout: () => Promise<void>;
   retryRestore: () => Promise<void>;
 };
@@ -109,6 +110,28 @@ export function AuthProvider({ children }: PropsWithChildren) {
     setStatus('unauthenticated');
   }, []);
 
+  const deleteAccount = useCallback(async (password: string) => {
+    if (!session?.token) {
+      setErrorMessage(SESSION_EXPIRED_MESSAGE);
+      setStatus('unauthenticated');
+      return;
+    }
+
+    setStatus('loading');
+    setErrorMessage(null);
+
+    try {
+      await authService.deleteAccount(session.token, password);
+      await tokenStorage.clearToken();
+      setSession(null);
+      setStatus('unauthenticated');
+    } catch (error) {
+      setErrorMessage(getUserMessage(error));
+      setStatus('authenticated');
+      throw error;
+    }
+  }, [session?.token]);
+
   const value = useMemo(
     () => ({
       status,
@@ -116,10 +139,11 @@ export function AuthProvider({ children }: PropsWithChildren) {
       errorMessage,
       login,
       register,
+      deleteAccount,
       logout,
       retryRestore: () => restoreSession(),
     }),
-    [errorMessage, login, logout, register, restoreSession, session, status],
+    [deleteAccount, errorMessage, login, logout, register, restoreSession, session, status],
   );
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;

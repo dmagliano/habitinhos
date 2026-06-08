@@ -9,13 +9,17 @@ import {
   View,
 } from 'react-native';
 import type { KeyboardAvoidingViewProps } from 'react-native';
+import { NativeStackScreenProps } from '@react-navigation/native-stack';
 
 import { AppScreen, Card, PrimaryButton, SecondaryButton, StatusBadge } from '../../components';
+import { RootStackParamList } from '../../navigation/routes';
 import { colors, radius, spacing, typography } from '../../theme';
 
 import { useAuth } from './AuthContext';
 
-export function LoginScreen() {
+type Props = NativeStackScreenProps<RootStackParamList, 'AuthLogin'>;
+
+export function LoginScreen({ navigation }: Partial<Props> = {}) {
   const { errorMessage, login, retryRestore, status } = useAuth();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
@@ -68,6 +72,15 @@ export function LoginScreen() {
                 value={password}
               />
             </View>
+
+            <Pressable
+              accessibilityRole="button"
+              disabled={isLoading}
+              onPress={() => navigation?.navigate('AuthPasswordReset')}
+              style={({ pressed }) => [styles.forgotButton, pressed && styles.forgotButtonPressed]}
+            >
+              <Text style={styles.forgotLabel}>Esqueci minha senha</Text>
+            </Pressable>
 
             <Pressable
               accessibilityLabel="Mantenha-me conectado"
@@ -193,5 +206,18 @@ const styles = StyleSheet.create({
   error: {
     ...typography.body,
     color: colors.error,
+  },
+  forgotButton: {
+    alignSelf: 'flex-start',
+    borderRadius: radius.md,
+    minHeight: 40,
+    justifyContent: 'center',
+  },
+  forgotButtonPressed: {
+    opacity: 0.72,
+  },
+  forgotLabel: {
+    ...typography.label,
+    color: colors.primaryDark,
   },
 });

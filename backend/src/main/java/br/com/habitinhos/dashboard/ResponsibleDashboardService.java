@@ -8,6 +8,7 @@ import br.com.habitinhos.dashboard.dto.ResponsibleDashboardResponse;
 import br.com.habitinhos.dashboard.dto.ResponsibleDashboardResponse.ResponsibleDashboardApproval;
 import br.com.habitinhos.dashboard.dto.ResponsibleDashboardResponse.ResponsibleDashboardChildSummary;
 import br.com.habitinhos.dashboard.dto.ResponsibleDashboardResponse.ResponsibleDashboardMissionCounts;
+import br.com.habitinhos.dashboard.dto.ResponsibleDashboardResponse.ResponsibleDashboardMissionPreview;
 import br.com.habitinhos.dashboard.dto.ResponsibleDashboardResponse.ResponsibleDashboardRedemption;
 import br.com.habitinhos.missions.AssignedMission;
 import br.com.habitinhos.missions.AssignedMissionRepository;
@@ -17,6 +18,10 @@ import br.com.habitinhos.rewards.RewardRedemptionRepository;
 import br.com.habitinhos.shared.error.ForbiddenException;
 import br.com.habitinhos.wallet.Wallet;
 import br.com.habitinhos.wallet.WalletRepository;
+import java.time.Instant;
+import java.time.LocalDate;
+import java.time.temporal.ChronoUnit;
+import java.util.Comparator;
 import java.util.EnumMap;
 import java.util.List;
 import java.util.Map;
@@ -32,6 +37,7 @@ public class ResponsibleDashboardService {
 
   private static final int APPROVAL_PREVIEW_LIMIT = 2;
   private static final int RECENT_REDEMPTIONS_LIMIT = 3;
+  private static final long MISSION_PREVIEW_DAYS = 7;
 
   private final ChildProfileRepository childProfileRepository;
   private final WalletRepository walletRepository;
@@ -68,8 +74,14 @@ public class ResponsibleDashboardService {
         .findAllByFamilyUnitIdAndChildIdIn(familyUnitId, activeChildIds)
         .stream()
         .collect(Collectors.toMap(Wallet::getChildId, Wallet::getBalance));
+    List<AssignedMission> assignedMissions = findAssignedMissionsForChildren(familyUnitId, activeChildIds);
     Map<UUID, Map<AssignedMissionStatus, Long>> missionCountsByChildId =
-        countMissionsByChild(familyUnitId, activeChildIds);
+        countMissionsByChild(assignedMissions);
+    Map<UUID, List<ResponsibleDashboardMissionPreview>> missionPreviewsByChildId =
+        previewMissionsByChild(
+            assignedMissions,
+            LocalDate.now(),
+            Instant.now().minus(MISSION_PREVIEW_DAYS, ChronoUnit.DAYS));
 
     List<AssignedMission> pendingApproval = assignedMissionRepository
         .findAllByFamilyUnitIdAndStatusOrderByCompletedAtAsc(
@@ -95,7 +107,8 @@ public class ResponsibleDashboardService {
             child.getAge(),
             child.getAvatarKey(),
             balanceByChildId.getOrDefault(child.getId(), 0),
-            toMissionCounts(missionCountsByChildId.get(child.getId()))))
+            toMissionCounts(missionCountsByChildId.get(child.getId())),
+            missionPreviewsByChildId.getOrDefault(child.getId(), List.of())))
         .toList();
 
     return new ResponsibleDashboardResponse(
@@ -105,14 +118,19 @@ public class ResponsibleDashboardService {
         recentRedemptions);
   }
 
-  private Map<UUID, Map<AssignedMissionStatus, Long>> countMissionsByChild(
+  private List<AssignedMission> findAssignedMissionsForChildren(
       UUID familyUnitId,
       List<UUID> childIds) {
     if (childIds.isEmpty()) {
-      return Map.of();
+      return List.of();
     }
 
-    return assignedMissionRepository.findAllByFamilyUnitIdAndChildIdIn(familyUnitId, childIds)
+    return assignedMissionRepository.findAllByFamilyUnitIdAndChildIdIn(familyUnitId, childIds);
+  }
+
+  private Map<UUID, Map<AssignedMissionStatus, Long>> countMissionsByChild(
+      List<AssignedMission> assignedMissions) {
+    return assignedMissions
         .stream()
         .collect(Collectors.groupingBy(
             AssignedMission::getChildId,
@@ -120,6 +138,73 @@ public class ResponsibleDashboardService {
                 AssignedMission::getStatus,
                 () -> new EnumMap<>(AssignedMissionStatus.class),
                 Collectors.counting())));
+  }
+
+  private Map<UUID, List<ResponsibleDashboardMissionPreview>> previewMissionsByChild(
+      List<AssignedMission> assignedMissions,
+      LocalDate today,
+      Instant recentInstant) {
+    LocalDate recentDate = today.minusDays(MISSION_PREVIEW_DAYS);
+
+    return assignedMissions.stream()
+        .filter(this::isPreviewStatus)
+        .filter(assignment -> isRecentPreview(assignment, today, recentDate, recentInstant))
+        .sorted(Comparator
+            .comparingInt((AssignedMission assignment) -> previewStatusOrder(assignment.getStatus()))
+            .thenComparing(this::previewSortInstant, Comparator.nullsLast(Comparator.reverseOrder())))
+        .collect(Collectors.groupingBy(
+            AssignedMission::getChildId,
+            Collectors.mapping(this::toMissionPreview, Collectors.toList())));
+  }
+
+  private boolean isPreviewStatus(AssignedMission assignment) {
+    return assignment.getStatus() == AssignedMissionStatus.PENDING
+        || assignment.getStatus() == AssignedMissionStatus.AWAITING_APPROVAL
+        || assignment.getStatus() == AssignedMissionStatus.COMPLETED;
+  }
+
+  private boolean isRecentPreview(
+      AssignedMission assignment,
+      LocalDate today,
+      LocalDate recentDate,
+      Instant recentInstant) {
+    if (assignment.getStatus() == AssignedMissionStatus.PENDING) {
+      LocalDate scheduledDate = assignment.getScheduledDate();
+      return scheduledDate != null
+          && !scheduledDate.isBefore(recentDate)
+          && !scheduledDate.isAfter(today);
+    }
+
+    Instant activityInstant = previewSortInstant(assignment);
+    return activityInstant != null && !activityInstant.isBefore(recentInstant);
+  }
+
+  private Instant previewSortInstant(AssignedMission assignment) {
+    if (assignment.getStatus() == AssignedMissionStatus.COMPLETED && assignment.getApprovedAt() != null) {
+      return assignment.getApprovedAt();
+    }
+
+    if (assignment.getCompletedAt() != null) {
+      return assignment.getCompletedAt();
+    }
+
+    return assignment.getUpdatedAt();
+  }
+
+  private int previewStatusOrder(AssignedMissionStatus status) {
+    return switch (status) {
+      case PENDING -> 0;
+      case AWAITING_APPROVAL -> 1;
+      case COMPLETED -> 2;
+      case REJECTED, CANCELLED -> 3;
+    };
+  }
+
+  private ResponsibleDashboardMissionPreview toMissionPreview(AssignedMission assignment) {
+    return new ResponsibleDashboardMissionPreview(
+        assignment.getId(),
+        assignment.getSnapshotTitle(),
+        assignment.getStatus());
   }
 
   private ResponsibleDashboardMissionCounts toMissionCounts(

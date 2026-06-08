@@ -17,6 +17,7 @@ jest.mock('../responsibleService', () => ({
 }));
 
 const logout = jest.fn();
+const deleteAccount = jest.fn();
 const navigate = jest.fn();
 
 const navigation = {
@@ -48,6 +49,7 @@ describe('responsible navigation flow', () => {
       errorMessage: null,
       login: jest.fn(),
       register: jest.fn(),
+      deleteAccount,
       logout,
       retryRestore: jest.fn(),
     });
@@ -128,5 +130,25 @@ describe('responsible navigation flow', () => {
 
     expect(navigate).toHaveBeenCalledWith('ChildProfileSelect');
     expect(logout).not.toHaveBeenCalled();
+  });
+
+  it('confirms account deletion with the responsible password from profile', async () => {
+    render(
+      <NavigationContainer>
+        <ResponsibleTabsScreen
+          navigation={navigation}
+          route={{ key: 'ResponsibleTabs', name: 'ResponsibleTabs' }}
+        />
+      </NavigationContainer>,
+    );
+
+    fireEvent.press(await screen.findByRole('button', { name: 'Abrir Perfil' }));
+    fireEvent.press(await screen.findByRole('button', { name: 'Excluir conta' }));
+
+    expect(screen.getByLabelText('Senha para excluir conta')).toBeOnTheScreen();
+    fireEvent.changeText(screen.getByLabelText('Senha para excluir conta'), 'secret');
+    fireEvent.press(screen.getByRole('button', { name: 'Excluir minha conta' }));
+
+    expect(deleteAccount).toHaveBeenCalledWith('secret');
   });
 });
