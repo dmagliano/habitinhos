@@ -12,11 +12,11 @@ type ChildSummaryCardProps = {
 
 type MissionPreviewStatus = ResponsibleDashboardMissionPreview['status'];
 
-const PREVIEW_GROUPS: Array<{
+const PREVIEW_GROUPS: {
   emptyLabel: string;
   label: string;
   status: MissionPreviewStatus;
-}> = [
+}[] = [
   {
     emptyLabel: 'Nenhuma pendente recente.',
     label: 'Pendentes',

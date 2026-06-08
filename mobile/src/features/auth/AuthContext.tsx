@@ -130,7 +130,7 @@ export function AuthProvider({ children }: PropsWithChildren) {
       setStatus('authenticated');
       throw error;
     }
-  }, [session?.token]);
+  }, [session]);
 
   const value = useMemo(
     () => ({
