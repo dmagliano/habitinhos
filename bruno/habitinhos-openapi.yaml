@@ -128,6 +128,38 @@ paths:
         '204':
           description: PIN atualizado
 
+  /auth/account-deletion/request:
+    post:
+      tags: [Auth]
+      summary: Solicitar confirmação de exclusão de conta
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/DeleteAccountRequest'
+      responses:
+        '202':
+          description: Código de confirmação enviado
+
+  /auth/account-deletion/confirm:
+    post:
+      tags: [Auth]
+      summary: Confirmar exclusão de conta
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/DeleteAccountConfirmRequest'
+      responses:
+        '204':
+          description: Conta excluída
+
   /me:
     get:
       tags: [Auth]
@@ -141,21 +173,6 @@ paths:
             application/json:
               schema:
                 type: object
-    delete:
-      tags: [Auth]
-      summary: Excluir conta autenticada
-      security:
-        - bearerAuth: []
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/DeleteAccountRequest'
-      responses:
-        '204':
-          description: Conta excluída
-
   /children:
     post:
       tags: [Children]
@@ -663,6 +680,18 @@ components:
       type: object
       required: [password]
       properties:
+        password:
+          type: string
+          example: SenhaForte123
+
+    DeleteAccountConfirmRequest:
+      type: object
+      required: [token, password]
+      properties:
+        token:
+          type: string
+          pattern: '^[A-Za-z0-9]{6}$'
+          example: DEL123
         password:
           type: string
           example: SenhaForte123

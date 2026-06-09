@@ -24,4 +24,10 @@ public class LoggingAccountEmailSender implements AccountEmailSender {
     log.info("Responsible PIN reset email requested for email={} expiresAt={}", email, expiresAt);
     log.debug("Responsible PIN reset local code for email={} code={}", email, token);
   }
+
+  @Override
+  public void sendAccountDeletionConfirmation(String email, String token, Instant expiresAt) {
+    log.info("Account deletion confirmation email requested for email={} expiresAt={}", email, expiresAt);
+    log.debug("Account deletion local code for email={} code={}", email, token);
+  }
 }

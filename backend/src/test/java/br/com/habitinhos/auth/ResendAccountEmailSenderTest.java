@@ -63,6 +63,28 @@ class ResendAccountEmailSenderTest {
   }
 
   @Test
+  void sendsAccountDeletionConfirmationThroughResendApi() {
+    RestClient.Builder restClientBuilder = RestClient.builder();
+    MockRestServiceServer server = MockRestServiceServer.bindTo(restClientBuilder).build();
+    ResendAccountEmailSender sender = new ResendAccountEmailSender(resendProperties(), restClientBuilder);
+
+    server.expect(once(), requestTo("https://api.resend.test/emails"))
+        .andExpect(method(HttpMethod.POST))
+        .andExpect(jsonPath("$.to[0]").value("resp@example.com"))
+        .andExpect(jsonPath("$.subject").value("Confirmação de exclusão da conta Habitinhos"))
+        .andExpect(jsonPath("$.html").value(org.hamcrest.Matchers.containsString("DEL123")))
+        .andExpect(jsonPath("$.text").value(org.hamcrest.Matchers.containsString("DEL123")))
+        .andRespond(withSuccess("{\"id\":\"email-789\"}", MediaType.APPLICATION_JSON));
+
+    sender.sendAccountDeletionConfirmation(
+        "resp@example.com",
+        "DEL123",
+        Instant.parse("2026-06-07T19:30:00Z"));
+
+    server.verify();
+  }
+
+  @Test
   void raisesDeliveryExceptionWhenResendRejectsRequest() {
     RestClient.Builder restClientBuilder = RestClient.builder();
     MockRestServiceServer server = MockRestServiceServer.bindTo(restClientBuilder).build();

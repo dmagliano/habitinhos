@@ -1,6 +1,7 @@
 package br.com.habitinhos.auth;
 
 import br.com.habitinhos.auth.dto.AuthResponse;
+import br.com.habitinhos.auth.dto.DeleteAccountConfirmRequest;
 import br.com.habitinhos.auth.dto.DeleteAccountRequest;
 import br.com.habitinhos.auth.dto.LoginRequest;
 import br.com.habitinhos.auth.dto.MeResponse;
@@ -187,16 +188,37 @@ public class AuthService {
   }
 
   @Transactional
-  public void deleteAccount(CurrentUser currentUser, DeleteAccountRequest request) {
+  public void requestAccountDeletion(CurrentUser currentUser, DeleteAccountRequest request) {
     AppUser user = findActiveResponsible(currentUser);
     if (!passwordEncoder.matches(request.password(), user.getPasswordHash())) {
       log.warn("Account deletion blocked by invalid password for userId={}", currentUser.userId());
       throw new UnauthorizedException("INVALID_CREDENTIALS", "E-mail ou senha inválidos.");
     }
 
+    IssuedResetToken issuedToken = issueResetToken(user, AuthResetPurpose.ACCOUNT_DELETION);
+    accountEmailSender.sendAccountDeletionConfirmation(user.getEmail(), issuedToken.rawToken(), issuedToken.expiresAt());
+    log.info("Account deletion confirmation token issued for userId={}", user.getId());
+  }
+
+  @Transactional
+  public void confirmAccountDeletion(CurrentUser currentUser, DeleteAccountConfirmRequest request) {
+    AppUser user = findActiveResponsible(currentUser);
+    if (!passwordEncoder.matches(request.password(), user.getPasswordHash())) {
+      log.warn("Account deletion confirmation blocked by invalid password for userId={}", currentUser.userId());
+      throw new UnauthorizedException("INVALID_CREDENTIALS", "E-mail ou senha inválidos.");
+    }
+
+    AuthResetToken resetToken = findUsableResetToken(request.token(), AuthResetPurpose.ACCOUNT_DELETION);
+    if (!resetToken.getUserId().equals(user.getId())) {
+      throw invalidResetToken();
+    }
+
     user.deactivate();
-    invalidateActiveTokens(user.getId(), AuthResetPurpose.PASSWORD, Instant.now(clock));
-    invalidateActiveTokens(user.getId(), AuthResetPurpose.RESPONSIBLE_PIN, Instant.now(clock));
+    Instant now = Instant.now(clock);
+    resetToken.markUsed(now);
+    invalidateActiveTokens(user.getId(), AuthResetPurpose.PASSWORD, now);
+    invalidateActiveTokens(user.getId(), AuthResetPurpose.RESPONSIBLE_PIN, now);
+    invalidateActiveTokens(user.getId(), AuthResetPurpose.ACCOUNT_DELETION, now);
     log.info("Account deactivated: userId={} familyUnitId={}", user.getId(), user.getFamilyUnitId());
   }
 

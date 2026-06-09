@@ -73,11 +73,19 @@ export const authService = {
     });
   },
 
-  async deleteAccount(token: string, password: string): Promise<void> {
-    await apiRequest<void>('/me', {
-      method: 'DELETE',
+  async requestAccountDeletion(token: string, password: string): Promise<void> {
+    await apiRequest<void>('/auth/account-deletion/request', {
+      method: 'POST',
       token,
       body: { password },
+    });
+  },
+
+  async deleteAccount(token: string, password: string, confirmationToken: string): Promise<void> {
+    await apiRequest<void>('/auth/account-deletion/confirm', {
+      method: 'POST',
+      token,
+      body: { password, token: confirmationToken },
     });
   },
 

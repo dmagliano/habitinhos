@@ -1,6 +1,7 @@
 package br.com.habitinhos.auth;
 
 import br.com.habitinhos.auth.dto.AuthResponse;
+import br.com.habitinhos.auth.dto.DeleteAccountConfirmRequest;
 import br.com.habitinhos.auth.dto.DeleteAccountRequest;
 import br.com.habitinhos.auth.dto.LoginRequest;
 import br.com.habitinhos.auth.dto.MeResponse;
@@ -14,7 +15,6 @@ import jakarta.validation.Valid;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
-import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -92,11 +92,19 @@ public class AuthController {
     return authService.me(currentUser);
   }
 
-  @DeleteMapping("/me")
-  @ResponseStatus(HttpStatus.NO_CONTENT)
-  public void deleteAccount(@Valid @RequestBody DeleteAccountRequest request) {
+  @PostMapping("/auth/account-deletion/request")
+  @ResponseStatus(HttpStatus.ACCEPTED)
+  public void requestAccountDeletion(@Valid @RequestBody DeleteAccountRequest request) {
     CurrentUser currentUser = currentUserProvider.getCurrentUser();
-    log.info("Account deletion request received for userId={}", currentUser.userId());
-    authService.deleteAccount(currentUser, request);
+    log.info("Account deletion confirmation request received for userId={}", currentUser.userId());
+    authService.requestAccountDeletion(currentUser, request);
+  }
+
+  @PostMapping("/auth/account-deletion/confirm")
+  @ResponseStatus(HttpStatus.NO_CONTENT)
+  public void confirmAccountDeletion(@Valid @RequestBody DeleteAccountConfirmRequest request) {
+    CurrentUser currentUser = currentUserProvider.getCurrentUser();
+    log.info("Account deletion confirmation received for userId={}", currentUser.userId());
+    authService.confirmAccountDeletion(currentUser, request);
   }
 }

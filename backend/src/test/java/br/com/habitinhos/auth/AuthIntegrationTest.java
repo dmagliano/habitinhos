@@ -8,7 +8,6 @@ import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.reset;
 import static org.mockito.Mockito.verify;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
@@ -277,18 +276,44 @@ class AuthIntegrationTest extends AbstractIntegrationTest {
   @Test
   void deleteAccountDeactivatesUserAndRejectsOldSession() throws Exception {
     String token = register("responsavel@example.com");
+    reset(accountEmailSender);
 
-    mockMvc.perform(delete("/me")
+    mockMvc.perform(post("/auth/account-deletion/request")
             .header("Authorization", "Bearer " + token)
             .contentType(MediaType.APPLICATION_JSON)
             .content(objectMapper.writeValueAsString(Map.of("password", "senha-errada"))))
         .andExpect(status().isUnauthorized())
         .andExpect(jsonPath("$.code").value("INVALID_CREDENTIALS"));
+    verify(accountEmailSender, never()).sendAccountDeletionConfirmation(any(), any(), any());
 
-    mockMvc.perform(delete("/me")
+    mockMvc.perform(post("/auth/account-deletion/request")
             .header("Authorization", "Bearer " + token)
             .contentType(MediaType.APPLICATION_JSON)
             .content(objectMapper.writeValueAsString(Map.of("password", RAW_PASSWORD))))
+        .andExpect(status().isAccepted());
+
+    ArgumentCaptor<String> tokenCaptor = ArgumentCaptor.forClass(String.class);
+    verify(accountEmailSender).sendAccountDeletionConfirmation(
+        eq("responsavel@example.com"),
+        tokenCaptor.capture(),
+        any(Instant.class));
+    assertThat(tokenCaptor.getValue()).matches("[A-Z0-9]{6}");
+
+    mockMvc.perform(post("/auth/account-deletion/confirm")
+            .header("Authorization", "Bearer " + token)
+            .contentType(MediaType.APPLICATION_JSON)
+            .content(objectMapper.writeValueAsString(Map.of(
+                "password", "senha-errada",
+                "token", tokenCaptor.getValue()))))
+        .andExpect(status().isUnauthorized())
+        .andExpect(jsonPath("$.code").value("INVALID_CREDENTIALS"));
+
+    mockMvc.perform(post("/auth/account-deletion/confirm")
+            .header("Authorization", "Bearer " + token)
+            .contentType(MediaType.APPLICATION_JSON)
+            .content(objectMapper.writeValueAsString(Map.of(
+                "password", RAW_PASSWORD,
+                "token", tokenCaptor.getValue()))))
         .andExpect(status().isNoContent());
 
     AppUser user = appUserRepository.findByEmailIgnoreCase("responsavel@example.com").orElseThrow();
