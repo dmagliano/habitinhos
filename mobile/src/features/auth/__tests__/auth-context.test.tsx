@@ -209,10 +209,10 @@ describe('AuthProvider', () => {
     await waitFor(() => expect(screen.getByText('authenticated')).toBeOnTheScreen());
 
     await act(async () => {
-      await latestAuth?.deleteAccount('secret');
+      await latestAuth?.deleteAccount('secret', 'DEL123');
     });
 
-    expect(authService.deleteAccount).toHaveBeenCalledWith('jwt-token', 'secret');
+    expect(authService.deleteAccount).toHaveBeenCalledWith('jwt-token', 'secret', 'DEL123');
     expect(tokenStorage.clearToken).toHaveBeenCalled();
     expect(screen.getByText('unauthenticated')).toBeOnTheScreen();
   });

@@ -3,11 +3,18 @@ import { fireEvent, render, screen } from '@testing-library/react-native';
 
 import { ChildResponse } from '../../../api/types';
 import { useAuth } from '../../auth/AuthContext';
+import { authService } from '../../auth/authService';
 import { getResponsibleTabBottomSafeAreaHeight, ResponsibleTabsScreen } from '../ResponsibleTabsScreen';
 import { responsibleService } from '../responsibleService';
 
 jest.mock('../../auth/AuthContext', () => ({
   useAuth: jest.fn(),
+}));
+
+jest.mock('../../auth/authService', () => ({
+  authService: {
+    requestAccountDeletion: jest.fn(),
+  },
 }));
 
 jest.mock('../responsibleService', () => ({
@@ -53,6 +60,7 @@ describe('responsible navigation flow', () => {
       logout,
       retryRestore: jest.fn(),
     });
+    jest.mocked(authService.requestAccountDeletion).mockResolvedValue(undefined);
     jest.mocked(responsibleService.getDashboard).mockResolvedValue({
       children: [],
       pendingApprovalCount: 0,
@@ -132,7 +140,7 @@ describe('responsible navigation flow', () => {
     expect(logout).not.toHaveBeenCalled();
   });
 
-  it('confirms account deletion with the responsible password from profile', async () => {
+  it('confirms account deletion with the responsible password and email code from profile', async () => {
     render(
       <NavigationContainer>
         <ResponsibleTabsScreen
@@ -147,8 +155,14 @@ describe('responsible navigation flow', () => {
 
     expect(screen.getByLabelText('Senha para excluir conta')).toBeOnTheScreen();
     fireEvent.changeText(screen.getByLabelText('Senha para excluir conta'), 'secret');
+    fireEvent.press(screen.getByRole('button', { name: 'Enviar código de confirmação' }));
+
+    expect(authService.requestAccountDeletion).toHaveBeenCalledWith('jwt-token', 'secret');
+
+    expect(await screen.findByLabelText('Código para excluir conta')).toBeOnTheScreen();
+    fireEvent.changeText(screen.getByLabelText('Código para excluir conta'), 'del123');
     fireEvent.press(screen.getByRole('button', { name: 'Excluir minha conta' }));
 
-    expect(deleteAccount).toHaveBeenCalledWith('secret');
+    expect(deleteAccount).toHaveBeenCalledWith('secret', 'DEL123');
   });
 });

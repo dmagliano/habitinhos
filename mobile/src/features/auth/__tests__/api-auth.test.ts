@@ -143,17 +143,28 @@ describe('apiRequest', () => {
     );
   });
 
-  it('deletes the authenticated account with password confirmation', async () => {
-    fetchMock.mockResolvedValueOnce(createResponse(204, undefined));
+  it('requests and confirms authenticated account deletion with email code', async () => {
+    fetchMock
+      .mockResolvedValueOnce(createResponse(202, undefined))
+      .mockResolvedValueOnce(createResponse(204, undefined));
 
-    await expect(authService.deleteAccount('jwt-token', 'secret')).resolves.toBeUndefined();
+    await expect(authService.requestAccountDeletion('jwt-token', 'secret')).resolves.toBeUndefined();
+    await expect(authService.deleteAccount('jwt-token', 'secret', 'DEL123')).resolves.toBeUndefined();
 
     expect(fetchMock).toHaveBeenCalledWith(
-      'http://10.0.2.2:8080/me',
+      'http://10.0.2.2:8080/auth/account-deletion/request',
       expect.objectContaining({
-        method: 'DELETE',
+        method: 'POST',
         headers: expect.objectContaining({ Authorization: 'Bearer jwt-token' }),
         body: JSON.stringify({ password: 'secret' }),
+      }),
+    );
+    expect(fetchMock).toHaveBeenCalledWith(
+      'http://10.0.2.2:8080/auth/account-deletion/confirm',
+      expect.objectContaining({
+        method: 'POST',
+        headers: expect.objectContaining({ Authorization: 'Bearer jwt-token' }),
+        body: JSON.stringify({ password: 'secret', token: 'DEL123' }),
       }),
     );
   });

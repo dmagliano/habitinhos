@@ -24,6 +24,8 @@ class OpenApiIntegrationTest extends AbstractIntegrationTest {
         .andExpect(content().string(containsString("\"/auth/password-reset/confirm\"")))
         .andExpect(content().string(containsString("\"/auth/responsible-pin/reset/request\"")))
         .andExpect(content().string(containsString("\"/auth/responsible-pin/reset/confirm\"")))
+        .andExpect(content().string(containsString("\"/auth/account-deletion/request\"")))
+        .andExpect(content().string(containsString("\"/auth/account-deletion/confirm\"")))
         .andExpect(content().string(containsString("\"/children\"")))
         .andExpect(content().string(containsString("\"/missions\"")))
         .andExpect(content().string(containsString("\"/missions/{id}\"")))

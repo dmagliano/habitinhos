@@ -1,6 +1,6 @@
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
-import { useCallback, useEffect, useState } from 'react';
+import { useCallback, useMemo, useState } from 'react';
 import { StyleSheet, Text, View } from 'react-native';
 
 import { AppHeader, AppScreen, Card, EmojiAvatar, SecondaryButton } from '../../components';
@@ -29,11 +29,17 @@ export function ChildTabsScreen({ navigation, route }: Props) {
   const { child } = route.params;
   const { session } = useAuth();
   const routeCompletedMissionId = route.params.completedMissionId;
-  const [completedMissionIds, setCompletedMissionIds] = useState<string[]>(
-    routeCompletedMissionId ? [routeCompletedMissionId] : [],
-  );
+  const [rememberedCompletedMissionIds, setRememberedCompletedMissionIds] = useState<string[]>([]);
+  const completedMissionIds = useMemo(() => {
+    if (!routeCompletedMissionId || rememberedCompletedMissionIds.includes(routeCompletedMissionId)) {
+      return rememberedCompletedMissionIds;
+    }
+
+    return [routeCompletedMissionId, ...rememberedCompletedMissionIds];
+  }, [rememberedCompletedMissionIds, routeCompletedMissionId]);
+
   const rememberCompletedMission = useCallback((missionId: string) => {
-    setCompletedMissionIds((currentMissionIds) => {
+    setRememberedCompletedMissionIds((currentMissionIds) => {
       if (currentMissionIds.includes(missionId)) {
         return currentMissionIds;
       }
@@ -41,12 +47,6 @@ export function ChildTabsScreen({ navigation, route }: Props) {
       return [...currentMissionIds, missionId];
     });
   }, []);
-
-  useEffect(() => {
-    if (routeCompletedMissionId) {
-      rememberCompletedMission(routeCompletedMissionId);
-    }
-  }, [rememberCompletedMission, routeCompletedMissionId]);
 
   return (
     <Tab.Navigator

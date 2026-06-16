@@ -94,6 +94,28 @@ public class ResendAccountEmailSender implements AccountEmailSender {
         """.formatted(token, EXPIRATION_FORMATTER.format(expiresAt)));
   }
 
+  @Override
+  public void sendAccountDeletionConfirmation(String email, String token, Instant expiresAt) {
+    sendEmail(
+        email,
+        "Confirmação de exclusão da conta Habitinhos",
+        """
+        <p>Recebemos uma solicitação para excluir sua conta no Habitinhos.</p>
+        <p>Informe este código no app para confirmar a exclusão:</p>
+        <p><strong style="font-size: 18px;">%s</strong></p>
+        <p>Ele expira em %s.</p>
+        <p>Se você não pediu essa exclusão, ignore este e-mail e mantenha sua conta protegida.</p>
+        """.formatted(escapeHtml(token), EXPIRATION_FORMATTER.format(expiresAt)),
+        """
+        Recebemos uma solicitação para excluir sua conta no Habitinhos.
+
+        Código: %s
+        Expira em: %s
+
+        Se você não pediu essa exclusão, ignore este e-mail e mantenha sua conta protegida.
+        """.formatted(token, EXPIRATION_FORMATTER.format(expiresAt)));
+  }
+
   private void sendEmail(String to, String subject, String html, String text) {
     try {
       ResendEmailResponse response = restClient.post()

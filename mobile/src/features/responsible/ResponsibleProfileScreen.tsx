@@ -5,6 +5,7 @@ import { ApiError } from '../../api/types';
 import { AppHeader, AppScreen, Card, PrimaryButton, SecondaryButton } from '../../components';
 import { colors, radius, spacing, typography } from '../../theme';
 import { useAuth } from '../auth/AuthContext';
+import { authService } from '../auth/authService';
 
 type ResponsibleProfileScreenProps = {
   hasActiveChild?: boolean;
@@ -20,11 +21,34 @@ export function ResponsibleProfileScreen({
   const { deleteAccount, session, status } = useAuth();
   const [showDeleteForm, setShowDeleteForm] = useState(false);
   const [deletePassword, setDeletePassword] = useState('');
+  const [deleteConfirmationToken, setDeleteConfirmationToken] = useState('');
+  const [deleteStep, setDeleteStep] = useState<'password' | 'confirmation'>('password');
+  const [requestingDeletion, setRequestingDeletion] = useState(false);
   const [deleteErrorMessage, setDeleteErrorMessage] = useState<string | null>(null);
   const familyName = session?.family.name ?? 'Família';
   const responsibleName = session?.user.name ?? 'Responsável';
   const responsibleEmail = session?.user.email ?? '';
   const deleting = status === 'loading' && showDeleteForm;
+  const requestingDeleteCode = requestingDeletion && showDeleteForm;
+  const deleteCodeReady = isValidDeleteCode(deleteConfirmationToken);
+
+  async function handleRequestDeleteConfirmation() {
+    if (requestingDeleteCode || !session?.token) {
+      return;
+    }
+
+    setDeleteErrorMessage(null);
+    setRequestingDeletion(true);
+
+    try {
+      await authService.requestAccountDeletion(session.token, deletePassword);
+      setDeleteStep('confirmation');
+    } catch (error) {
+      setDeleteErrorMessage(getDeleteAccountErrorMessage(error));
+    } finally {
+      setRequestingDeletion(false);
+    }
+  }
 
   async function handleDeleteAccount() {
     if (deleting) {
@@ -34,7 +58,7 @@ export function ResponsibleProfileScreen({
     setDeleteErrorMessage(null);
 
     try {
-      await deleteAccount(deletePassword);
+      await deleteAccount(deletePassword, deleteConfirmationToken);
     } catch (error) {
       setDeleteErrorMessage(getDeleteAccountErrorMessage(error));
     }
@@ -68,7 +92,9 @@ export function ResponsibleProfileScreen({
       {showDeleteForm ? (
         <Card style={styles.deleteCard}>
           <Text style={styles.deleteTitle}>Excluir conta</Text>
-          <Text style={styles.profileText}>Esta ação remove o acesso da conta do responsável.</Text>
+          <Text style={styles.profileText}>
+            Esta ação remove o acesso da conta do responsável. Enviaremos um código para {responsibleEmail}.
+          </Text>
           <View style={styles.field}>
             <Text style={styles.cardLabel}>Senha</Text>
             <TextInput
@@ -81,19 +107,45 @@ export function ResponsibleProfileScreen({
               value={deletePassword}
             />
           </View>
+          {deleteStep === 'confirmation' ? (
+            <View style={styles.field}>
+              <Text style={styles.cardLabel}>Código recebido por e-mail</Text>
+              <TextInput
+                accessibilityLabel="Código para excluir conta"
+                autoCapitalize="characters"
+                maxLength={6}
+                onChangeText={(value) => setDeleteConfirmationToken(formatDeleteCode(value))}
+                placeholder="ABC123"
+                placeholderTextColor={colors.textMuted}
+                style={styles.input}
+                value={deleteConfirmationToken}
+              />
+            </View>
+          ) : null}
           {deleteErrorMessage ? <Text style={styles.error}>{deleteErrorMessage}</Text> : null}
-          <PrimaryButton
-            disabled={!deletePassword}
-            label={deleting ? 'Excluindo...' : 'Excluir minha conta'}
-            loading={deleting}
-            onPress={handleDeleteAccount}
-          />
+          {deleteStep === 'password' ? (
+            <PrimaryButton
+              disabled={!deletePassword}
+              label={requestingDeleteCode ? 'Enviando código...' : 'Enviar código de confirmação'}
+              loading={requestingDeleteCode}
+              onPress={handleRequestDeleteConfirmation}
+            />
+          ) : (
+            <PrimaryButton
+              disabled={!deletePassword || !deleteCodeReady}
+              label={deleting ? 'Excluindo...' : 'Excluir minha conta'}
+              loading={deleting}
+              onPress={handleDeleteAccount}
+            />
+          )}
           <SecondaryButton
-            disabled={deleting}
+            disabled={deleting || requestingDeleteCode}
             label="Cancelar"
             onPress={() => {
               setShowDeleteForm(false);
               setDeletePassword('');
+              setDeleteConfirmationToken('');
+              setDeleteStep('password');
               setDeleteErrorMessage(null);
             }}
           />
@@ -109,6 +161,14 @@ function getDeleteAccountErrorMessage(error: unknown): string {
   }
 
   return 'Não conseguimos excluir a conta. Tente novamente.';
+}
+
+function formatDeleteCode(value: string): string {
+  return value.replace(/[^a-zA-Z0-9]/g, '').toUpperCase().slice(0, 6);
+}
+
+function isValidDeleteCode(value: string): boolean {
+  return /^[A-Z0-9]{6}$/.test(value);
 }
 
 const styles = StyleSheet.create({

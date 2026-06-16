@@ -9,4 +9,6 @@ public interface AccountEmailSender {
   void sendPasswordReset(String email, String token, Instant expiresAt);
 
   void sendResponsiblePinReset(String email, String token, Instant expiresAt);
+
+  void sendAccountDeletionConfirmation(String email, String token, Instant expiresAt);
 }
