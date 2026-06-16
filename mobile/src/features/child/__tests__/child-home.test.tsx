@@ -43,6 +43,7 @@ describe('ChildHomeScreen', () => {
       errorMessage: null,
       login: jest.fn(),
       register: jest.fn(),
+      deleteAccount: jest.fn(),
       logout: jest.fn(),
       retryRestore: jest.fn(),
     });
@@ -76,9 +77,13 @@ describe('ChildHomeScreen', () => {
       'Separar uniforme',
       'Regar as plantas',
     ]);
+    expect(screen.queryByText('Arrumar a cama com carinho')).toBeNull();
+
+    fireEvent.press(screen.getByRole('button', { name: 'Abrir missões para Arrumar a cama' }));
+    expect(openMissions).toHaveBeenCalledTimes(1);
 
     fireEvent.press(screen.getByRole('button', { name: 'Ver missões' }));
-    expect(openMissions).toHaveBeenCalledTimes(1);
+    expect(openMissions).toHaveBeenCalledTimes(2);
   });
 
   it('renders loading and empty states without fake missions', async () => {
@@ -96,6 +101,31 @@ describe('ChildHomeScreen', () => {
     expect(await screen.findByText('Nenhuma missão hoje')).toBeOnTheScreen();
     expect(screen.getByText('Quando houver uma nova missão, ela aparece aqui.')).toBeOnTheScreen();
     expect(screen.queryByTestId('home-mission-title')).toBeNull();
+  });
+
+  it('hides completed missions passed back from navigation', async () => {
+    jest.mocked(childService.getWallet).mockResolvedValue({
+      childId: joaquim.id,
+      balance: 42,
+      createdAt: '2026-06-01T10:00:00Z',
+      updatedAt: '2026-06-01T10:00:00Z',
+    });
+    jest.mocked(childService.listPendingMissions).mockResolvedValue([
+      mission('mission-completed', 'Arrumar a cama', '2026-06-03', '2026-06-01T11:00:00Z'),
+      mission('mission-next', 'Separar uniforme', '2026-06-03', '2026-06-01T12:00:00Z'),
+    ]);
+
+    render(
+      <ChildHomeScreen
+        child={joaquim}
+        completedMissionIds={['mission-completed']}
+        onOpenMissions={openMissions}
+      />,
+    );
+
+    expect(await screen.findByText('Separar uniforme')).toBeOnTheScreen();
+    expect(screen.queryByText('Arrumar a cama')).toBeNull();
+    expect(screen.getByText('Você tem 1 missão pendente hoje.')).toBeOnTheScreen();
   });
 
   it('renders a friendly error state and retries real backend loading', async () => {

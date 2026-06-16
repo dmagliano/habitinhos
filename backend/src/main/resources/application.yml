@@ -3,12 +3,10 @@ server:
   port: ${PORT:8080}
 
 spring:
+  profiles:
+    default: local
   application:
     name: habitinhos-backend
-  datasource:
-    url: ${SPRING_DATASOURCE_URL:${DATABASE_URL}}
-    username: ${SPRING_DATASOURCE_USERNAME:${DATABASE_USERNAME}}
-    password: ${SPRING_DATASOURCE_PASSWORD:${DATABASE_PASSWORD}}
   flyway:
     enabled: true
   jpa:
@@ -35,4 +33,39 @@ habitinhos:
     jwt:
       issuer: ${HABITINHOS_JWT_ISSUER:habitinhos}
       expiration-minutes: ${HABITINHOS_JWT_EXPIRATION_MINUTES:120}
+  email:
+    from: ${HABITINHOS_EMAIL_FROM:Habitinhos <onboarding@resend.dev>}
+    user-agent: ${HABITINHOS_EMAIL_USER_AGENT:habitinhos-backend/1.0}
+    resend:
+      api-key: ${RESEND_API_KEY:}
+      base-url: ${RESEND_BASE_URL:https://api.resend.com}
+
+---
+spring:
+  config:
+    activate:
+      on-profile: local
+  datasource:
+    url: ${SPRING_DATASOURCE_URL:jdbc:postgresql://localhost:5432/habitinhos}
+    username: ${SPRING_DATASOURCE_USERNAME:habitinhos}
+    password: ${SPRING_DATASOURCE_PASSWORD:habitinhos}
+
+habitinhos:
+  security:
+    jwt:
+      secret: ${HABITINHOS_JWT_SECRET:habitinhos-local-development-secret-000000000000}
+
+---
+spring:
+  config:
+    activate:
+      on-profile: render
+  datasource:
+    url: ${SPRING_DATASOURCE_URL}
+    username: ${SPRING_DATASOURCE_USERNAME}
+    password: ${SPRING_DATASOURCE_PASSWORD}
+
+habitinhos:
+  security:
+    jwt:
       secret: ${HABITINHOS_JWT_SECRET}

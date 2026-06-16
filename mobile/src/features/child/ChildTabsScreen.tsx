@@ -1,6 +1,6 @@
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
-import { useState } from 'react';
+import { useCallback, useMemo, useState } from 'react';
 import { StyleSheet, Text, View } from 'react-native';
 
 import { AppHeader, AppScreen, Card, EmojiAvatar, SecondaryButton } from '../../components';
@@ -28,6 +28,25 @@ const Tab = createBottomTabNavigator<ChildTabParamList>();
 export function ChildTabsScreen({ navigation, route }: Props) {
   const { child } = route.params;
   const { session } = useAuth();
+  const routeCompletedMissionId = route.params.completedMissionId;
+  const [rememberedCompletedMissionIds, setRememberedCompletedMissionIds] = useState<string[]>([]);
+  const completedMissionIds = useMemo(() => {
+    if (!routeCompletedMissionId || rememberedCompletedMissionIds.includes(routeCompletedMissionId)) {
+      return rememberedCompletedMissionIds;
+    }
+
+    return [routeCompletedMissionId, ...rememberedCompletedMissionIds];
+  }, [rememberedCompletedMissionIds, routeCompletedMissionId]);
+
+  const rememberCompletedMission = useCallback((missionId: string) => {
+    setRememberedCompletedMissionIds((currentMissionIds) => {
+      if (currentMissionIds.includes(missionId)) {
+        return currentMissionIds;
+      }
+
+      return [...currentMissionIds, missionId];
+    });
+  }, []);
 
   return (
     <Tab.Navigator
@@ -39,6 +58,7 @@ export function ChildTabsScreen({ navigation, route }: Props) {
         {({ navigation: tabNavigation }) => (
           <ChildHomeScreen
             child={child}
+            completedMissionIds={completedMissionIds}
             onOpenMissions={() => tabNavigation.navigate('ChildMissions')}
           />
         )}
@@ -47,6 +67,8 @@ export function ChildTabsScreen({ navigation, route }: Props) {
         {() => (
           <ChildMissionsScreen
             child={child}
+            completedMissionIds={completedMissionIds}
+            onMissionCompleted={rememberCompletedMission}
             onOpenMissionDetail={(mission) =>
               navigation.navigate('ChildMissionDetail', { child, mission })
             }
@@ -63,6 +85,7 @@ export function ChildTabsScreen({ navigation, route }: Props) {
             familyName={session?.family.name}
             avatarKey={child.avatarKey}
             onManageFamily={() => navigation.navigate('ResponsibleTabs', { activeChild: child })}
+            onRecoverPin={() => navigation.navigate('ResponsiblePinReset')}
             onSwitchChild={() => navigation.navigate('ChildProfileSelect')}
             token={session?.token ?? null}
           />
@@ -77,6 +100,7 @@ function ProfileTab({
   childName,
   familyName,
   onManageFamily,
+  onRecoverPin,
   onSwitchChild,
   token,
 }: {
@@ -84,6 +108,7 @@ function ProfileTab({
   childName: string;
   familyName?: string;
   onManageFamily: () => void;
+  onRecoverPin: () => void;
   onSwitchChild: () => void;
   token: string | null;
 }) {
@@ -111,6 +136,7 @@ function ProfileTab({
       {showResponsiblePin ? (
         <ResponsiblePinPrompt
           onCancel={() => setShowResponsiblePin(false)}
+          onForgotPin={onRecoverPin}
           onVerified={onManageFamily}
           token={token}
         />

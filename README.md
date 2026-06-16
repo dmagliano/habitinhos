@@ -59,6 +59,27 @@ The mobile app reads the backend URL from the public Expo variable
 EXPO_PUBLIC_API_URL=https://habitinhos-api.onrender.com
 ```
 
+For local development, you can choose the target when starting Expo:
+
+```bash
+cd mobile
+npm run android:local   # Android emulator -> backend on the host at :8080
+npm run android:render  # Android emulator -> deployed Render backend
+npm run ios:local       # iOS simulator -> backend at localhost:8080
+npm run web:local       # browser -> backend at localhost:8080
+```
+
+The local URL depends on where the app is running:
+
+```text
+Android emulator: http://10.0.2.2:8080
+iOS simulator/web: http://localhost:8080
+```
+
+If you prefer a private local env file, copy one of the examples in `mobile/` to
+`mobile/.env.local`. Expo will bundle `EXPO_PUBLIC_*` variables into the mobile app, so use this only
+for non-secret values such as public API URLs.
+
 Set it in the same EAS environment used by the build profile:
 
 - `eas build --profile preview` uses the `preview` environment.
@@ -73,7 +94,7 @@ eas env:create --name EXPO_PUBLIC_API_URL --value https://habitinhos-api.onrende
 eas env:create --name EXPO_PUBLIC_API_URL --value https://habitinhos-api.onrender.com --environment production --visibility plaintext
 ```
 
-For local emulator development, if no Expo variable is set, the app falls back to
+For local emulator development, if no Expo variable is set, the app also falls back to
 `http://10.0.2.2:8080`.
 
 ## Swagger Endpoint Testing
@@ -82,12 +103,35 @@ Start the backend:
 
 ```bash
 cd backend
-export SPRING_DATASOURCE_URL=jdbc:postgresql://localhost:5432/habitinhos
-export SPRING_DATASOURCE_USERNAME="$(docker compose -f ../docker-compose.yml exec -T postgres printenv POSTGRES_USER)"
-export SPRING_DATASOURCE_PASSWORD="$(docker compose -f ../docker-compose.yml exec -T postgres printenv POSTGRES_PASSWORD)"
-export HABITINHOS_JWT_SECRET="$(openssl rand -base64 32)"
 ./mvnw spring-boot:run
 ```
+
+By default, local backend execution uses the `local` Spring profile, connects to the PostgreSQL service from
+`docker-compose.yml` at `jdbc:postgresql://localhost:5432/habitinhos` with
+`habitinhos` / `habitinhos`, and uses a development-only JWT secret. Deployed environments should run with
+`SPRING_PROFILES_ACTIVE=render` and provide
+`SPRING_DATASOURCE_URL`, `SPRING_DATASOURCE_USERNAME`, and
+`SPRING_DATASOURCE_PASSWORD`; the Render Docker entrypoint normalizes Render's
+`DATABASE_URL` into the JDBC URL expected by Spring. They must also provide
+`HABITINHOS_JWT_SECRET`.
+
+## Email Delivery
+
+The backend sends welcome, password reset, and responsible PIN reset emails through Resend when
+`RESEND_API_KEY` is configured. In Render, keep the API key as a secret environment variable:
+
+```text
+RESEND_API_KEY=...
+```
+
+Set the sender to an address from a verified Resend domain before sending to real users:
+
+```text
+HABITINHOS_EMAIL_FROM=Habitinhos <noreply@your-verified-domain.com>
+```
+
+If `RESEND_API_KEY` is absent, the backend falls back to local logging so development does not require
+real email delivery.
 
 Open Swagger UI:
 

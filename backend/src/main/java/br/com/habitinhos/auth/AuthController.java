@@ -1,9 +1,15 @@
 package br.com.habitinhos.auth;
 
 import br.com.habitinhos.auth.dto.AuthResponse;
+import br.com.habitinhos.auth.dto.DeleteAccountConfirmRequest;
+import br.com.habitinhos.auth.dto.DeleteAccountRequest;
 import br.com.habitinhos.auth.dto.LoginRequest;
 import br.com.habitinhos.auth.dto.MeResponse;
+import br.com.habitinhos.auth.dto.PasswordResetConfirmRequest;
+import br.com.habitinhos.auth.dto.PasswordResetRequest;
 import br.com.habitinhos.auth.dto.RegisterRequest;
+import br.com.habitinhos.auth.dto.ResponsiblePinResetConfirmRequest;
+import br.com.habitinhos.auth.dto.ResponsiblePinResetRequest;
 import br.com.habitinhos.auth.dto.VerifyResponsiblePinRequest;
 import jakarta.validation.Valid;
 import org.slf4j.Logger;
@@ -41,6 +47,20 @@ public class AuthController {
     return authService.login(request);
   }
 
+  @PostMapping("/auth/password-reset/request")
+  @ResponseStatus(HttpStatus.ACCEPTED)
+  public void requestPasswordReset(@Valid @RequestBody PasswordResetRequest request) {
+    log.info("Password reset request received");
+    authService.requestPasswordReset(request);
+  }
+
+  @PostMapping("/auth/password-reset/confirm")
+  @ResponseStatus(HttpStatus.NO_CONTENT)
+  public void confirmPasswordReset(@Valid @RequestBody PasswordResetConfirmRequest request) {
+    log.info("Password reset confirmation received");
+    authService.confirmPasswordReset(request);
+  }
+
   @PostMapping("/auth/responsible-pin/verify")
   @ResponseStatus(HttpStatus.NO_CONTENT)
   public void verifyResponsiblePin(@Valid @RequestBody VerifyResponsiblePinRequest request) {
@@ -49,10 +69,42 @@ public class AuthController {
     authService.verifyResponsiblePin(currentUser, request);
   }
 
+  @PostMapping("/auth/responsible-pin/reset/request")
+  @ResponseStatus(HttpStatus.ACCEPTED)
+  public void requestResponsiblePinReset(@Valid @RequestBody ResponsiblePinResetRequest request) {
+    CurrentUser currentUser = currentUserProvider.getCurrentUser();
+    log.info("Responsible PIN reset request received for userId={}", currentUser.userId());
+    authService.requestResponsiblePinReset(currentUser, request);
+  }
+
+  @PostMapping("/auth/responsible-pin/reset/confirm")
+  @ResponseStatus(HttpStatus.NO_CONTENT)
+  public void confirmResponsiblePinReset(@Valid @RequestBody ResponsiblePinResetConfirmRequest request) {
+    CurrentUser currentUser = currentUserProvider.getCurrentUser();
+    log.info("Responsible PIN reset confirmation received for userId={}", currentUser.userId());
+    authService.confirmResponsiblePinReset(currentUser, request);
+  }
+
   @GetMapping("/me")
   public MeResponse me() {
     CurrentUser currentUser = currentUserProvider.getCurrentUser();
     log.debug("Auth me request for userId={} familyUnitId={}", currentUser.userId(), currentUser.familyUnitId());
     return authService.me(currentUser);
+  }
+
+  @PostMapping("/auth/account-deletion/request")
+  @ResponseStatus(HttpStatus.ACCEPTED)
+  public void requestAccountDeletion(@Valid @RequestBody DeleteAccountRequest request) {
+    CurrentUser currentUser = currentUserProvider.getCurrentUser();
+    log.info("Account deletion confirmation request received for userId={}", currentUser.userId());
+    authService.requestAccountDeletion(currentUser, request);
+  }
+
+  @PostMapping("/auth/account-deletion/confirm")
+  @ResponseStatus(HttpStatus.NO_CONTENT)
+  public void confirmAccountDeletion(@Valid @RequestBody DeleteAccountConfirmRequest request) {
+    CurrentUser currentUser = currentUserProvider.getCurrentUser();
+    log.info("Account deletion confirmation received for userId={}", currentUser.userId());
+    authService.confirmAccountDeletion(currentUser, request);
   }
 }

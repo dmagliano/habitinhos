@@ -89,6 +89,86 @@ describe('apiRequest', () => {
     );
   });
 
+  it('requests and confirms password reset through public auth endpoints', async () => {
+    fetchMock
+      .mockResolvedValueOnce(createResponse(202, undefined))
+      .mockResolvedValueOnce(createResponse(204, undefined));
+
+    await expect(authService.requestPasswordReset('dani@example.com')).resolves.toBeUndefined();
+    await expect(authService.confirmPasswordReset('ABC123', 'novaSenha123')).resolves.toBeUndefined();
+
+    expect(fetchMock).toHaveBeenNthCalledWith(
+      1,
+      'http://10.0.2.2:8080/auth/password-reset/request',
+      expect.objectContaining({
+        method: 'POST',
+        body: JSON.stringify({ email: 'dani@example.com' }),
+      }),
+    );
+    expect(fetchMock).toHaveBeenNthCalledWith(
+      2,
+      'http://10.0.2.2:8080/auth/password-reset/confirm',
+      expect.objectContaining({
+        method: 'POST',
+        body: JSON.stringify({ token: 'ABC123', newPassword: 'novaSenha123' }),
+      }),
+    );
+  });
+
+  it('requests and confirms responsible PIN reset with the authenticated token', async () => {
+    fetchMock
+      .mockResolvedValueOnce(createResponse(202, undefined))
+      .mockResolvedValueOnce(createResponse(204, undefined));
+
+    await expect(authService.requestResponsiblePinReset('jwt-token', 'secret')).resolves.toBeUndefined();
+    await expect(authService.confirmResponsiblePinReset('jwt-token', 'PIN456', '5678')).resolves.toBeUndefined();
+
+    expect(fetchMock).toHaveBeenNthCalledWith(
+      1,
+      'http://10.0.2.2:8080/auth/responsible-pin/reset/request',
+      expect.objectContaining({
+        method: 'POST',
+        headers: expect.objectContaining({ Authorization: 'Bearer jwt-token' }),
+        body: JSON.stringify({ password: 'secret' }),
+      }),
+    );
+    expect(fetchMock).toHaveBeenNthCalledWith(
+      2,
+      'http://10.0.2.2:8080/auth/responsible-pin/reset/confirm',
+      expect.objectContaining({
+        method: 'POST',
+        headers: expect.objectContaining({ Authorization: 'Bearer jwt-token' }),
+        body: JSON.stringify({ token: 'PIN456', newPin: '5678' }),
+      }),
+    );
+  });
+
+  it('requests and confirms authenticated account deletion with email code', async () => {
+    fetchMock
+      .mockResolvedValueOnce(createResponse(202, undefined))
+      .mockResolvedValueOnce(createResponse(204, undefined));
+
+    await expect(authService.requestAccountDeletion('jwt-token', 'secret')).resolves.toBeUndefined();
+    await expect(authService.deleteAccount('jwt-token', 'secret', 'DEL123')).resolves.toBeUndefined();
+
+    expect(fetchMock).toHaveBeenCalledWith(
+      'http://10.0.2.2:8080/auth/account-deletion/request',
+      expect.objectContaining({
+        method: 'POST',
+        headers: expect.objectContaining({ Authorization: 'Bearer jwt-token' }),
+        body: JSON.stringify({ password: 'secret' }),
+      }),
+    );
+    expect(fetchMock).toHaveBeenCalledWith(
+      'http://10.0.2.2:8080/auth/account-deletion/confirm',
+      expect.objectContaining({
+        method: 'POST',
+        headers: expect.objectContaining({ Authorization: 'Bearer jwt-token' }),
+        body: JSON.stringify({ password: 'secret', token: 'DEL123' }),
+      }),
+    );
+  });
+
   it('maps invalid responsible PIN to a PIN-specific message', async () => {
     fetchMock.mockResolvedValueOnce(
       createResponse(403, {

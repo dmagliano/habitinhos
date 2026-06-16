@@ -18,6 +18,8 @@ services:
         - docs/**
         - .planning/**
     envVars:
+      - key: SPRING_PROFILES_ACTIVE
+        value: render
       - key: DATABASE_URL
         fromDatabase:
           name: habitinhos-db

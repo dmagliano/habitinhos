@@ -122,6 +122,9 @@ class ResponsibleDashboardIntegrationTest extends AbstractIntegrationTest {
         .andExpect(jsonPath("$.children[0].missionCounts.COMPLETED").value(1))
         .andExpect(jsonPath("$.children[0].missionCounts.REJECTED").value(1))
         .andExpect(jsonPath("$.children[0].missionCounts.CANCELLED").value(1))
+        .andExpect(jsonPath("$.children[0].missionPreviews.length()").value(4))
+        .andExpect(jsonPath("$.children[0].missionPreviews[0].title").value("Arrumar cama"))
+        .andExpect(jsonPath("$.children[0].missionPreviews[0].status").value("PENDING"))
         .andExpect(jsonPath("$.pendingApprovalCount").value(3))
         .andExpect(jsonPath("$.approvalPreview.length()").value(2))
         .andExpect(jsonPath("$.approvalPreview[0].id").value(awaitingOne.toString()))
@@ -144,6 +147,8 @@ class ResponsibleDashboardIntegrationTest extends AbstractIntegrationTest {
         .doesNotContain("Noah")
         .doesNotContain("Missão externa")
         .doesNotContain("Recompensa externa")
+        .doesNotContain("Tirar lixo")
+        .doesNotContain("Regar plantas")
         .doesNotContain(userA.getFamilyUnitId().toString());
     assertThat(pending).isNotNull();
   }
@@ -219,7 +224,7 @@ class ResponsibleDashboardIntegrationTest extends AbstractIntegrationTest {
             .header("Authorization", "Bearer " + token)
             .contentType(MediaType.APPLICATION_JSON)
             .content(objectMapper.writeValueAsString(
-                new AssignMissionRequest(List.of(childId), LocalDate.of(2026, 6, 1)))))
+                new AssignMissionRequest(List.of(childId), LocalDate.now()))))
         .andExpect(status().isCreated())
         .andReturn()
         .getResponse()

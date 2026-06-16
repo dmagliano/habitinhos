@@ -10,19 +10,23 @@ import { childService } from './childService';
 
 type ChildHomeScreenProps = {
   child: ChildResponse;
+  completedMissionIds?: string[];
   onOpenMissions: () => void;
 };
 
 type LoadState = 'loading' | 'ready' | 'error';
 
-export function ChildHomeScreen({ child, onOpenMissions }: ChildHomeScreenProps) {
+export function ChildHomeScreen({ child, completedMissionIds, onOpenMissions }: ChildHomeScreenProps) {
   const { session } = useAuth();
   const token = session?.token ?? null;
   const [wallet, setWallet] = useState<WalletResponse | null>(null);
   const [missions, setMissions] = useState<AssignedMissionResponse[]>([]);
   const [loadState, setLoadState] = useState<LoadState>('loading');
 
-  const sortedMissions = useMemo(() => sortPendingMissions(missions), [missions]);
+  const sortedMissions = useMemo(
+    () => filterCompletedMissions(sortPendingMissions(missions), completedMissionIds),
+    [completedMissionIds, missions],
+  );
   const visibleMissions = sortedMissions.slice(0, 3);
 
   const loadHome = useCallback(async () => {
@@ -95,22 +99,21 @@ export function ChildHomeScreen({ child, onOpenMissions }: ChildHomeScreenProps)
           {visibleMissions.length > 0 ? (
             <View style={styles.missionList}>
               {visibleMissions.map((mission) => (
-                <Card key={mission.id} style={styles.missionCard}>
-                  <View style={styles.missionRewardRow}>
-                    <Text style={styles.missionEmoji}>✅</Text>
+                <Card
+                  accessibilityLabel={`Abrir missões para ${mission.snapshotTitle}`}
+                  key={mission.id}
+                  onPress={onOpenMissions}
+                  style={styles.missionCard}
+                >
+                  <Text style={styles.missionTitle} testID="home-mission-title">
+                    {mission.snapshotTitle}
+                  </Text>
+                  <View style={styles.missionMetaRow}>
+                    <Text style={styles.missionDueDate}>
+                      {mission.dueDate ? `Para ${formatDate(mission.dueDate)}` : 'Sem prazo'}
+                    </Text>
                     <CoinBadge amount={mission.snapshotCoinValue} />
                   </View>
-                  <View style={styles.missionCopy}>
-                    <Text style={styles.missionTitle} testID="home-mission-title">
-                      {mission.snapshotTitle}
-                    </Text>
-                    {mission.snapshotDescription ? (
-                      <Text style={styles.missionDescription}>{mission.snapshotDescription}</Text>
-                    ) : null}
-                  </View>
-                  {mission.dueDate ? (
-                    <Text style={styles.missionDueDate}>Para {formatDate(mission.dueDate)}</Text>
-                  ) : null}
                 </Card>
               ))}
             </View>
@@ -127,6 +130,19 @@ export function ChildHomeScreen({ child, onOpenMissions }: ChildHomeScreenProps)
       ) : null}
     </AppScreen>
   );
+}
+
+function filterCompletedMissions(
+  missions: AssignedMissionResponse[],
+  completedMissionIds: string[] | undefined,
+): AssignedMissionResponse[] {
+  if (!completedMissionIds?.length) {
+    return missions;
+  }
+
+  const completedMissionIdSet = new Set(completedMissionIds);
+
+  return missions.filter((mission) => !completedMissionIdSet.has(mission.id));
 }
 
 function sortPendingMissions(missions: AssignedMissionResponse[]): AssignedMissionResponse[] {
@@ -230,26 +246,16 @@ const styles = StyleSheet.create({
     gap: spacing.md,
   },
   missionCard: {
-    gap: spacing.sm,
-  },
-  missionRewardRow: {
-    alignItems: 'center',
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-  },
-  missionEmoji: {
-    fontSize: 24,
-  },
-  missionCopy: {
     gap: spacing.xs,
   },
   missionTitle: {
     ...typography.heading,
     color: colors.textPrimary,
   },
-  missionDescription: {
-    ...typography.body,
-    color: colors.textSecondary,
+  missionMetaRow: {
+    alignItems: 'center',
+    flexDirection: 'row',
+    justifyContent: 'space-between',
   },
   missionDueDate: {
     ...typography.label,

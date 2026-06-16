@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useRef, useState } from 'react';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { ActivityIndicator, StyleSheet, Text, View } from 'react-native';
 
 import { ApiError, AssignedMissionResponse, ChildResponse, WalletResponse } from '../../api/types';
@@ -13,6 +13,8 @@ import { MissionCard } from './components/MissionCard';
 
 type ChildMissionsScreenProps = {
   child: ChildResponse;
+  completedMissionIds?: string[];
+  onMissionCompleted?: (missionId: string) => void;
   onOpenMissionDetail: (mission: AssignedMissionResponse) => void;
 };
 
@@ -25,7 +27,12 @@ type MissionFeedback =
 
 const MISSION_ERROR_COPY = 'Não conseguimos atualizar essa missão. Tente novamente.';
 
-export function ChildMissionsScreen({ child, onOpenMissionDetail }: ChildMissionsScreenProps) {
+export function ChildMissionsScreen({
+  child,
+  completedMissionIds,
+  onMissionCompleted,
+  onOpenMissionDetail,
+}: ChildMissionsScreenProps) {
   const { session } = useAuth();
   const token = session?.token ?? null;
   const completingMissionRef = useRef<string | null>(null);
@@ -34,6 +41,10 @@ export function ChildMissionsScreen({ child, onOpenMissionDetail }: ChildMission
   const [loadState, setLoadState] = useState<LoadState>('loading');
   const [completingMissionId, setCompletingMissionId] = useState<string | null>(null);
   const [feedback, setFeedback] = useState<MissionFeedback>(null);
+  const visibleMissions = useMemo(
+    () => filterCompletedMissions(missions, completedMissionIds),
+    [completedMissionIds, missions],
+  );
 
   const loadMissions = useCallback(
     async (showLoading = true) => {
@@ -86,6 +97,8 @@ export function ChildMissionsScreen({ child, onOpenMissionDetail }: ChildMission
 
     try {
       const completedMission = await childService.completeMission(token, mission.id);
+      onMissionCompleted?.(mission.id);
+      setMissions((currentMissions) => currentMissions.filter((currentMission) => currentMission.id !== mission.id));
       const refreshed = await loadMissions(false);
 
       if (completedMission.status === 'AWAITING_APPROVAL') {
@@ -110,7 +123,7 @@ export function ChildMissionsScreen({ child, onOpenMissionDetail }: ChildMission
       <AppHeader
         action={wallet ? <CoinBadge amount={wallet.balance} /> : null}
         emoji="✅"
-        subtitle={loadState === 'ready' ? getSubtitle(missions.length) : undefined}
+        subtitle={loadState === 'ready' ? getSubtitle(visibleMissions.length) : undefined}
         title="Suas missões"
       />
 
@@ -131,7 +144,7 @@ export function ChildMissionsScreen({ child, onOpenMissionDetail }: ChildMission
         </Card>
       ) : null}
 
-      {loadState === 'ready' && missions.length === 0 ? (
+      {loadState === 'ready' && visibleMissions.length === 0 ? (
         <EmptyState
           body="Aproveite o descanso!"
           emoji="🌤️"
@@ -139,9 +152,9 @@ export function ChildMissionsScreen({ child, onOpenMissionDetail }: ChildMission
         />
       ) : null}
 
-      {loadState === 'ready' && missions.length > 0 ? (
+      {loadState === 'ready' && visibleMissions.length > 0 ? (
         <View style={styles.list}>
-          {missions.map((mission) => (
+          {visibleMissions.map((mission) => (
             <MissionCard
               completing={completingMissionId === mission.id}
               key={mission.id}
@@ -154,6 +167,19 @@ export function ChildMissionsScreen({ child, onOpenMissionDetail }: ChildMission
       ) : null}
     </AppScreen>
   );
+}
+
+function filterCompletedMissions(
+  missions: AssignedMissionResponse[],
+  completedMissionIds: string[] | undefined,
+): AssignedMissionResponse[] {
+  if (!completedMissionIds?.length) {
+    return missions;
+  }
+
+  const completedMissionIdSet = new Set(completedMissionIds);
+
+  return missions.filter((mission) => !completedMissionIdSet.has(mission.id));
 }
 
 function MissionFeedbackBanner({ feedback }: { feedback: MissionFeedback }) {

@@ -2,16 +2,16 @@
 gsd_state_version: 1.0
 milestone: v1.0
 milestone_name: milestone
-status: ready_to_plan
-last_updated: 2026-06-05T22:17:19.000Z
-last_activity: 2026-06-05 -- Quick task 260605-qcf complete
+status: planning
+last_updated: 2026-06-08T00:16:00.000Z
+last_activity: 2026-06-08 -- Completed Phase 06.3 access recovery and account deletion
 progress:
-  total_phases: 9
-  completed_phases: 8
-  total_plans: 27
-  completed_plans: 27
-  percent: 89
-stopped_at: Quick task 260605-qcf complete — ready to discuss Phase 7
+  total_phases: 10
+  completed_phases: 9
+  total_plans: 32
+  completed_plans: 29
+  percent: 91
+stopped_at: Ready for Phase 7 demo polish planning
 ---
 
 # Project State
@@ -21,22 +21,22 @@ stopped_at: Quick task 260605-qcf complete — ready to discuss Phase 7
 See: .planning/PROJECT.md (updated 2026-06-01)
 
 **Core value:** The complete family flow must work end to end with family isolation, wallet integrity, and coin history.
-**Current focus:** Phase 7 — polimento para demonstração do tcc
+**Current focus:** Phase 7 — polimento para demonstração do TCC
 
 ## Current Position
 
 Phase: 7
 Plan: Not started
 Status: Ready to plan
-Last activity: 2026-06-05
+Last activity: 2026-06-08
 
-Progress: [██████████] 96%
+Progress: [█████████░] 91%
 
 ## Performance Metrics
 
 **Velocity:**
 
-- Total plans completed: 27
+- Total plans completed: 29
 - Average duration: n/a
 - Total execution time: 0 hours
 
@@ -52,11 +52,12 @@ Progress: [██████████] 96%
 | 06 Fluxo do responsável | 4 | 4 | n/a |
 | 06.1 | 3 | - | - |
 | 06.2 | 1 | - | - |
+| 06.3 | 2 | 2 | n/a |
 
 **Recent Trend:**
 
-- Last 5 plans: 05-04, 06-01, 06-02, 06-03, 06-04
-- Trend: Phase 06.2 inserted after Phase 06.1 for final post-UAT navigation/copy fixes before Phase 7
+- Last 5 plans: 06-04, 06.1-03, 06.2-01, 06.3-01, 06.3-02
+- Trend: Phase 06.3 completed access recovery and account deletion before Phase 7 demo polish
 
 | Phase 02 P03 | 10 min | 3 tasks | 12 files |
 | Phase 02 P02 | 12 min | 3 tasks | 9 files |
@@ -74,6 +75,8 @@ Progress: [██████████] 96%
 | Phase 06.1 P02 | 10min | 3 tasks | 10 files |
 | Phase 06.1 P03 | 19min | 3 tasks | 16 files |
 | Phase 06.2 P01 | 20min | 3 tasks | 14 files |
+| Phase 06.3 P01 | 2h15min focused + full backend | 6 tasks | backend/auth/openapi |
+| Phase 06.3 P02 | 1h | 5 tasks | mobile/auth/navigation/profile |
 
 ## Accumulated Context
 
@@ -81,6 +84,8 @@ Progress: [██████████] 96%
 
 - Phase 06.1 inserted after Phase 6: Ajustes pós-UAT dos fluxos de entrada, troca de modo e entrega de resgates (URGENT)
 - Phase 06.2 inserted after Phase 6: Ajustes pós-UAT de cadastro, seletor de crianças e navegação responsável (URGENT)
+- Phase 06.3 inserted before Phase 7: Recuperação de acesso e exclusão de conta, covering password reset, responsible PIN reset, and account deletion before demo polish.
+- Phase 06.3 completed on 2026-06-08: backend reset/delete endpoints, Resend-backed email integration, mobile recovery flows, and account deletion UI.
 
 ### Decisions
 

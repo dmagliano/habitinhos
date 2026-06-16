@@ -3,11 +3,18 @@ import { fireEvent, render, screen } from '@testing-library/react-native';
 
 import { ChildResponse } from '../../../api/types';
 import { useAuth } from '../../auth/AuthContext';
+import { authService } from '../../auth/authService';
 import { getResponsibleTabBottomSafeAreaHeight, ResponsibleTabsScreen } from '../ResponsibleTabsScreen';
 import { responsibleService } from '../responsibleService';
 
 jest.mock('../../auth/AuthContext', () => ({
   useAuth: jest.fn(),
+}));
+
+jest.mock('../../auth/authService', () => ({
+  authService: {
+    requestAccountDeletion: jest.fn(),
+  },
 }));
 
 jest.mock('../responsibleService', () => ({
@@ -17,6 +24,7 @@ jest.mock('../responsibleService', () => ({
 }));
 
 const logout = jest.fn();
+const deleteAccount = jest.fn();
 const navigate = jest.fn();
 
 const navigation = {
@@ -48,9 +56,11 @@ describe('responsible navigation flow', () => {
       errorMessage: null,
       login: jest.fn(),
       register: jest.fn(),
+      deleteAccount,
       logout,
       retryRestore: jest.fn(),
     });
+    jest.mocked(authService.requestAccountDeletion).mockResolvedValue(undefined);
     jest.mocked(responsibleService.getDashboard).mockResolvedValue({
       children: [],
       pendingApprovalCount: 0,
@@ -128,5 +138,31 @@ describe('responsible navigation flow', () => {
 
     expect(navigate).toHaveBeenCalledWith('ChildProfileSelect');
     expect(logout).not.toHaveBeenCalled();
+  });
+
+  it('confirms account deletion with the responsible password and email code from profile', async () => {
+    render(
+      <NavigationContainer>
+        <ResponsibleTabsScreen
+          navigation={navigation}
+          route={{ key: 'ResponsibleTabs', name: 'ResponsibleTabs' }}
+        />
+      </NavigationContainer>,
+    );
+
+    fireEvent.press(await screen.findByRole('button', { name: 'Abrir Perfil' }));
+    fireEvent.press(await screen.findByRole('button', { name: 'Excluir conta' }));
+
+    expect(screen.getByLabelText('Senha para excluir conta')).toBeOnTheScreen();
+    fireEvent.changeText(screen.getByLabelText('Senha para excluir conta'), 'secret');
+    fireEvent.press(screen.getByRole('button', { name: 'Enviar código de confirmação' }));
+
+    expect(authService.requestAccountDeletion).toHaveBeenCalledWith('jwt-token', 'secret');
+
+    expect(await screen.findByLabelText('Código para excluir conta')).toBeOnTheScreen();
+    fireEvent.changeText(screen.getByLabelText('Código para excluir conta'), 'del123');
+    fireEvent.press(screen.getByRole('button', { name: 'Excluir minha conta' }));
+
+    expect(deleteAccount).toHaveBeenCalledWith('secret', 'DEL123');
   });
 });

@@ -16,6 +16,8 @@ jest.mock('../../auth/AuthContext', () => ({
 jest.mock('../../auth/authService', () => ({
   authService: {
     verifyResponsiblePin: jest.fn(),
+    requestResponsiblePinReset: jest.fn(),
+    confirmResponsiblePinReset: jest.fn(),
   },
 }));
 
@@ -69,6 +71,7 @@ describe('child navigation flow', () => {
       errorMessage: null,
       login: jest.fn(),
       register: jest.fn(),
+      deleteAccount: jest.fn(),
       logout,
       retryRestore: jest.fn(),
     });
@@ -126,6 +129,9 @@ describe('child navigation flow', () => {
 
     fireEvent.press(screen.getByRole('button', { name: 'Gerenciar família' }));
     expect(screen.getByText('PIN do responsável')).toBeOnTheScreen();
+    fireEvent.press(screen.getByRole('button', { name: 'Esqueci meu PIN' }));
+    expect(navigate).toHaveBeenCalledWith('ResponsiblePinReset');
+
     fireEvent.changeText(screen.getByLabelText('PIN do responsável'), '1234');
     fireEvent.press(screen.getByRole('button', { name: 'Confirmar PIN' }));
 

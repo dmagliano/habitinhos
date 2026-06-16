@@ -1,7 +1,8 @@
-import { StyleSheet, Text, View } from 'react-native';
+import { useMemo, useState } from 'react';
+import { Pressable, StyleSheet, Text, View } from 'react-native';
 
 import { Card, CoinBadge, EmojiAvatar, SecondaryButton } from '../../../components';
-import { ResponsibleDashboardChildSummary } from '../../../api/types';
+import { ResponsibleDashboardChildSummary, ResponsibleDashboardMissionPreview } from '../../../api/types';
 import { colors, spacing, typography } from '../../../theme';
 
 type ChildSummaryCardProps = {
@@ -9,7 +10,37 @@ type ChildSummaryCardProps = {
   onOpenDetail: (childId: string) => void;
 };
 
+type MissionPreviewStatus = ResponsibleDashboardMissionPreview['status'];
+
+const PREVIEW_GROUPS: {
+  emptyLabel: string;
+  label: string;
+  status: MissionPreviewStatus;
+}[] = [
+  {
+    emptyLabel: 'Nenhuma pendente recente.',
+    label: 'Pendentes',
+    status: 'PENDING',
+  },
+  {
+    emptyLabel: 'Nenhuma aprovação recente.',
+    label: 'Aprovações',
+    status: 'AWAITING_APPROVAL',
+  },
+  {
+    emptyLabel: 'Nenhuma concluída recente.',
+    label: 'Concluídas',
+    status: 'COMPLETED',
+  },
+];
+
 export function ChildSummaryCard({ child, onOpenDetail }: ChildSummaryCardProps) {
+  const [expandedStatus, setExpandedStatus] = useState<MissionPreviewStatus | null>(null);
+  const missionPreviewsByStatus = useMemo(
+    () => groupMissionPreviewsByStatus(child.missionPreviews),
+    [child.missionPreviews],
+  );
+
   return (
     <Card style={styles.card} testID={`child-summary-${child.id}`}>
       <View style={styles.header}>
@@ -21,6 +52,45 @@ export function ChildSummaryCard({ child, onOpenDetail }: ChildSummaryCardProps)
       </View>
 
       <Text style={styles.missionSummary}>{getMissionSummary(child)}</Text>
+      <View style={styles.previewPanel}>
+        <Text style={styles.previewScope}>Últimos 7 dias</Text>
+        {PREVIEW_GROUPS.map((group) => {
+          const previews = missionPreviewsByStatus[group.status] ?? [];
+          const expanded = expandedStatus === group.status;
+
+          return (
+            <View key={group.status} style={styles.previewGroup}>
+              <Pressable
+                accessibilityLabel={`${expanded ? 'Ocultar' : 'Mostrar'} ${group.label.toLowerCase()} de ${child.name}`}
+                accessibilityRole="button"
+                accessibilityState={{ expanded }}
+                onPress={() => setExpandedStatus(expanded ? null : group.status)}
+                style={({ pressed }) => [styles.previewHeader, pressed && styles.previewHeaderPressed]}
+              >
+                <Text style={styles.previewLabel}>{group.label}</Text>
+                <View style={styles.previewCountRow}>
+                  <Text style={styles.previewCount}>{previews.length}</Text>
+                  <Text style={styles.previewToggle}>{expanded ? '-' : '+'}</Text>
+                </View>
+              </Pressable>
+
+              {expanded ? (
+                <View style={styles.previewList}>
+                  {previews.length > 0 ? (
+                    previews.map((mission) => (
+                      <Text key={mission.id} style={styles.previewTitle}>
+                        {mission.title}
+                      </Text>
+                    ))
+                  ) : (
+                    <Text style={styles.previewEmpty}>{group.emptyLabel}</Text>
+                  )}
+                </View>
+              ) : null}
+            </View>
+          );
+        })}
+      </View>
       <CoinBadge amount={child.balance} />
       <SecondaryButton
         accessibilityLabel={`Ver detalhes de ${child.name}`}
@@ -28,6 +98,16 @@ export function ChildSummaryCard({ child, onOpenDetail }: ChildSummaryCardProps)
         onPress={() => onOpenDetail(child.id)}
       />
     </Card>
+  );
+}
+
+function groupMissionPreviewsByStatus(previews: ResponsibleDashboardMissionPreview[]) {
+  return previews.reduce<Partial<Record<MissionPreviewStatus, ResponsibleDashboardMissionPreview[]>>>(
+    (groups, preview) => {
+      groups[preview.status] = [...(groups[preview.status] ?? []), preview];
+      return groups;
+    },
+    {},
   );
 }
 
@@ -82,5 +162,60 @@ const styles = StyleSheet.create({
   missionSummary: {
     ...typography.label,
     color: colors.primaryDark,
+  },
+  previewPanel: {
+    gap: spacing.xs,
+  },
+  previewScope: {
+    ...typography.label,
+    color: colors.textMuted,
+  },
+  previewGroup: {
+    borderColor: colors.border,
+    borderRadius: 8,
+    borderWidth: 1,
+    overflow: 'hidden',
+  },
+  previewHeader: {
+    alignItems: 'center',
+    backgroundColor: colors.surfaceSoft,
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    minHeight: 44,
+    paddingHorizontal: spacing.md,
+  },
+  previewHeaderPressed: {
+    opacity: 0.82,
+  },
+  previewLabel: {
+    ...typography.label,
+    color: colors.textPrimary,
+  },
+  previewCountRow: {
+    alignItems: 'center',
+    flexDirection: 'row',
+    gap: spacing.sm,
+  },
+  previewCount: {
+    ...typography.label,
+    color: colors.primaryDark,
+  },
+  previewToggle: {
+    ...typography.heading,
+    color: colors.textSecondary,
+    minWidth: 14,
+    textAlign: 'center',
+  },
+  previewList: {
+    gap: spacing.xs,
+    padding: spacing.md,
+  },
+  previewTitle: {
+    ...typography.body,
+    color: colors.textPrimary,
+  },
+  previewEmpty: {
+    ...typography.body,
+    color: colors.textMuted,
   },
 });

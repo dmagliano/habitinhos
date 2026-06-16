@@ -58,6 +58,7 @@ describe('ResponsibleRewardsScreen', () => {
       errorMessage: null,
       login: jest.fn(),
       register: jest.fn(),
+      deleteAccount: jest.fn(),
       logout: jest.fn(),
       retryRestore: jest.fn(),
     });
@@ -118,6 +119,7 @@ describe('ResponsibleRewardFormScreen', () => {
       errorMessage: null,
       login: jest.fn(),
       register: jest.fn(),
+      deleteAccount: jest.fn(),
       logout: jest.fn(),
       retryRestore: jest.fn(),
     });

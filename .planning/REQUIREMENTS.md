@@ -15,6 +15,9 @@
 - [x] **AUTH-06**: Users from one family cannot access data from another family.
 - [x] **AUTH-07**: Mobile unauthenticated entry shows a welcome screen with login and registration options, and session persistence is controlled by an explicit "mantenha-me conectado" choice.
 - [x] **AUTH-08**: Mobile registration screen does not show expired-session or login-only recovery messages; it only shows registration fields, actions, and registration-specific errors.
+- [ ] **AUTH-09**: Responsible adult can request and confirm password reset by email without revealing whether the email exists.
+- [ ] **AUTH-10**: Authenticated responsible adult can request and confirm responsible PIN reset by email after password verification.
+- [ ] **AUTH-11**: Authenticated responsible adult can delete/deactivate their account and family access through a deliberate confirmation flow.
 
 ### Children
 
@@ -110,6 +113,7 @@
 | AUTH-01..AUTH-06 | Phase 1 | Complete |
 | AUTH-07 | Phase 06.1 | Complete |
 | AUTH-08 | Phase 06.2 | Complete |
+| AUTH-09..AUTH-11 | Phase 06.3 | Pending |
 | CHLD-01..CHLD-04 | Phase 1 | Complete |
 | CHLD-05 | Phase 06.2 | Complete |
 | DOCS-01 | Phases 1, 2, 3 | Complete |
@@ -130,8 +134,8 @@
 | DOCS-02..DOCS-04 | Phase 7 | Pending |
 
 **Coverage:**
-- v1 requirements: 49 total
-- Mapped to phases: 49
+- v1 requirements: 52 total
+- Mapped to phases: 52
 - Unmapped: 0
 
 ---
