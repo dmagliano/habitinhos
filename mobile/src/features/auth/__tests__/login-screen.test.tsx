@@ -1,4 +1,5 @@
 import { act, fireEvent, render, screen, waitFor } from '@testing-library/react-native';
+import { TextInput } from 'react-native';
 
 import { RootNavigator } from '../../../navigation/RootNavigator';
 import { AuthWelcomeScreen } from '../AuthWelcomeScreen';
@@ -283,13 +284,49 @@ describe('RegisterScreen', () => {
     });
   });
 
-  it('renders the required registration fields and submits the account request', async () => {
+  it('renders password confirmation after password and explains disabled submit', () => {
     render(<RegisterScreen navigation={{ navigate } as never} route={{ key: 'AuthRegister', name: 'AuthRegister' }} />);
 
-    expect(screen.getByRole('button', { name: 'Criar conta' })).toBeOnTheScreen();
+    const inputs = screen.UNSAFE_getAllByType(TextInput);
+    expect(inputs.map((input) => input.props.accessibilityLabel)).toEqual([
+      'Nome',
+      'E-mail',
+      'Senha',
+      'Confirmar senha',
+      'Nome da família',
+      'PIN do responsável',
+    ]);
+    expect(screen.getByPlaceholderText('Mínimo de 8 caracteres')).toBeOnTheScreen();
+    expect(screen.getByRole('button', { name: 'Criar conta' })).toBeDisabled();
+    expect(screen.getByText('Complete os campos obrigatórios para criar a conta.')).toBeOnTheScreen();
+  });
+
+  it('shows password mismatch only after confirmation has content and blocks invalid submit', () => {
+    render(<RegisterScreen navigation={{ navigate } as never} route={{ key: 'AuthRegister', name: 'AuthRegister' }} />);
+
     fireEvent.changeText(screen.getByLabelText('Nome'), 'Dani');
     fireEvent.changeText(screen.getByLabelText('E-mail'), 'dani@example.com');
-    fireEvent.changeText(screen.getByLabelText('Senha'), 'secret');
+    fireEvent.changeText(screen.getByLabelText('Senha'), 'Demo12345');
+    fireEvent.changeText(screen.getByLabelText('Nome da família'), 'Familia Silva');
+    fireEvent.changeText(screen.getByLabelText('PIN do responsável'), '1234');
+
+    expect(screen.queryByText('As senhas precisam ser iguais.')).toBeNull();
+
+    fireEvent.changeText(screen.getByLabelText('Confirmar senha'), 'Demo123');
+
+    expect(screen.getByText('As senhas precisam ser iguais.')).toBeOnTheScreen();
+    fireEvent.press(screen.getByRole('button', { name: 'Criar conta' }));
+
+    expect(register).not.toHaveBeenCalled();
+  });
+
+  it('submits the account request with the unchanged backend payload when valid', async () => {
+    render(<RegisterScreen navigation={{ navigate } as never} route={{ key: 'AuthRegister', name: 'AuthRegister' }} />);
+
+    fireEvent.changeText(screen.getByLabelText('Nome'), 'Dani');
+    fireEvent.changeText(screen.getByLabelText('E-mail'), 'dani@example.com');
+    fireEvent.changeText(screen.getByLabelText('Senha'), 'Demo12345');
+    fireEvent.changeText(screen.getByLabelText('Confirmar senha'), 'Demo12345');
     fireEvent.changeText(screen.getByLabelText('Nome da família'), 'Familia Silva');
     fireEvent.changeText(screen.getByLabelText('PIN do responsável'), '1234');
     fireEvent.press(screen.getByRole('button', { name: 'Criar conta' }));
@@ -298,11 +335,12 @@ describe('RegisterScreen', () => {
       expect(register).toHaveBeenCalledWith({
         name: 'Dani',
         email: 'dani@example.com',
-        password: 'secret',
+        password: 'Demo12345',
         familyName: 'Familia Silva',
         responsiblePin: '1234',
       }),
     );
+    expect(register.mock.calls[0][0]).not.toHaveProperty('confirmPassword');
   });
 
   it('renders friendly backend errors and lets the user return to login', () => {

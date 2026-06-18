@@ -23,13 +23,23 @@ export function RegisterScreen({ navigation }: Props) {
   const [name, setName] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [confirmPassword, setConfirmPassword] = useState('');
   const [familyName, setFamilyName] = useState('');
   const [responsiblePin, setResponsiblePin] = useState('');
   const isLoading = status === 'loading';
   const registrationErrorMessage = isSessionRecoveryMessage(errorMessage) ? null : errorMessage;
+  const hasPasswordMismatch = confirmPassword.length > 0 && confirmPassword !== password;
+  const isFormValid =
+    name.trim().length > 0 &&
+    email.trim().length > 0 &&
+    password.length >= 8 &&
+    confirmPassword === password &&
+    familyName.trim().length > 0 &&
+    responsiblePin.length === 4;
+  const shouldExplainDisabledSubmit = !isLoading && !isFormValid;
 
   async function handleSubmit() {
-    if (isLoading) {
+    if (isLoading || !isFormValid) {
       return;
     }
 
@@ -84,12 +94,26 @@ export function RegisterScreen({ navigation }: Props) {
               <TextInput
                 accessibilityLabel="Senha"
                 onChangeText={setPassword}
-                placeholder="Crie uma senha"
+                placeholder="Mínimo de 8 caracteres"
                 placeholderTextColor={colors.textMuted}
                 secureTextEntry
                 style={styles.input}
                 value={password}
               />
+            </View>
+
+            <View style={styles.field}>
+              <Text style={styles.label}>Confirmar senha</Text>
+              <TextInput
+                accessibilityLabel="Confirmar senha"
+                onChangeText={setConfirmPassword}
+                placeholder="Digite a senha novamente"
+                placeholderTextColor={colors.textMuted}
+                secureTextEntry
+                style={styles.input}
+                value={confirmPassword}
+              />
+              {hasPasswordMismatch ? <Text style={styles.error}>As senhas precisam ser iguais.</Text> : null}
             </View>
 
             <View style={styles.field}>
@@ -122,8 +146,12 @@ export function RegisterScreen({ navigation }: Props) {
             </View>
 
             {registrationErrorMessage ? <Text style={styles.error}>{registrationErrorMessage}</Text> : null}
+            {shouldExplainDisabledSubmit ? (
+              <Text style={styles.helper}>Complete os campos obrigatórios para criar a conta.</Text>
+            ) : null}
 
             <PrimaryButton
+              disabled={!isFormValid || isLoading}
               label={isLoading ? 'Criando conta...' : 'Criar conta'}
               loading={isLoading}
               onPress={handleSubmit}
