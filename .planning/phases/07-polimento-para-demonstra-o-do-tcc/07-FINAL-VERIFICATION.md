@@ -27,6 +27,7 @@ Focused checks also passed during Plan 07-01:
 Post-review focused check:
 
 - `cd backend && ./mvnw test -Dtest=DemoDataSeederTest` - PASS after making the demo seed startup path transactional
+- `cd backend && ./mvnw test` - PASS after the post-review fix, 68 tests, 0 failures, 0 errors, build success
 
 ## Documentation Checks
 
