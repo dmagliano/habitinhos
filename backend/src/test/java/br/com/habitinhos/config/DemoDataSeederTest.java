@@ -21,7 +21,9 @@ import java.util.List;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.test.context.TestPropertySource;
 
+@TestPropertySource(properties = "habitinhos.demo.seed.enabled=true")
 class DemoDataSeederTest extends AbstractIntegrationTest {
 
   @Autowired
