@@ -24,6 +24,10 @@ Focused checks also passed during Plan 07-01:
 - `cd mobile && npm test -- --runInBand src/features/auth/__tests__/login-screen.test.tsx` - PASS, 16 tests, 0 failures
 - `cd mobile && npm run typecheck` - PASS
 
+Post-review focused check:
+
+- `cd backend && ./mvnw test -Dtest=DemoDataSeederTest` - PASS after making the demo seed startup path transactional
+
 ## Documentation Checks
 
 | Requirement | Evidence | Status |
