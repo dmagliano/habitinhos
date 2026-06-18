@@ -300,11 +300,17 @@ Plans:
   6. Final mobile polish verifies all implemented screens against `docs/design/mobile-design-contract.md` and the Stitch visual references mapped in `docs/design/phase-design-map.md`.
 
 **Plans**: 3 plans
-
 Plans:
+**Wave 1**
 
 - [ ] 07-01: Demo seeds/data and final visual polish
+
+**Wave 2** *(blocked on Wave 1 completion)*
+
 - [ ] 07-02: README, architecture docs, API/data model docs, presentation script
+
+**Wave 3** *(blocked on Wave 2 completion)*
+
 - [ ] 07-03: Final test pass and demo rehearsal fixes
 
 ## Progress
