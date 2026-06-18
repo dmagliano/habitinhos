@@ -80,9 +80,9 @@
 ### Documentation and Demo
 
 - [x] **DOCS-01**: Backend endpoints implemented in each backend phase are exposed through OpenAPI/Swagger and can be inspected/tested from Swagger UI.
-- [ ] **DOCS-02**: `docs/` contains architecture, data model, API contract, and testing strategy.
-- [ ] **DOCS-03**: README explains local setup for backend, mobile, PostgreSQL, and demo flow.
-- [ ] **DOCS-04**: Demo seeds or documented setup steps create a repeatable TCC scenario.
+- [x] **DOCS-02**: `docs/` contains architecture, data model, API contract, and testing strategy.
+- [x] **DOCS-03**: README explains local setup for backend, mobile, PostgreSQL, and demo flow.
+- [x] **DOCS-04**: Demo seeds or documented setup steps create a repeatable TCC scenario.
 
 ## v2 Requirements
 
