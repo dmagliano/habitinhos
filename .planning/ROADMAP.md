@@ -303,7 +303,7 @@ Plans:
 Plans:
 **Wave 1**
 
-- [ ] 07-01: Demo seeds/data and final visual polish
+- [x] 07-01: Demo seeds/data and final visual polish
 
 **Wave 2** *(blocked on Wave 1 completion)*
 
@@ -329,4 +329,4 @@ Phases execute in numeric order: 1 → 2 → 3 → 4 → 5 → 6 → 06.1 → 06
 | 06.1 Ajustes pós-UAT dos fluxos de entrada, troca de modo e entrega de resgates | 3/3 | Complete    | 2026-06-03 |
 | 06.2 Ajustes pós-UAT de cadastro, seletor de crianças e navegação responsável | 1/1 | Complete    | 2026-06-04 |
 | 06.3 Recuperação de acesso e exclusão de conta | 2/2 | Complete | 2026-06-08 |
-| 7. Polimento para demonstração do TCC | 0/3 | Not started | - |
+| 7. Polimento para demonstração do TCC | 1/3 | In Progress|  |
