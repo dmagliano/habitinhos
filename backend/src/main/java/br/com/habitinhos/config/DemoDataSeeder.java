@@ -18,7 +18,6 @@ import br.com.habitinhos.rewards.RewardRedemptionRepository;
 import br.com.habitinhos.rewards.RewardRepository;
 import br.com.habitinhos.wallet.CoinTransaction;
 import br.com.habitinhos.wallet.Wallet;
-import br.com.habitinhos.wallet.WalletRepository;
 import br.com.habitinhos.wallet.WalletService;
 import java.time.LocalDate;
 import org.slf4j.Logger;
@@ -42,7 +41,6 @@ public class DemoDataSeeder implements ApplicationRunner {
   private final AppUserRepository appUserRepository;
   private final FamilyUnitRepository familyUnitRepository;
   private final ChildProfileRepository childProfileRepository;
-  private final WalletRepository walletRepository;
   private final WalletService walletService;
   private final MissionRepository missionRepository;
   private final AssignedMissionRepository assignedMissionRepository;
@@ -54,7 +52,6 @@ public class DemoDataSeeder implements ApplicationRunner {
       AppUserRepository appUserRepository,
       FamilyUnitRepository familyUnitRepository,
       ChildProfileRepository childProfileRepository,
-      WalletRepository walletRepository,
       WalletService walletService,
       MissionRepository missionRepository,
       AssignedMissionRepository assignedMissionRepository,
@@ -64,7 +61,6 @@ public class DemoDataSeeder implements ApplicationRunner {
     this.appUserRepository = appUserRepository;
     this.familyUnitRepository = familyUnitRepository;
     this.childProfileRepository = childProfileRepository;
-    this.walletRepository = walletRepository;
     this.walletService = walletService;
     this.missionRepository = missionRepository;
     this.assignedMissionRepository = assignedMissionRepository;
@@ -74,12 +70,17 @@ public class DemoDataSeeder implements ApplicationRunner {
   }
 
   @Override
+  @Transactional
   public void run(ApplicationArguments args) {
-    run();
+    seed();
   }
 
   @Transactional
   public void run() {
+    seed();
+  }
+
+  private void seed() {
     if (appUserRepository.existsByEmailIgnoreCase(DEMO_EMAIL)) {
       log.info("Demo seed skipped: responsible account already exists.");
       return;
