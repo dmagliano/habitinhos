@@ -40,6 +40,7 @@ Prefer Spring Boot integration tests with PostgreSQL-compatible behavior. Testco
 ### Integration Tests
 
 - Registration/login and `/me`.
+- Password reset, responsible PIN reset, and account-deletion token flows.
 - Family isolation across users.
 - Child creation creates wallet atomically.
 - Mission completion without approval credits coins and writes `CoinTransaction`.
@@ -47,6 +48,8 @@ Prefer Spring Boot integration tests with PostgreSQL-compatible behavior. Testco
 - Mission rejection does not credit coins.
 - Reward redemption with sufficient balance debits coins and writes `CoinTransaction`.
 - Reward redemption with insufficient balance fails without debit.
+- Responsible dashboard `/dashboard/responsible` aggregates children, balances, mission status counts, approvals, and recent redemptions.
+- Local demo seed creates a repeatable family scenario and remains idempotent when `HABITINHOS_DEMO_SEED_ENABLED=true`.
 
 ### Transaction Tests
 
@@ -67,12 +70,20 @@ For MVP, keep mobile testing lightweight unless time allows:
 Before TCC demo:
 
 1. Start PostgreSQL.
-2. Start backend and confirm Swagger is reachable.
-3. Start mobile app.
-4. Register/login responsible adult.
-5. Create child, mission, assignment, reward.
-6. Complete mission as child.
-7. Approve mission when needed.
-8. Confirm balance and statement.
-9. Redeem reward.
-10. Confirm insufficient balance is blocked.
+2. Start backend with `HABITINHOS_DEMO_SEED_ENABLED=true` and confirm Swagger is reachable.
+3. Start mobile app with `npm run android:local`, `npm run ios:local`, or `npm run web:local`.
+4. Login with the local demo account `demo@habitinhos.local` / `Demo12345`.
+5. Verify responsible dashboard cards, pending approvals, and recent redemptions.
+6. Enter child flow, complete a mission, inspect wallet balance, and redeem a reward.
+7. Return to responsible mode with responsible PIN `1234`.
+8. Mark a reward redemption delivered and verify recent redemption history.
+9. Open registration and confirm password minimum, `Confirmar senha`, and disabled-submit explanation.
+10. Follow `docs/tcc-demo-script.md` once end-to-end and record the result in the final verification artifact.
+
+Focused Phase 7 checks:
+
+```bash
+cd backend && ./mvnw test -Dtest=DemoDataSeederTest
+cd mobile && npm test -- --runInBand src/features/auth/__tests__/login-screen.test.tsx
+cd mobile && npm run typecheck
+```

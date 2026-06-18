@@ -13,17 +13,22 @@ Protected endpoints use Bearer JWT authorization. Manual endpoint testing flow:
 3. Use Swagger UI's authorize action with `Bearer <token>`.
 4. Test protected endpoints from the same documented contract.
 
-## Phase 1 Boundary
-
-Phase 1 implements only auth, `/me`, and children endpoints. Mission, reward, wallet statement, dashboard, and mobile-specific flows are documented for later phases and must not be implemented during backend foundation.
-
 ## Auth
 
 | Method | Path | Purpose |
 |--------|------|---------|
 | POST | `/auth/register` | Create responsible user and family unit from responsible name, email, password, and family name |
 | POST | `/auth/login` | Authenticate responsible user by email/password and return JWT |
+| POST | `/auth/password-reset/request` | Accept email and issue password reset instructions without revealing whether the email exists |
+| POST | `/auth/password-reset/confirm` | Confirm password reset token and save a new password |
+| POST | `/auth/responsible-pin/verify` | Verify the current responsible PIN for the authenticated user |
+| POST | `/auth/responsible-pin/reset/request` | Issue responsible PIN reset instructions after password verification |
+| POST | `/auth/responsible-pin/reset/confirm` | Confirm responsible PIN reset token and save a new PIN |
+| POST | `/auth/account-deletion/request` | Issue account deletion confirmation instructions after password verification |
+| POST | `/auth/account-deletion/confirm` | Confirm account deletion token and deactivate the responsible account |
 | GET | `/me` | Return authenticated user and family context |
+
+Password reset request is public. Responsible PIN and account deletion endpoints are protected and require Bearer JWT authorization. Reset codes may be delivered by Resend or logged locally when `RESEND_API_KEY` is absent.
 
 ## Children
 
@@ -35,7 +40,7 @@ Phase 1 implements only auth, `/me`, and children endpoints. Mission, reward, wa
 | PUT | `/children/{id}` | Update child |
 | PATCH | `/children/{id}/deactivate` | Soft deactivate child |
 
-Phase 1 child endpoints are responsible-only. Children are not authenticatable `User` records in this phase.
+Child endpoints are family-scoped. Children are `ChildProfile` records and are not authenticatable `AppUser` records in the MVP.
 
 ## Missions
 
@@ -106,8 +111,19 @@ or `false`, the assignment remains `REJECTED`.
 
 | Method | Path | Purpose |
 |--------|------|---------|
-| POST | `/children/{childId}/reward-redemptions` | Redeem reward for child |
-| GET | `/children/{childId}/reward-redemptions` | List child redemptions |
+| POST | `/rewards/{id}/redeem` | Redeem reward for the `childId` supplied in the request body |
+| PATCH | `/reward-redemptions/{id}/delivered` | Mark a redeemed reward as delivered |
+
+Redeem request body:
+
+```json
+{
+  "childId": "00000000-0000-0000-0000-000000000000"
+}
+```
+
+The response includes `rewardId`, `childId`, `walletId`, `status`, `snapshotTitle`,
+`snapshotCost`, `coinTransactionId`, `deliveredAt`, `createdAt`, and `updatedAt`.
 
 ## Wallet
 

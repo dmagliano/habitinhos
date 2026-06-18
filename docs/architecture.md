@@ -18,12 +18,16 @@ Supporting files:
 The backend owns:
 
 - Authentication and authorization.
+- Password reset, responsible PIN reset, and account deletion confirmation tokens.
 - Family tenant isolation.
 - Mission rules and status transitions.
 - Mission approval/rejection.
 - Wallet balance.
 - Coin credits and debits.
 - Reward redemption.
+- Reward delivery status.
+- Responsible dashboard aggregation.
+- Local opt-in demo data seeding.
 - Audit/history through `CoinTransaction`.
 
 The backend must validate critical rules even when the mobile app also performs UX validation.
@@ -43,21 +47,24 @@ The mobile app owns:
 
 `FamilyUnit` is the tenant. Backend services derive tenant context from the authenticated responsible user and apply it to queries and commands. Client-supplied `familyUnitId` must not be trusted for authorization.
 
-## Suggested Backend Package Structure
+## Backend Package Structure
 
 ```text
 backend/src/main/java/.../habitinhos/
   auth/
   family/
   children/
+  missions/
+  rewards/
   wallet/
+  dashboard/
   shared/
   config/
 ```
 
-Each domain package should keep controller, DTO, service, repository, and entity classes close enough to stay readable without creating a heavy architecture framework.
+Each domain package keeps controller, DTO, service, repository, and entity classes close enough to stay readable without creating a heavy architecture framework. `config/DemoDataSeeder` is a local-only `ApplicationRunner` guarded by the `local` profile and `habitinhos.demo.seed.enabled=true`; it is intended only for repeatable TCC demonstration data.
 
-Phase 1 should create only `auth`, `family`, `children`, `wallet`, `shared`, and configuration/security support. Later phases add `missions`, `rewards`, and `dashboard` when their roadmap scope starts.
+Current backend endpoint groups are auth, children, missions, assigned missions, rewards, reward-redemptions, wallet, and `/dashboard/responsible`.
 
 ## Suggested Mobile Structure
 
