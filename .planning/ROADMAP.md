@@ -328,10 +328,12 @@ Plans:
   5. Backend integration tests cover duplicate active registration, inactive-account recadastro, new IDs, login behavior, and reset behavior.
   6. OpenAPI/API documentation stays aligned with the refined registration behavior.
 
-**Plans:** 0 plans
-
+**Plans:** 1 plan
 Plans:
-- [ ] TBD (run /gsd-plan-phase 8 to break down)
+
+**Wave 1**
+
+- [ ] 08-01: Backend recadastro, active-only e-mail uniqueness, tests, seed, and docs
 
 ## Progress
 
@@ -350,4 +352,4 @@ Phases execute in numeric order: 1 → 2 → 3 → 4 → 5 → 6 → 06.1 → 06
 | 06.2 Ajustes pós-UAT de cadastro, seletor de crianças e navegação responsável | 1/1 | Complete    | 2026-06-04 |
 | 06.3 Recuperação de acesso e exclusão de conta | 2/2 | Complete | 2026-06-08 |
 | 7. Polimento para demonstração do TCC | 3/3 | Complete   | 2026-06-18 |
-| 8. Permitir recadastro com e-mail de conta excluída/inativa | 0/0 | Not planned | — |
+| 8. Permitir recadastro com e-mail de conta excluída/inativa | 0/1 | Ready to execute | — |

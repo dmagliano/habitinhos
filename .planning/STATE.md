@@ -2,13 +2,13 @@
 gsd_state_version: 1.0
 milestone: v1.0
 milestone_name: milestone
-status: verifying
-last_updated: "2026-06-21T19:34:49.952Z"
-last_activity: 2026-06-18
+status: executing
+last_updated: "2026-06-21T19:50:59.986Z"
+last_activity: 2026-06-21 -- Phase 08 planning complete
 progress:
   total_phases: 11
   completed_phases: 10
-  total_plans: 32
+  total_plans: 33
   completed_plans: 32
   percent: 91
 ---
@@ -20,16 +20,16 @@ progress:
 See: .planning/PROJECT.md (updated 2026-06-01)
 
 **Core value:** The complete family flow must work end to end with family isolation, wallet integrity, and coin history.
-**Current focus:** Phase 07 — polimento-para-demonstra-o-do-tcc
+**Current focus:** Phase 08 — permitir-recadastro-com-e-mail-de-conta-exclu-da-inativa
 
 ## Current Position
 
-Phase: 07 (polimento-para-demonstra-o-do-tcc) — EXECUTING
-Plan: 3 of 3
-Status: Phase complete — ready for verification
-Last activity: 2026-06-18
+Phase: 08 (permitir-recadastro-com-e-mail-de-conta-exclu-da-inativa) — READY TO EXECUTE
+Plan: 0 of 1
+Status: Ready to execute
+Last activity: 2026-06-21 -- Phase 08 planning complete
 
-Progress: [██████████] 100%
+Progress: [░░░░░░░░░░] 0%
 
 ## Performance Metrics
 
