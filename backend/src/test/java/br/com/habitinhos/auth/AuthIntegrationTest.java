@@ -1,5 +1,6 @@
 package br.com.habitinhos.auth;
 
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.hamcrest.Matchers.blankOrNullString;
 import static org.hamcrest.Matchers.not;
@@ -21,11 +22,14 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import java.time.Instant;
 import java.util.Map;
+import java.util.UUID;
 import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.MediaType;
+import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.test.web.servlet.MockMvc;
 
@@ -47,6 +51,9 @@ class AuthIntegrationTest extends AbstractIntegrationTest {
 
   @Autowired
   private PasswordEncoder passwordEncoder;
+
+  @Autowired
+  private JdbcTemplate jdbcTemplate;
 
   @MockBean
   private AccountEmailSender accountEmailSender;
@@ -115,6 +122,28 @@ class AuthIntegrationTest extends AbstractIntegrationTest {
             .content(objectMapper.writeValueAsString(registerRequest("Responsavel@Example.com"))))
         .andExpect(status().isConflict())
         .andExpect(jsonPath("$.code").value("EMAIL_ALREADY_REGISTERED"));
+  }
+
+  @Test
+  void databaseEnforcesEmailUniquenessOnlyForActiveUsers() {
+    UUID inactiveFamilyId = insertFamily("Família Histórica");
+    insertUser(
+        inactiveFamilyId,
+        "responsavel@example.com",
+        false);
+
+    UUID activeFamilyId = insertFamily("Família Atual");
+    insertUser(
+        activeFamilyId,
+        "responsavel@example.com",
+        true);
+
+    UUID duplicateActiveFamilyId = insertFamily("Família Duplicada");
+    assertThatThrownBy(() -> insertUser(
+            duplicateActiveFamilyId,
+            "responsavel@example.com",
+            true))
+        .isInstanceOf(DataIntegrityViolationException.class);
   }
 
   @Test
@@ -363,5 +392,42 @@ class AuthIntegrationTest extends AbstractIntegrationTest {
         RAW_PASSWORD,
         "Familia Demo",
         "1234");
+  }
+
+  private UUID insertFamily(String name) {
+    UUID familyId = UUID.randomUUID();
+    jdbcTemplate.update(
+        """
+        INSERT INTO family_units (id, name, active, created_at, updated_at)
+        VALUES (?, ?, true, now(), now())
+        """,
+        familyId,
+        name);
+    return familyId;
+  }
+
+  private void insertUser(UUID familyId, String email, boolean active) {
+    jdbcTemplate.update(
+        """
+        INSERT INTO app_users (
+          id,
+          family_unit_id,
+          name,
+          email,
+          role,
+          password_hash,
+          responsible_pin_hash,
+          active,
+          created_at,
+          updated_at
+        )
+        VALUES (?, ?, 'Responsavel Demo', ?, 'RESPONSIBLE', ?, ?, ?, now(), now())
+        """,
+        UUID.randomUUID(),
+        familyId,
+        email,
+        passwordEncoder.encode(RAW_PASSWORD),
+        passwordEncoder.encode("1234"),
+        active);
   }
 }
