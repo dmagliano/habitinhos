@@ -4,6 +4,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 import br.com.habitinhos.auth.AppUser;
 import br.com.habitinhos.auth.AppUserRepository;
+import br.com.habitinhos.auth.UserRole;
 import br.com.habitinhos.children.ChildProfile;
 import br.com.habitinhos.children.ChildProfileRepository;
 import br.com.habitinhos.family.FamilyUnit;
@@ -112,5 +113,46 @@ class DemoDataSeederTest extends AbstractIntegrationTest {
         .hasSizeGreaterThanOrEqualTo(1);
     assertThat(coinTransactionRepository.findAll())
         .hasSizeGreaterThanOrEqualTo(2);
+  }
+
+  @Test
+  void seedsFreshDemoAccountWhenOnlyHistoricalDemoAccountIsInactive() throws Exception {
+    FamilyUnit historicalFamily = familyUnitRepository.saveAndFlush(new FamilyUnit("Família Demo Antiga"));
+    historicalFamily.deactivate();
+    familyUnitRepository.saveAndFlush(historicalFamily);
+    AppUser historicalResponsible = appUserRepository.saveAndFlush(new AppUser(
+        historicalFamily.getId(),
+        "Dani Demo Antiga",
+        "demo@habitinhos.local",
+        UserRole.RESPONSIBLE,
+        passwordEncoder.encode("Demo12345"),
+        passwordEncoder.encode("1234")));
+    historicalResponsible.deactivate();
+    appUserRepository.saveAndFlush(historicalResponsible);
+
+    demoDataSeeder.run();
+
+    List<AppUser> demoUsers = appUserRepository.findAll()
+        .stream()
+        .filter(user -> "demo@habitinhos.local".equalsIgnoreCase(user.getEmail()))
+        .toList();
+    assertThat(demoUsers).hasSize(2);
+    assertThat(demoUsers).filteredOn(AppUser::isActive).hasSize(1);
+    assertThat(demoUsers).filteredOn(user -> !user.isActive()).hasSize(1);
+
+    AppUser activeResponsible = demoUsers.stream()
+        .filter(AppUser::isActive)
+        .findFirst()
+        .orElseThrow();
+    assertThat(activeResponsible.getId()).isNotEqualTo(historicalResponsible.getId());
+    assertThat(activeResponsible.getFamilyUnitId()).isNotEqualTo(historicalFamily.getId());
+
+    FamilyUnit activeFamily = familyUnitRepository.findById(activeResponsible.getFamilyUnitId()).orElseThrow();
+    assertThat(activeFamily.isActive()).isTrue();
+    assertThat(activeFamily.getName()).isEqualTo("Família Demo Habitinhos");
+
+    List<ChildProfile> children = childProfileRepository
+        .findAllByFamilyUnitIdAndActiveTrueOrderByCreatedAtAsc(activeFamily.getId());
+    assertThat(children).hasSizeGreaterThanOrEqualTo(2);
   }
 }
