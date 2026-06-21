@@ -23,4 +23,8 @@ public class FamilyUnit extends BaseEntity {
   public FamilyUnit(String name) {
     this.name = name;
   }
+
+  public void deactivate() {
+    this.active = false;
+  }
 }
