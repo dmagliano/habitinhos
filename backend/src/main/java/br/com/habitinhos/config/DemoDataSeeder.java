@@ -81,7 +81,7 @@ public class DemoDataSeeder implements ApplicationRunner {
   }
 
   private void seed() {
-    if (appUserRepository.existsByEmailIgnoreCase(DEMO_EMAIL)) {
+    if (appUserRepository.existsByEmailIgnoreCaseAndActiveTrue(DEMO_EMAIL)) {
       log.info("Demo seed skipped: responsible account already exists.");
       return;
     }
