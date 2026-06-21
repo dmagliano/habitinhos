@@ -88,6 +88,7 @@ Progress: [██████████] 100%
 - Phase 06.2 inserted after Phase 6: Ajustes pós-UAT de cadastro, seletor de crianças e navegação responsável (URGENT)
 - Phase 06.3 inserted before Phase 7: Recuperação de acesso e exclusão de conta, covering password reset, responsible PIN reset, and account deletion before demo polish.
 - Phase 06.3 completed on 2026-06-08: backend reset/delete endpoints, Resend-backed email integration, mobile recovery flows, and account deletion UI.
+- Phase 8 added: Permitir recadastro com e-mail de conta excluída/inativa
 
 ### Decisions
 
