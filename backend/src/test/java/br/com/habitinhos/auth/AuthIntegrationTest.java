@@ -16,6 +16,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 import br.com.habitinhos.auth.dto.LoginRequest;
 import br.com.habitinhos.auth.dto.RegisterRequest;
+import br.com.habitinhos.family.FamilyUnit;
 import br.com.habitinhos.family.FamilyUnitRepository;
 import br.com.habitinhos.shared.AbstractIntegrationTest;
 import com.fasterxml.jackson.databind.JsonNode;
@@ -303,7 +304,7 @@ class AuthIntegrationTest extends AbstractIntegrationTest {
   }
 
   @Test
-  void deleteAccountDeactivatesUserAndRejectsOldSession() throws Exception {
+  void deleteAccountDeactivatesUserAndFamilyThenAllowsFreshRegistration() throws Exception {
     String token = register("responsavel@example.com");
     reset(accountEmailSender);
 
@@ -345,8 +346,14 @@ class AuthIntegrationTest extends AbstractIntegrationTest {
                 "token", tokenCaptor.getValue()))))
         .andExpect(status().isNoContent());
 
-    AppUser user = appUserRepository.findByEmailIgnoreCase("responsavel@example.com").orElseThrow();
-    assertThat(user.isActive()).isFalse();
+    AppUser oldUser = appUserRepository.findByEmailIgnoreCase("responsavel@example.com").orElseThrow();
+    UUID oldUserId = oldUser.getId();
+    UUID oldFamilyId = oldUser.getFamilyUnitId();
+    assertThat(oldUser.isActive()).isFalse();
+    assertThat(familyUnitRepository.findById(oldFamilyId))
+        .get()
+        .extracting(FamilyUnit::isActive)
+        .isEqualTo(false);
 
     mockMvc.perform(post("/auth/login")
             .contentType(MediaType.APPLICATION_JSON)
@@ -359,12 +366,60 @@ class AuthIntegrationTest extends AbstractIntegrationTest {
     mockMvc.perform(get("/me")
             .header("Authorization", "Bearer " + token))
         .andExpect(status().isUnauthorized());
+
+    reset(accountEmailSender);
+    mockMvc.perform(post("/auth/password-reset/request")
+            .contentType(MediaType.APPLICATION_JSON)
+            .content(objectMapper.writeValueAsString(Map.of("email", "responsavel@example.com"))))
+        .andExpect(status().isAccepted());
+    verify(accountEmailSender, never()).sendPasswordReset(any(), any(), any());
+
+    String freshRegistration = mockMvc.perform(post("/auth/register")
+            .contentType(MediaType.APPLICATION_JSON)
+            .content(objectMapper.writeValueAsString(registerRequest(
+                "RESPONSAVEL@example.com",
+                "novaConta123",
+                "Família Nova"))))
+        .andExpect(status().isCreated())
+        .andExpect(jsonPath("$.token", not(blankOrNullString())))
+        .andExpect(jsonPath("$.user.email").value("responsavel@example.com"))
+        .andExpect(jsonPath("$.family.name").value("Família Nova"))
+        .andReturn()
+        .getResponse()
+        .getContentAsString();
+
+    JsonNode freshJson = objectMapper.readTree(freshRegistration);
+    UUID freshUserId = UUID.fromString(freshJson.at("/user/id").asText());
+    UUID freshFamilyId = UUID.fromString(freshJson.at("/family/id").asText());
+    assertThat(freshUserId).isNotEqualTo(oldUserId);
+    assertThat(freshFamilyId).isNotEqualTo(oldFamilyId);
+
+    AppUser freshUser = appUserRepository.findByEmailIgnoreCaseAndActiveTrue("responsavel@example.com").orElseThrow();
+    assertThat(freshUser.getId()).isEqualTo(freshUserId);
+    assertThat(freshUser.getFamilyUnitId()).isEqualTo(freshFamilyId);
+    assertThat(familyUnitRepository.findById(freshFamilyId)).get().extracting(FamilyUnit::isActive).isEqualTo(true);
+
+    login("responsavel@example.com", "novaConta123");
+
+    reset(accountEmailSender);
+    mockMvc.perform(post("/auth/password-reset/request")
+            .contentType(MediaType.APPLICATION_JSON)
+            .content(objectMapper.writeValueAsString(Map.of("email", "responsavel@example.com"))))
+        .andExpect(status().isAccepted());
+    verify(accountEmailSender).sendPasswordReset(
+        eq("responsavel@example.com"),
+        any(String.class),
+        any(Instant.class));
   }
 
   private String register(String email) throws Exception {
+    return register(email, RAW_PASSWORD, "Familia Demo");
+  }
+
+  private String register(String email, String password, String familyName) throws Exception {
     String response = mockMvc.perform(post("/auth/register")
             .contentType(MediaType.APPLICATION_JSON)
-            .content(objectMapper.writeValueAsString(registerRequest(email))))
+            .content(objectMapper.writeValueAsString(registerRequest(email, password, familyName))))
         .andExpect(status().isCreated())
         .andReturn()
         .getResponse()
@@ -386,11 +441,15 @@ class AuthIntegrationTest extends AbstractIntegrationTest {
   }
 
   private RegisterRequest registerRequest(String email) {
+    return registerRequest(email, RAW_PASSWORD, "Familia Demo");
+  }
+
+  private RegisterRequest registerRequest(String email, String password, String familyName) {
     return new RegisterRequest(
         "Responsavel Demo",
         email,
-        RAW_PASSWORD,
-        "Familia Demo",
+        password,
+        familyName,
         "1234");
   }
 
