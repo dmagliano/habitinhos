@@ -2,15 +2,16 @@
 gsd_state_version: 1.0
 milestone: v1.0
 milestone_name: milestone
-status: executing
-last_updated: "2026-06-21T19:50:59.986Z"
-last_activity: 2026-06-21 -- Phase 08 planning complete
+status: milestone_complete
+last_updated: 2026-06-21T20:40:11.706Z
+last_activity: 2026-06-21 -- Phase 08 completed; milestone complete
 progress:
   total_phases: 11
-  completed_phases: 10
+  completed_phases: 11
   total_plans: 33
-  completed_plans: 32
-  percent: 91
+  completed_plans: 33
+  percent: 100
+stopped_at: Milestone complete (Phase 08 was final phase)
 ---
 
 # Project State
@@ -20,22 +21,22 @@ progress:
 See: .planning/PROJECT.md (updated 2026-06-01)
 
 **Core value:** The complete family flow must work end to end with family isolation, wallet integrity, and coin history.
-**Current focus:** Phase 08 — permitir-recadastro-com-e-mail-de-conta-exclu-da-inativa
+**Current focus:** Milestone complete
 
 ## Current Position
 
-Phase: 08 (permitir-recadastro-com-e-mail-de-conta-exclu-da-inativa) — READY TO EXECUTE
-Plan: 0 of 1
-Status: Ready to execute
-Last activity: 2026-06-21 -- Phase 08 planning complete
+Phase: 08 (permitir-recadastro-com-e-mail-de-conta-exclu-da-inativa) - COMPLETE
+Plan: 1 of 1
+Status: Milestone complete
+Last activity: 2026-06-21 -- Phase 08 completed
 
-Progress: [░░░░░░░░░░] 0%
+Progress: [██████████] 100%
 
 ## Performance Metrics
 
 **Velocity:**
 
-- Total plans completed: 29
+- Total plans completed: 33
 - Average duration: n/a
 - Total execution time: 0 hours
 
@@ -52,11 +53,13 @@ Progress: [░░░░░░░░░░] 0%
 | 06.1 | 3 | - | - |
 | 06.2 | 1 | - | - |
 | 06.3 | 2 | 2 | n/a |
+| 07 Polimento para demonstração do TCC | 3 | 3 | n/a |
+| 08 Permitir recadastro com e-mail de conta excluída/inativa | 1 | 1 | 40min |
 
 **Recent Trend:**
 
-- Last 5 plans: 06-04, 06.1-03, 06.2-01, 06.3-01, 06.3-02
-- Trend: Phase 06.3 completed access recovery and account deletion before Phase 7 demo polish
+- Last 5 plans: 06.3-02, 07-01, 07-02, 07-03, 08-01
+- Trend: Phase 08 completed active-only recadastro after Phase 7 demo polish
 
 | Phase 02 P03 | 10 min | 3 tasks | 12 files |
 | Phase 02 P02 | 12 min | 3 tasks | 9 files |
@@ -89,6 +92,7 @@ Progress: [░░░░░░░░░░] 0%
 - Phase 06.3 inserted before Phase 7: Recuperação de acesso e exclusão de conta, covering password reset, responsible PIN reset, and account deletion before demo polish.
 - Phase 06.3 completed on 2026-06-08: backend reset/delete endpoints, Resend-backed email integration, mobile recovery flows, and account deletion UI.
 - Phase 8 added: Permitir recadastro com e-mail de conta excluída/inativa
+- Phase 8 completed on 2026-06-21: active-only e-mail uniqueness, recadastro after deletion with new user/family ids, demo seed adjustment, docs, review, and full backend verification.
 
 ### Decisions
 
@@ -123,9 +127,9 @@ None yet.
 
 ## Session Continuity
 
-Last session: 2026-06-21T19:34:49.863Z
-Stopped at: Phase 8 context gathered
-Resume file: .planning/phases/08-permitir-recadastro-com-e-mail-de-conta-exclu-da-inativa/08-CONTEXT.md
+Last session: 2026-06-21T20:40:11.706Z
+Stopped at: Phase 8 completed; milestone complete
+Resume file: .planning/phases/08-permitir-recadastro-com-e-mail-de-conta-exclu-da-inativa/08-01-SUMMARY.md
 
 ## Quick Tasks Completed
 

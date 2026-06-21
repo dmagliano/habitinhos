@@ -17,7 +17,7 @@
 - [x] **AUTH-08**: Mobile registration screen does not show expired-session or login-only recovery messages; it only shows registration fields, actions, and registration-specific errors.
 - [ ] **AUTH-09**: Responsible adult can request and confirm password reset by email without revealing whether the email exists.
 - [ ] **AUTH-10**: Authenticated responsible adult can request and confirm responsible PIN reset by email after password verification.
-- [ ] **AUTH-11**: Authenticated responsible adult can delete/deactivate their account and family access through a deliberate confirmation flow.
+- [x] **AUTH-11**: Authenticated responsible adult can delete/deactivate their account and family access through a deliberate confirmation flow.
 
 ### Children
 

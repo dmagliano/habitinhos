@@ -16,7 +16,7 @@ Habitinhos will be built as a monorepo MVP in seven phases: backend foundation, 
 - [x] **Phase 06.2: Ajustes pós-UAT de cadastro, seletor de crianças e navegação responsável** - Remove registration stale-session copy, clarify child creation copy, eliminate entry-mode selection, add family-management access from child selector, and add responsible-home return to children. (INSERTED) (completed 2026-06-04)
 - [x] **Phase 06.3: Recuperação de acesso e exclusão de conta** - Add password reset by email, responsible PIN reset by email, and deliberate account deletion from API through mobile UI. (INSERTED) (completed 2026-06-08)
 - [x] **Phase 7: Polimento para demonstração do TCC** - Add demo seeds, visual polish, README, architecture docs, presentation script, and final testing. (completed 2026-06-18)
-- [ ] **Phase 8: Permitir recadastro com e-mail de conta excluída/inativa** - Allow a responsible adult to create a new account with an email that only exists on inactive/deleted accounts while preserving active-account uniqueness.
+- [x] **Phase 8: Permitir recadastro com e-mail de conta excluída/inativa** - Allow a responsible adult to create a new account with an email that only exists on inactive/deleted accounts while preserving active-account uniqueness. (completed 2026-06-21)
 
 ## Phase Details
 
@@ -328,12 +328,12 @@ Plans:
   5. Backend integration tests cover duplicate active registration, inactive-account recadastro, new IDs, login behavior, and reset behavior.
   6. OpenAPI/API documentation stays aligned with the refined registration behavior.
 
-**Plans:** 1 plan
+**Plans:** 1/1 plans complete
 Plans:
 
 **Wave 1**
 
-- [ ] 08-01: Backend recadastro, active-only e-mail uniqueness, tests, seed, and docs
+- [x] 08-01: Backend recadastro, active-only e-mail uniqueness, tests, seed, and docs
 
 ## Progress
 
@@ -352,4 +352,4 @@ Phases execute in numeric order: 1 → 2 → 3 → 4 → 5 → 6 → 06.1 → 06
 | 06.2 Ajustes pós-UAT de cadastro, seletor de crianças e navegação responsável | 1/1 | Complete    | 2026-06-04 |
 | 06.3 Recuperação de acesso e exclusão de conta | 2/2 | Complete | 2026-06-08 |
 | 7. Polimento para demonstração do TCC | 3/3 | Complete   | 2026-06-18 |
-| 8. Permitir recadastro com e-mail de conta excluída/inativa | 0/1 | Ready to execute | — |
+| 8. Permitir recadastro com e-mail de conta excluída/inativa | 1/1 | Complete   | 2026-06-21 |
