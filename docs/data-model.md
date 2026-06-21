@@ -23,7 +23,7 @@ Authenticatable user, initially responsible adults.
 | id | Primary key |
 | familyUnitId | Tenant reference |
 | name | Display name |
-| email | Unique login identifier, likely globally unique |
+| email | Login identifier; normalized email is unique among active users, while inactive historical accounts may retain the same email for a future registration |
 | role | `RESPONSIBLE`; `ADMIN` reserved for future |
 | passwordHash | Hashed password only |
 | responsiblePinHash | Hashed 4-digit responsible PIN used to enter responsible mode |
@@ -181,7 +181,8 @@ Short-lived token record for account recovery and destructive account actions.
 - All wallet balance changes happen through transactional services.
 - Every credit/debit writes a matching `CoinTransaction`.
 - Mission/reward deactivation preserves historical rows.
-- Account deletion deactivates the responsible user and invalidates active reset tokens.
+- Active users have unique normalized email values through a partial unique index on `lower(email)` where `active = true`.
+- Account deletion deactivates the responsible user and family unit, invalidates active reset tokens, and preserves historical rows for audit/history.
 - Reward delivery updates `RewardRedemption.deliveredAt` without changing the linked coin transaction.
 - `auth_reset_tokens` stores only token hashes and supports password-reset, responsible-pin reset, and account-deletion purposes.
 - Coin values and costs are positive integers.

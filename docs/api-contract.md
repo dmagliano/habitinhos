@@ -25,10 +25,12 @@ Protected endpoints use Bearer JWT authorization. Manual endpoint testing flow:
 | POST | `/auth/responsible-pin/reset/request` | Issue responsible PIN reset instructions after password verification |
 | POST | `/auth/responsible-pin/reset/confirm` | Confirm responsible PIN reset token and save a new PIN |
 | POST | `/auth/account-deletion/request` | Issue account deletion confirmation instructions after password verification |
-| POST | `/auth/account-deletion/confirm` | Confirm account deletion token and deactivate the responsible account |
+| POST | `/auth/account-deletion/confirm` | Confirm account deletion token and deactivate the responsible account and family unit |
 | GET | `/me` | Return authenticated user and family context |
 
 Password reset request is public. Responsible PIN and account deletion endpoints are protected and require Bearer JWT authorization. Reset codes may be delivered by Resend or logged locally when `RESEND_API_KEY` is absent.
+
+Registration rejects an email only when the same normalized email already belongs to an active account, returning `EMAIL_ALREADY_REGISTERED`. If the email exists only on inactive historical rows, registration creates a fresh responsible user and family unit with new ids. Login and password reset lookup only active accounts; inactive-only email behaves like an invalid or unknown account, and password reset remains enumeration-safe by accepting the request without sending reset instructions.
 
 ## Children
 
