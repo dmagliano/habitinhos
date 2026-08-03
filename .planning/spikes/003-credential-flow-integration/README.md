@@ -54,4 +54,4 @@ npm test -- --runInBand \
 
 ## Results
 
-**Verdict: VALIDATED.** Four focused suites passed with 31 tests. Static search confirms direct `secureTextEntry` is isolated to the shared component, while screen-level tests prove visibility in login, password reset, responsible PIN entry, and account deletion without regressing service or navigation behavior.
+**Verdict: VALIDATED.** Four focused suites passed with 31 tests. Static search confirms direct `secureTextEntry` is isolated to the shared component, while screen-level tests prove visibility in login, password reset, responsible PIN entry, and account deletion without regressing service or navigation behavior. The full mobile suite also passed with 126 tests, alongside TypeScript and Expo lint checks.
