@@ -12,7 +12,7 @@ concurrency:
 jobs:
   build_android_preview:
     name: Build Android preview APK
-    if: ${{ startsWith(github.event.pull_request.head.ref, 'release/') && github.event.pull_request.head.repo.full_name == github.repository }}
+    if: ${{ startsWith(github.ref_name, 'release/') && github.event.pull_request.head.repo.full_name == github.event.pull_request.base.repo.full_name }}
     type: build
     environment: preview
     params:
