@@ -1,4 +1,4 @@
-import { PropsWithChildren, useEffect, useState } from 'react';
+import { PropsWithChildren, useEffect, useRef, useState } from 'react';
 import { Keyboard, Platform, ScrollView, StyleSheet, View, ViewStyle } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
@@ -7,13 +7,28 @@ import { colors, spacing } from '../theme';
 type AppScreenProps = PropsWithChildren<{
   scroll?: boolean;
   centered?: boolean;
+  scrollToEndOnKeyboard?: boolean;
   style?: ViewStyle;
   contentStyle?: ViewStyle;
 }>;
 
-export function AppScreen({ children, scroll = true, centered = false, style, contentStyle }: AppScreenProps) {
+export function AppScreen({
+  children,
+  scroll = true,
+  centered = false,
+  scrollToEndOnKeyboard = false,
+  style,
+  contentStyle,
+}: AppScreenProps) {
   const [keyboardPaddingBottom, setKeyboardPaddingBottom] = useState(0);
+  const scrollViewRef = useRef<ScrollView>(null);
   const content = <View style={[styles.content, centered && styles.centered, contentStyle]}>{children}</View>;
+
+  const handleContentSizeChange = () => {
+    if (shouldScrollToEndAfterKeyboardLayout(scrollToEndOnKeyboard, keyboardPaddingBottom)) {
+      scrollViewRef.current?.scrollToEnd({ animated: true });
+    }
+  };
 
   useEffect(() => {
     const showEvent = Platform.OS === 'ios' ? 'keyboardWillShow' : 'keyboardDidShow';
@@ -36,12 +51,14 @@ export function AppScreen({ children, scroll = true, centered = false, style, co
     <SafeAreaView style={[styles.safeArea, style]}>
       {scroll ? (
         <ScrollView
+          ref={scrollViewRef}
           contentContainerStyle={[
             styles.scrollContent,
             keyboardPaddingBottom > 0 && { paddingBottom: keyboardPaddingBottom },
           ]}
           keyboardDismissMode="on-drag"
           keyboardShouldPersistTaps="handled"
+          onContentSizeChange={handleContentSizeChange}
           showsVerticalScrollIndicator={false}
         >
           {content}
@@ -51,6 +68,10 @@ export function AppScreen({ children, scroll = true, centered = false, style, co
       )}
     </SafeAreaView>
   );
+}
+
+export function shouldScrollToEndAfterKeyboardLayout(enabled: boolean, keyboardPaddingBottom: number): boolean {
+  return enabled && keyboardPaddingBottom > 0;
 }
 
 const styles = StyleSheet.create({
