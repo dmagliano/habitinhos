@@ -1,5 +1,6 @@
 package br.com.habitinhos.auth;
 
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.hamcrest.Matchers.blankOrNullString;
 import static org.hamcrest.Matchers.not;
@@ -15,17 +16,21 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 import br.com.habitinhos.auth.dto.LoginRequest;
 import br.com.habitinhos.auth.dto.RegisterRequest;
+import br.com.habitinhos.family.FamilyUnit;
 import br.com.habitinhos.family.FamilyUnitRepository;
 import br.com.habitinhos.shared.AbstractIntegrationTest;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import java.time.Instant;
 import java.util.Map;
+import java.util.UUID;
 import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.MediaType;
+import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.test.web.servlet.MockMvc;
 
@@ -47,6 +52,9 @@ class AuthIntegrationTest extends AbstractIntegrationTest {
 
   @Autowired
   private PasswordEncoder passwordEncoder;
+
+  @Autowired
+  private JdbcTemplate jdbcTemplate;
 
   @MockBean
   private AccountEmailSender accountEmailSender;
@@ -115,6 +123,28 @@ class AuthIntegrationTest extends AbstractIntegrationTest {
             .content(objectMapper.writeValueAsString(registerRequest("Responsavel@Example.com"))))
         .andExpect(status().isConflict())
         .andExpect(jsonPath("$.code").value("EMAIL_ALREADY_REGISTERED"));
+  }
+
+  @Test
+  void databaseEnforcesEmailUniquenessOnlyForActiveUsers() {
+    UUID inactiveFamilyId = insertFamily("Família Histórica");
+    insertUser(
+        inactiveFamilyId,
+        "responsavel@example.com",
+        false);
+
+    UUID activeFamilyId = insertFamily("Família Atual");
+    insertUser(
+        activeFamilyId,
+        "responsavel@example.com",
+        true);
+
+    UUID duplicateActiveFamilyId = insertFamily("Família Duplicada");
+    assertThatThrownBy(() -> insertUser(
+            duplicateActiveFamilyId,
+            "responsavel@example.com",
+            true))
+        .isInstanceOf(DataIntegrityViolationException.class);
   }
 
   @Test
@@ -274,7 +304,7 @@ class AuthIntegrationTest extends AbstractIntegrationTest {
   }
 
   @Test
-  void deleteAccountDeactivatesUserAndRejectsOldSession() throws Exception {
+  void deleteAccountDeactivatesUserAndFamilyThenAllowsFreshRegistration() throws Exception {
     String token = register("responsavel@example.com");
     reset(accountEmailSender);
 
@@ -316,8 +346,14 @@ class AuthIntegrationTest extends AbstractIntegrationTest {
                 "token", tokenCaptor.getValue()))))
         .andExpect(status().isNoContent());
 
-    AppUser user = appUserRepository.findByEmailIgnoreCase("responsavel@example.com").orElseThrow();
-    assertThat(user.isActive()).isFalse();
+    AppUser oldUser = appUserRepository.findByEmailIgnoreCase("responsavel@example.com").orElseThrow();
+    UUID oldUserId = oldUser.getId();
+    UUID oldFamilyId = oldUser.getFamilyUnitId();
+    assertThat(oldUser.isActive()).isFalse();
+    assertThat(familyUnitRepository.findById(oldFamilyId))
+        .get()
+        .extracting(FamilyUnit::isActive)
+        .isEqualTo(false);
 
     mockMvc.perform(post("/auth/login")
             .contentType(MediaType.APPLICATION_JSON)
@@ -330,12 +366,60 @@ class AuthIntegrationTest extends AbstractIntegrationTest {
     mockMvc.perform(get("/me")
             .header("Authorization", "Bearer " + token))
         .andExpect(status().isUnauthorized());
+
+    reset(accountEmailSender);
+    mockMvc.perform(post("/auth/password-reset/request")
+            .contentType(MediaType.APPLICATION_JSON)
+            .content(objectMapper.writeValueAsString(Map.of("email", "responsavel@example.com"))))
+        .andExpect(status().isAccepted());
+    verify(accountEmailSender, never()).sendPasswordReset(any(), any(), any());
+
+    String freshRegistration = mockMvc.perform(post("/auth/register")
+            .contentType(MediaType.APPLICATION_JSON)
+            .content(objectMapper.writeValueAsString(registerRequest(
+                "RESPONSAVEL@example.com",
+                "novaConta123",
+                "Família Nova"))))
+        .andExpect(status().isCreated())
+        .andExpect(jsonPath("$.token", not(blankOrNullString())))
+        .andExpect(jsonPath("$.user.email").value("responsavel@example.com"))
+        .andExpect(jsonPath("$.family.name").value("Família Nova"))
+        .andReturn()
+        .getResponse()
+        .getContentAsString();
+
+    JsonNode freshJson = objectMapper.readTree(freshRegistration);
+    UUID freshUserId = UUID.fromString(freshJson.at("/user/id").asText());
+    UUID freshFamilyId = UUID.fromString(freshJson.at("/family/id").asText());
+    assertThat(freshUserId).isNotEqualTo(oldUserId);
+    assertThat(freshFamilyId).isNotEqualTo(oldFamilyId);
+
+    AppUser freshUser = appUserRepository.findByEmailIgnoreCaseAndActiveTrue("responsavel@example.com").orElseThrow();
+    assertThat(freshUser.getId()).isEqualTo(freshUserId);
+    assertThat(freshUser.getFamilyUnitId()).isEqualTo(freshFamilyId);
+    assertThat(familyUnitRepository.findById(freshFamilyId)).get().extracting(FamilyUnit::isActive).isEqualTo(true);
+
+    login("responsavel@example.com", "novaConta123");
+
+    reset(accountEmailSender);
+    mockMvc.perform(post("/auth/password-reset/request")
+            .contentType(MediaType.APPLICATION_JSON)
+            .content(objectMapper.writeValueAsString(Map.of("email", "responsavel@example.com"))))
+        .andExpect(status().isAccepted());
+    verify(accountEmailSender).sendPasswordReset(
+        eq("responsavel@example.com"),
+        any(String.class),
+        any(Instant.class));
   }
 
   private String register(String email) throws Exception {
+    return register(email, RAW_PASSWORD, "Familia Demo");
+  }
+
+  private String register(String email, String password, String familyName) throws Exception {
     String response = mockMvc.perform(post("/auth/register")
             .contentType(MediaType.APPLICATION_JSON)
-            .content(objectMapper.writeValueAsString(registerRequest(email))))
+            .content(objectMapper.writeValueAsString(registerRequest(email, password, familyName))))
         .andExpect(status().isCreated())
         .andReturn()
         .getResponse()
@@ -357,11 +441,52 @@ class AuthIntegrationTest extends AbstractIntegrationTest {
   }
 
   private RegisterRequest registerRequest(String email) {
+    return registerRequest(email, RAW_PASSWORD, "Familia Demo");
+  }
+
+  private RegisterRequest registerRequest(String email, String password, String familyName) {
     return new RegisterRequest(
         "Responsavel Demo",
         email,
-        RAW_PASSWORD,
-        "Familia Demo",
+        password,
+        familyName,
         "1234");
+  }
+
+  private UUID insertFamily(String name) {
+    UUID familyId = UUID.randomUUID();
+    jdbcTemplate.update(
+        """
+        INSERT INTO family_units (id, name, active, created_at, updated_at)
+        VALUES (?, ?, true, now(), now())
+        """,
+        familyId,
+        name);
+    return familyId;
+  }
+
+  private void insertUser(UUID familyId, String email, boolean active) {
+    jdbcTemplate.update(
+        """
+        INSERT INTO app_users (
+          id,
+          family_unit_id,
+          name,
+          email,
+          role,
+          password_hash,
+          responsible_pin_hash,
+          active,
+          created_at,
+          updated_at
+        )
+        VALUES (?, ?, 'Responsavel Demo', ?, 'RESPONSIBLE', ?, ?, ?, now(), now())
+        """,
+        UUID.randomUUID(),
+        familyId,
+        email,
+        passwordEncoder.encode(RAW_PASSWORD),
+        passwordEncoder.encode("1234"),
+        active);
   }
 }

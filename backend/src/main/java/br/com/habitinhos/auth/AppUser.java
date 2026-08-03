@@ -23,7 +23,7 @@ public class AppUser extends BaseEntity {
   @Column(nullable = false, length = 160)
   private String name;
 
-  @Column(nullable = false, unique = true, length = 320)
+  @Column(nullable = false, length = 320)
   private String email;
 
   @Enumerated(EnumType.STRING)

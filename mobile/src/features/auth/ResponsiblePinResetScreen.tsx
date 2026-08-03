@@ -11,7 +11,7 @@ import {
 import type { KeyboardAvoidingViewProps } from 'react-native';
 
 import { ApiError } from '../../api/types';
-import { AppScreen, Card, PrimaryButton, SecondaryButton } from '../../components';
+import { AppScreen, Card, PrimaryButton, SecondaryButton, SecureTextInput } from '../../components';
 import { RootStackParamList } from '../../navigation/routes';
 import { colors, radius, spacing, typography } from '../../theme';
 
@@ -27,10 +27,13 @@ export function ResponsiblePinResetScreen({ navigation }: Props) {
   const [password, setPassword] = useState('');
   const [resetToken, setResetToken] = useState('');
   const [newPin, setNewPin] = useState('');
+  const [confirmNewPin, setConfirmNewPin] = useState('');
   const [step, setStep] = useState<ResetStep>('request');
   const [submitting, setSubmitting] = useState(false);
   const [message, setMessage] = useState<string | null>(null);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
+  const hasPinMismatch = confirmNewPin.length > 0 && confirmNewPin !== newPin;
+  const hasValidPinConfirmation = /^\d{4}$/.test(newPin) && confirmNewPin === newPin;
 
   async function requestReset() {
     if (!session?.token || submitting) {
@@ -53,7 +56,7 @@ export function ResponsiblePinResetScreen({ navigation }: Props) {
   }
 
   async function confirmReset() {
-    if (!session?.token || submitting) {
+    if (!session?.token || submitting || !hasValidPinConfirmation) {
       return;
     }
 
@@ -86,14 +89,18 @@ export function ResponsiblePinResetScreen({ navigation }: Props) {
               <>
                 <View style={styles.field}>
                   <Text style={styles.label}>Senha da conta</Text>
-                  <TextInput
+                  <SecureTextInput
                     accessibilityLabel="Senha da conta"
+                    autoCapitalize="none"
+                    autoComplete="current-password"
+                    autoCorrect={false}
                     onChangeText={setPassword}
                     placeholder="Sua senha"
                     placeholderTextColor={colors.textMuted}
-                    secureTextEntry
+                    spellCheck={false}
                     style={styles.input}
                     value={password}
+                    visibilityLabel="senha da conta"
                   />
                 </View>
 
@@ -123,21 +130,40 @@ export function ResponsiblePinResetScreen({ navigation }: Props) {
 
                 <View style={styles.field}>
                   <Text style={styles.label}>Novo PIN</Text>
-                  <TextInput
+                  <SecureTextInput
                     accessibilityLabel="Novo PIN"
+                    autoComplete="off"
                     keyboardType="number-pad"
                     maxLength={4}
                     onChangeText={(value) => setNewPin(value.replace(/\D/g, '').slice(0, 4))}
                     placeholder="4 dígitos"
                     placeholderTextColor={colors.textMuted}
-                    secureTextEntry
                     style={styles.input}
                     value={newPin}
+                    visibilityLabel="novo PIN"
                   />
                 </View>
 
+                <View style={styles.field}>
+                  <Text style={styles.label}>Confirmar novo PIN</Text>
+                  <SecureTextInput
+                    accessibilityLabel="Confirmar novo PIN"
+                    autoComplete="off"
+                    keyboardType="number-pad"
+                    maxLength={4}
+                    onChangeText={(value) => setConfirmNewPin(value.replace(/\D/g, '').slice(0, 4))}
+                    placeholder="Digite o PIN novamente"
+                    placeholderTextColor={colors.textMuted}
+                    style={styles.input}
+                    value={confirmNewPin}
+                    visibilityLabel="confirmação do novo PIN"
+                  />
+                  {hasPinMismatch ? <Text accessibilityLiveRegion="polite" style={styles.error}>Os PINs precisam ser iguais.</Text> : null}
+                  {hasValidPinConfirmation ? <Text accessibilityLiveRegion="polite" style={styles.success}>✓ PINs válidos e iguais.</Text> : null}
+                </View>
+
                 <PrimaryButton
-                  disabled={!isValidResetCode(resetToken) || !/^\d{4}$/.test(newPin)}
+                  disabled={!isValidResetCode(resetToken) || !hasValidPinConfirmation}
                   label={submitting ? 'Salvando...' : 'Salvar novo PIN'}
                   loading={submitting}
                   onPress={confirmReset}

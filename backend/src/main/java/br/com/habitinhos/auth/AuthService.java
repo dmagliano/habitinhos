@@ -71,7 +71,7 @@ public class AuthService {
   @Transactional
   public AuthResponse register(RegisterRequest request) {
     String email = normalizeEmail(request.email());
-    if (appUserRepository.existsByEmailIgnoreCase(email)) {
+    if (appUserRepository.existsByEmailIgnoreCaseAndActiveTrue(email)) {
       log.warn("Register blocked: email already registered");
       throw new ConflictException("EMAIL_ALREADY_REGISTERED", "E-mail já cadastrado.");
     }
@@ -116,8 +116,7 @@ public class AuthService {
   public AuthResponse login(LoginRequest request) {
     String email = normalizeEmail(request.email());
     log.debug("Login request processing");
-    AppUser user = appUserRepository.findByEmailIgnoreCase(email)
-        .filter(AppUser::isActive)
+    AppUser user = appUserRepository.findByEmailIgnoreCaseAndActiveTrue(email)
         .filter(found -> passwordEncoder.matches(request.password(), found.getPasswordHash()))
         .orElseThrow(() -> new UnauthorizedException(
             "INVALID_CREDENTIALS",
@@ -136,8 +135,7 @@ public class AuthService {
   @Transactional
   public void requestPasswordReset(PasswordResetRequest request) {
     String email = normalizeEmail(request.email());
-    appUserRepository.findByEmailIgnoreCase(email)
-        .filter(AppUser::isActive)
+    appUserRepository.findByEmailIgnoreCaseAndActiveTrue(email)
         .ifPresentOrElse(
             user -> {
               IssuedResetToken issuedToken = issueResetToken(user, AuthResetPurpose.PASSWORD);
@@ -214,12 +212,15 @@ public class AuthService {
     }
 
     user.deactivate();
+    FamilyUnit family = familyUnitRepository.findById(user.getFamilyUnitId())
+        .orElseThrow(() -> new NotFoundException("FAMILY_NOT_FOUND", "Família não encontrada."));
+    family.deactivate();
     Instant now = Instant.now(clock);
     resetToken.markUsed(now);
     invalidateActiveTokens(user.getId(), AuthResetPurpose.PASSWORD, now);
     invalidateActiveTokens(user.getId(), AuthResetPurpose.RESPONSIBLE_PIN, now);
     invalidateActiveTokens(user.getId(), AuthResetPurpose.ACCOUNT_DELETION, now);
-    log.info("Account deactivated: userId={} familyUnitId={}", user.getId(), user.getFamilyUnitId());
+    log.info("Account deactivated: userId={} familyUnitId={}", user.getId(), family.getId());
   }
 
   @Transactional(readOnly = true)

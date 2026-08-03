@@ -11,7 +11,7 @@ import {
 import type { KeyboardAvoidingViewProps } from 'react-native';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
 
-import { AppScreen, Card, PrimaryButton, SecondaryButton, StatusBadge } from '../../components';
+import { AppScreen, Card, PrimaryButton, SecondaryButton, SecureTextInput, StatusBadge } from '../../components';
 import { RootStackParamList } from '../../navigation/routes';
 import { colors, radius, spacing, typography } from '../../theme';
 
@@ -62,14 +62,18 @@ export function LoginScreen({ navigation }: Partial<Props> = {}) {
 
             <View style={styles.field}>
               <Text style={styles.label}>Senha</Text>
-              <TextInput
+              <SecureTextInput
                 accessibilityLabel="Senha"
+                autoCapitalize="none"
+                autoComplete="current-password"
+                autoCorrect={false}
                 onChangeText={setPassword}
                 placeholder="Sua senha"
                 placeholderTextColor={colors.textMuted}
-                secureTextEntry
+                spellCheck={false}
                 style={styles.input}
                 value={password}
+                visibilityLabel="senha"
               />
             </View>
 

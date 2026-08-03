@@ -85,6 +85,38 @@ HABITINHOS_JWT_SECRET
 The Render Docker entrypoint can normalize Render's `DATABASE_URL` into the JDBC URL expected by
 Spring. See `render.yaml` and `backend/docker-entrypoint.sh`.
 
+## Local TCC Demo Seed
+
+For a repeatable local demo, start PostgreSQL and run the backend with the demo seed explicitly
+enabled:
+
+```bash
+docker compose up -d postgres
+cd backend
+HABITINHOS_DEMO_SEED_ENABLED=true ./mvnw spring-boot:run
+```
+
+The seed is local-only, opt-in, and idempotent. It creates a representative family with children,
+wallet balances, mission history, rewards, coin transactions, and a recent reward redemption.
+
+Local demo credentials:
+
+```text
+E-mail: demo@habitinhos.local
+Senha: Demo12345
+PIN do responsável: 1234
+```
+
+After the backend is running, start the mobile app against the local API:
+
+```bash
+cd mobile
+npm run android:local
+```
+
+Use `npm run ios:local` for iOS simulator or `npm run web:local` for browser. The walkthrough for the
+presentation is in `docs/tcc-demo-script.md`.
+
 ## Email Delivery
 
 The backend sends welcome, password reset, and responsible PIN reset emails through Resend when
@@ -184,6 +216,17 @@ cd mobile
 npm run lint
 npm run typecheck
 npm run test:ci
+```
+
+Focused demo-readiness checks:
+
+```bash
+cd backend
+./mvnw test -Dtest=DemoDataSeederTest
+
+cd mobile
+npm test -- --runInBand src/features/auth/__tests__/login-screen.test.tsx
+npm run typecheck
 ```
 
 ## License, Copyright, and Attribution

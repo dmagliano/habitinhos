@@ -23,9 +23,10 @@ Authenticatable user, initially responsible adults.
 | id | Primary key |
 | familyUnitId | Tenant reference |
 | name | Display name |
-| email | Unique login identifier, likely globally unique |
+| email | Login identifier; normalized email is unique among active users, while inactive historical accounts may retain the same email for a future registration |
 | role | `RESPONSIBLE`; `ADMIN` reserved for future |
 | passwordHash | Hashed password only |
+| responsiblePinHash | Hashed 4-digit responsible PIN used to enter responsible mode |
 | active | Soft activation flag |
 | createdAt | Creation timestamp |
 | updatedAt | Update timestamp |
@@ -101,7 +102,6 @@ Mission assigned to a specific child.
 | snapshotRequiresApproval | Approval rule copied at assignment time |
 | snapshotRecurrenceType | Recurrence rule copied at assignment time |
 | snapshotCompletionWindowDays | Completion window copied at assignment time |
-| coinsCredited | Amount credited when completed/approved |
 | createdAt | Creation timestamp |
 | updatedAt | Update timestamp |
 
@@ -115,7 +115,7 @@ Reward configured by a responsible adult.
 | familyUnitId | Tenant reference |
 | title | Required title |
 | description | Optional detail |
-| costInCoins | Positive integer |
+| cost | Positive integer coin cost |
 | active | Soft activation flag |
 | createdByUserId | Responsible creator |
 | createdAt | Creation timestamp |
@@ -129,13 +129,14 @@ Reward redemption by a child.
 |-------|-------|
 | id | Primary key |
 | familyUnitId | Tenant reference |
-| childId | Child requester |
 | rewardId | Reward reference |
-| costInCoins | Cost snapshot at redemption time |
-| status | `REQUESTED`, `REDEEMED`, `FULFILLED`, `CANCELLED` |
-| requestedAt | Request timestamp |
-| fulfilledAt | Future use |
-| cancelledAt | Future use |
+| childId | Child requester |
+| walletId | Wallet debited for the redemption |
+| status | `REDEEMED`, `DELIVERED`, `CANCELLED` |
+| snapshotTitle | Reward title copied at redemption time |
+| snapshotCost | Reward cost copied at redemption time |
+| coinTransactionId | Debit transaction linked after wallet debit |
+| deliveredAt | Delivery timestamp when responsible marks as delivered |
 | createdAt | Creation timestamp |
 | updatedAt | Update timestamp |
 
@@ -160,11 +161,29 @@ Ledger entry for wallet operations.
 | description | Optional description |
 | createdAt | Creation timestamp |
 
+### AuthResetToken
+
+Short-lived token record for account recovery and destructive account actions.
+
+| Field | Notes |
+|-------|-------|
+| id | Primary key |
+| userId | Responsible user receiving the code |
+| purpose | `PASSWORD`, `RESPONSIBLE_PIN`, or `ACCOUNT_DELETION` |
+| tokenHash | SHA-256 hash of the emailed/logged code, never the raw code |
+| expiresAt | Expiration timestamp |
+| usedAt | Set when the token is consumed or invalidated |
+| createdAt | Creation timestamp |
+
 ## Integrity Rules
 
 - Every family-scoped entity stores `familyUnitId`.
 - All wallet balance changes happen through transactional services.
 - Every credit/debit writes a matching `CoinTransaction`.
 - Mission/reward deactivation preserves historical rows.
+- Active users have unique normalized email values through a partial unique index on `lower(email)` where `active = true`.
+- Account deletion deactivates the responsible user and family unit, invalidates active reset tokens, and preserves historical rows for audit/history.
+- Reward delivery updates `RewardRedemption.deliveredAt` without changing the linked coin transaction.
+- `auth_reset_tokens` stores only token hashes and supports password-reset, responsible-pin reset, and account-deletion purposes.
 - Coin values and costs are positive integers.
 - Backend checks relationships belong to the same family before mutating data.

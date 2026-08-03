@@ -67,7 +67,7 @@ export function ChildProfileSelectScreen({ navigation }: Props) {
   };
 
   return (
-    <AppScreen>
+    <AppScreen scrollToEndOnKeyboard>
       <AppHeader
         emoji="⭐"
         subtitle="Escolha um perfil da família."

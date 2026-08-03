@@ -595,6 +595,7 @@ components:
           type: string
           format: email
           maxLength: 320
+          description: Unique among active accounts after normalization; inactive historical accounts may reuse the email for a new registration.
           example: ana@email.com
         password:
           type: string

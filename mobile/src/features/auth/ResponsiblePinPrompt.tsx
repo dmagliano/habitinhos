@@ -1,8 +1,8 @@
 import { useState } from 'react';
-import { StyleSheet, Text, TextInput, View } from 'react-native';
+import { StyleSheet, Text, View } from 'react-native';
 
 import { ApiError } from '../../api/types';
-import { Card, PrimaryButton, SecondaryButton } from '../../components';
+import { Card, PrimaryButton, SecondaryButton, SecureTextInput } from '../../components';
 import { colors, radius, spacing, typography } from '../../theme';
 
 import { authService } from './authService';
@@ -50,16 +50,17 @@ export function ResponsiblePinPrompt({ onCancel, onForgotPin, onVerified, token 
         <Text style={styles.helper}>Informe o PIN de 4 dígitos para gerenciar a família.</Text>
       </View>
 
-      <TextInput
+      <SecureTextInput
         accessibilityLabel="PIN do responsável"
+        autoComplete="off"
         keyboardType="number-pad"
         maxLength={4}
         onChangeText={(value) => setPin(value.replace(/\D/g, '').slice(0, 4))}
         placeholder="0000"
         placeholderTextColor={colors.textMuted}
-        secureTextEntry
-        style={styles.input}
+        style={[styles.input, styles.centeredSecureInput]}
         value={pin}
+        visibilityLabel="PIN do responsável"
       />
 
       {errorMessage ? <Text style={styles.error}>{errorMessage}</Text> : null}
@@ -102,6 +103,9 @@ const styles = StyleSheet.create({
   },
   copy: {
     gap: spacing.xs,
+  },
+  centeredSecureInput: {
+    paddingLeft: 88,
   },
   error: {
     ...typography.body,

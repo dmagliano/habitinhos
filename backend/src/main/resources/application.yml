@@ -29,6 +29,9 @@ logging:
     org.springframework.security: INFO
 
 habitinhos:
+  demo:
+    seed:
+      enabled: ${HABITINHOS_DEMO_SEED_ENABLED:false}
   security:
     jwt:
       issuer: ${HABITINHOS_JWT_ISSUER:habitinhos}

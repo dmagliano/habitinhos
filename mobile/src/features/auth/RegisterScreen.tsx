@@ -10,7 +10,7 @@ import {
 import type { KeyboardAvoidingViewProps } from 'react-native';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
 
-import { AppScreen, Card, PrimaryButton, SecondaryButton } from '../../components';
+import { AppScreen, Card, PrimaryButton, SecondaryButton, SecureTextInput } from '../../components';
 import { RootStackParamList } from '../../navigation/routes';
 import { colors, radius, spacing, typography } from '../../theme';
 
@@ -23,13 +23,27 @@ export function RegisterScreen({ navigation }: Props) {
   const [name, setName] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [confirmPassword, setConfirmPassword] = useState('');
   const [familyName, setFamilyName] = useState('');
   const [responsiblePin, setResponsiblePin] = useState('');
+  const [confirmResponsiblePin, setConfirmResponsiblePin] = useState('');
   const isLoading = status === 'loading';
   const registrationErrorMessage = isSessionRecoveryMessage(errorMessage) ? null : errorMessage;
+  const hasPasswordMismatch = confirmPassword.length > 0 && confirmPassword !== password;
+  const hasValidPasswordConfirmation = password.length >= 8 && confirmPassword === password;
+  const hasPinMismatch = confirmResponsiblePin.length > 0 && confirmResponsiblePin !== responsiblePin;
+  const hasValidPinConfirmation = /^\d{4}$/.test(responsiblePin) && confirmResponsiblePin === responsiblePin;
+  const isFormValid =
+    name.trim().length > 0 &&
+    email.trim().length > 0 &&
+    password.length >= 8 &&
+    confirmPassword === password &&
+    familyName.trim().length > 0 &&
+    hasValidPinConfirmation;
+  const shouldExplainDisabledSubmit = !isLoading && !isFormValid;
 
   async function handleSubmit() {
-    if (isLoading) {
+    if (isLoading || !isFormValid) {
       return;
     }
 
@@ -81,15 +95,38 @@ export function RegisterScreen({ navigation }: Props) {
 
             <View style={styles.field}>
               <Text style={styles.label}>Senha</Text>
-              <TextInput
+              <SecureTextInput
                 accessibilityLabel="Senha"
+                autoCapitalize="none"
+                autoComplete="new-password"
+                autoCorrect={false}
                 onChangeText={setPassword}
-                placeholder="Crie uma senha"
+                placeholder="Mínimo de 8 caracteres"
                 placeholderTextColor={colors.textMuted}
-                secureTextEntry
+                spellCheck={false}
                 style={styles.input}
                 value={password}
+                visibilityLabel="senha"
               />
+            </View>
+
+            <View style={styles.field}>
+              <Text style={styles.label}>Confirmar senha</Text>
+              <SecureTextInput
+                accessibilityLabel="Confirmar senha"
+                autoCapitalize="none"
+                autoComplete="new-password"
+                autoCorrect={false}
+                onChangeText={setConfirmPassword}
+                placeholder="Digite a senha novamente"
+                placeholderTextColor={colors.textMuted}
+                spellCheck={false}
+                style={styles.input}
+                value={confirmPassword}
+                visibilityLabel="confirmação da senha"
+              />
+              {hasPasswordMismatch ? <Text accessibilityLiveRegion="polite" style={styles.error}>As senhas precisam ser iguais.</Text> : null}
+              {hasValidPasswordConfirmation ? <Text accessibilityLiveRegion="polite" style={styles.success}>✓ Senhas válidas e iguais.</Text> : null}
             </View>
 
             <View style={styles.field}>
@@ -107,23 +144,46 @@ export function RegisterScreen({ navigation }: Props) {
 
             <View style={styles.field}>
               <Text style={styles.label}>PIN do responsável</Text>
-              <TextInput
+              <SecureTextInput
                 accessibilityLabel="PIN do responsável"
+                autoComplete="off"
                 keyboardType="number-pad"
                 maxLength={4}
                 onChangeText={(value) => setResponsiblePin(value.replace(/\D/g, '').slice(0, 4))}
                 placeholder="4 dígitos"
                 placeholderTextColor={colors.textMuted}
-                secureTextEntry
                 style={styles.input}
                 value={responsiblePin}
+                visibilityLabel="PIN do responsável"
               />
               <Text style={styles.helper}>Use este PIN para entrar na gestão da família a partir do modo criança.</Text>
             </View>
 
+            <View style={styles.field}>
+              <Text style={styles.label}>Confirmar PIN do responsável</Text>
+              <SecureTextInput
+                accessibilityLabel="Confirmar PIN do responsável"
+                autoComplete="off"
+                keyboardType="number-pad"
+                maxLength={4}
+                onChangeText={(value) => setConfirmResponsiblePin(value.replace(/\D/g, '').slice(0, 4))}
+                placeholder="Digite o PIN novamente"
+                placeholderTextColor={colors.textMuted}
+                style={styles.input}
+                value={confirmResponsiblePin}
+                visibilityLabel="confirmação do PIN do responsável"
+              />
+              {hasPinMismatch ? <Text accessibilityLiveRegion="polite" style={styles.error}>Os PINs precisam ser iguais.</Text> : null}
+              {hasValidPinConfirmation ? <Text accessibilityLiveRegion="polite" style={styles.success}>✓ PINs válidos e iguais.</Text> : null}
+            </View>
+
             {registrationErrorMessage ? <Text style={styles.error}>{registrationErrorMessage}</Text> : null}
+            {shouldExplainDisabledSubmit ? (
+              <Text style={styles.helper}>Complete os campos obrigatórios para criar a conta.</Text>
+            ) : null}
 
             <PrimaryButton
+              disabled={!isFormValid || isLoading}
               label={isLoading ? 'Criando conta...' : 'Criar conta'}
               loading={isLoading}
               onPress={handleSubmit}
@@ -198,6 +258,10 @@ const styles = StyleSheet.create({
   error: {
     ...typography.body,
     color: colors.error,
+  },
+  success: {
+    ...typography.body,
+    color: colors.success,
   },
   helper: {
     ...typography.body,

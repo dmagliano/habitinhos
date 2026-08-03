@@ -5,4 +5,5 @@ export { CoinBadge } from './CoinBadge';
 export { EmojiAvatar } from './EmojiAvatar';
 export { PrimaryButton } from './PrimaryButton';
 export { SecondaryButton } from './SecondaryButton';
+export { SecureTextInput } from './SecureTextInput';
 export { StatusBadge } from './StatusBadge';

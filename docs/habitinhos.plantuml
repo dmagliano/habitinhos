@@ -1,0 +1,149 @@
+@startuml
+
+!theme plain
+top to bottom direction
+skinparam linetype ortho
+
+class app_users {
+   family_unit_id: uuid
+   name: varchar(160)
+   email: varchar(320)
+   role: varchar(40)
+   password_hash: varchar(255)
+   active: boolean
+   created_at: timestamp with time zone
+   updated_at: timestamp with time zone
+   id: uuid
+}
+class assigned_missions {
+   family_unit_id: uuid
+   mission_id: uuid
+   child_id: uuid
+   status: varchar(32)
+   due_date: date
+   completed_at: timestamp with time zone
+   approved_at: timestamp with time zone
+   rejected_at: timestamp with time zone
+   rejection_reason: varchar(500)
+   snapshot_title: varchar(160)
+   snapshot_description: varchar(1000)
+   snapshot_coin_value: integer
+   snapshot_requires_approval: boolean
+   created_at: timestamp with time zone
+   updated_at: timestamp with time zone
+   id: uuid
+}
+class child_profiles {
+   family_unit_id: uuid
+   name: varchar(160)
+   age: integer
+   avatar_key: varchar(80)
+   access_pin_hash: varchar(255)
+   active: boolean
+   created_at: timestamp with time zone
+   updated_at: timestamp with time zone
+   id: uuid
+}
+class coin_transactions {
+   family_unit_id: uuid
+   wallet_id: uuid
+   child_id: uuid
+   assigned_mission_id: uuid
+   reward_redemption_id: uuid
+   type: varchar(20)
+   source_type: varchar(40)
+   amount: integer
+   balance_after: integer
+   description: varchar(255)
+   created_by_user_id: uuid
+   created_at: timestamp with time zone
+   id: uuid
+}
+class family_units {
+   name: varchar(160)
+   active: boolean
+   created_at: timestamp with time zone
+   updated_at: timestamp with time zone
+   id: uuid
+}
+class flyway_schema_history {
+   version: varchar(50)
+   description: varchar(200)
+   type: varchar(20)
+   script: varchar(1000)
+   checksum: integer
+   installed_by: varchar(100)
+   installed_on: timestamp
+   execution_time: integer
+   success: boolean
+   installed_rank: integer
+}
+class missions {
+   family_unit_id: uuid
+   title: varchar(160)
+   description: varchar(1000)
+   coin_value: integer
+   requires_approval: boolean
+   recurrence_type: varchar(24)
+   active: boolean
+   created_by_user_id: uuid
+   created_at: timestamp with time zone
+   updated_at: timestamp with time zone
+   id: uuid
+}
+class reward_redemptions {
+   family_unit_id: uuid
+   reward_id: uuid
+   child_id: uuid
+   wallet_id: uuid
+   status: varchar(32)
+   snapshot_title: varchar(160)
+   snapshot_cost: integer
+   coin_transaction_id: uuid
+   created_at: timestamp with time zone
+   updated_at: timestamp with time zone
+   id: uuid
+}
+class rewards {
+   family_unit_id: uuid
+   title: varchar(160)
+   description: varchar(1000)
+   cost: integer
+   active: boolean
+   created_by_user_id: uuid
+   created_at: timestamp with time zone
+   updated_at: timestamp with time zone
+   id: uuid
+}
+class wallets {
+   family_unit_id: uuid
+   child_id: uuid
+   balance: integer
+   created_at: timestamp with time zone
+   updated_at: timestamp with time zone
+   id: uuid
+}
+
+app_users              -[#595959,plain]-^  family_units          : "family_unit_id:id"
+assigned_missions      -[#595959,plain]-^  child_profiles        : "child_id:id"
+assigned_missions      -[#595959,plain]-^  family_units          : "family_unit_id:id"
+assigned_missions      -[#595959,plain]-^  missions              : "mission_id:id"
+child_profiles         -[#595959,plain]-^  family_units          : "family_unit_id:id"
+coin_transactions      -[#595959,plain]-^  app_users             : "created_by_user_id:id"
+coin_transactions      -[#595959,plain]-^  assigned_missions     : "assigned_mission_id:id"
+coin_transactions      -[#595959,plain]-^  child_profiles        : "child_id:id"
+coin_transactions      -[#595959,plain]-^  family_units          : "family_unit_id:id"
+coin_transactions      -[#595959,plain]-^  reward_redemptions    : "reward_redemption_id:id"
+coin_transactions      -[#595959,plain]-^  wallets               : "wallet_id:id"
+missions               -[#595959,plain]-^  app_users             : "created_by_user_id:id"
+missions               -[#595959,plain]-^  family_units          : "family_unit_id:id"
+reward_redemptions     -[#595959,plain]-^  child_profiles        : "child_id:id"
+reward_redemptions     -[#595959,plain]-^  coin_transactions     : "coin_transaction_id:id"
+reward_redemptions     -[#595959,plain]-^  family_units          : "family_unit_id:id"
+reward_redemptions     -[#595959,plain]-^  rewards               : "reward_id:id"
+reward_redemptions     -[#595959,plain]-^  wallets               : "wallet_id:id"
+rewards                -[#595959,plain]-^  app_users             : "created_by_user_id:id"
+rewards                -[#595959,plain]-^  family_units          : "family_unit_id:id"
+wallets                -[#595959,plain]-^  child_profiles        : "child_id:id"
+wallets                -[#595959,plain]-^  family_units          : "family_unit_id:id"
+@enduml
