@@ -133,12 +133,35 @@ describe('PasswordResetScreen', () => {
 
     fireEvent.changeText(screen.getByLabelText('Código recebido'), 'abc123');
     fireEvent.changeText(screen.getByLabelText('Nova senha'), 'novaSenha123');
+    fireEvent.changeText(screen.getByLabelText('Confirmar nova senha'), 'novaSenha123');
+    expect(screen.getByText('✓ Senhas válidas e iguais.')).toBeOnTheScreen();
     fireEvent.press(screen.getByRole('button', { name: 'Salvar nova senha' }));
 
     await waitFor(() =>
       expect(authService.confirmPasswordReset).toHaveBeenCalledWith('ABC123', 'novaSenha123'),
     );
     expect(await screen.findByText('Senha atualizada. Você já pode entrar com a nova senha.')).toBeOnTheScreen();
+  });
+
+  it('blocks password reset while the password confirmation does not match', async () => {
+    render(
+      <PasswordResetScreen
+        navigation={{ navigate } as never}
+        route={{ key: 'AuthPasswordReset', name: 'AuthPasswordReset' }}
+      />,
+    );
+
+    fireEvent.changeText(screen.getByLabelText('E-mail'), 'dani@example.com');
+    fireEvent.press(screen.getByRole('button', { name: 'Enviar instruções' }));
+    await screen.findByLabelText('Código recebido');
+
+    fireEvent.changeText(screen.getByLabelText('Código recebido'), 'abc123');
+    fireEvent.changeText(screen.getByLabelText('Nova senha'), 'novaSenha123');
+    fireEvent.changeText(screen.getByLabelText('Confirmar nova senha'), 'outraSenha123');
+
+    expect(screen.getByText('As senhas precisam ser iguais.')).toBeOnTheScreen();
+    expect(screen.getByRole('button', { name: 'Salvar nova senha' })).toBeDisabled();
+    expect(authService.confirmPasswordReset).not.toHaveBeenCalled();
   });
 });
 
@@ -327,6 +350,7 @@ describe('RegisterScreen', () => {
     fireEvent.changeText(screen.getByLabelText('E-mail'), 'dani@example.com');
     fireEvent.changeText(screen.getByLabelText('Senha'), 'Demo12345');
     fireEvent.changeText(screen.getByLabelText('Confirmar senha'), 'Demo12345');
+    expect(screen.getByText('✓ Senhas válidas e iguais.')).toBeOnTheScreen();
     fireEvent.changeText(screen.getByLabelText('Nome da família'), 'Familia Silva');
     fireEvent.changeText(screen.getByLabelText('PIN do responsável'), '1234');
     fireEvent.press(screen.getByRole('button', { name: 'Criar conta' }));

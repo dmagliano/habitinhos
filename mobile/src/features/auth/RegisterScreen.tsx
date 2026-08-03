@@ -29,6 +29,7 @@ export function RegisterScreen({ navigation }: Props) {
   const isLoading = status === 'loading';
   const registrationErrorMessage = isSessionRecoveryMessage(errorMessage) ? null : errorMessage;
   const hasPasswordMismatch = confirmPassword.length > 0 && confirmPassword !== password;
+  const hasValidPasswordConfirmation = password.length >= 8 && confirmPassword === password;
   const isFormValid =
     name.trim().length > 0 &&
     email.trim().length > 0 &&
@@ -114,6 +115,7 @@ export function RegisterScreen({ navigation }: Props) {
                 value={confirmPassword}
               />
               {hasPasswordMismatch ? <Text style={styles.error}>As senhas precisam ser iguais.</Text> : null}
+              {hasValidPasswordConfirmation ? <Text style={styles.success}>✓ Senhas válidas e iguais.</Text> : null}
             </View>
 
             <View style={styles.field}>
@@ -226,6 +228,10 @@ const styles = StyleSheet.create({
   error: {
     ...typography.body,
     color: colors.error,
+  },
+  success: {
+    ...typography.body,
+    color: colors.success,
   },
   helper: {
     ...typography.body,

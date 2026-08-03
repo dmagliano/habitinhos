@@ -25,10 +25,13 @@ export function PasswordResetScreen({ navigation }: Props) {
   const [email, setEmail] = useState('');
   const [resetToken, setResetToken] = useState('');
   const [newPassword, setNewPassword] = useState('');
+  const [confirmNewPassword, setConfirmNewPassword] = useState('');
   const [step, setStep] = useState<ResetStep>('request');
   const [submitting, setSubmitting] = useState(false);
   const [message, setMessage] = useState<string | null>(null);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
+  const hasPasswordMismatch = confirmNewPassword.length > 0 && confirmNewPassword !== newPassword;
+  const hasValidPasswordConfirmation = newPassword.length >= 8 && confirmNewPassword === newPassword;
 
   async function requestReset() {
     if (submitting) {
@@ -51,7 +54,7 @@ export function PasswordResetScreen({ navigation }: Props) {
   }
 
   async function confirmReset() {
-    if (submitting) {
+    if (submitting || !hasValidPasswordConfirmation) {
       return;
     }
 
@@ -133,8 +136,23 @@ export function PasswordResetScreen({ navigation }: Props) {
                   />
                 </View>
 
+                <View style={styles.field}>
+                  <Text style={styles.label}>Confirmar nova senha</Text>
+                  <TextInput
+                    accessibilityLabel="Confirmar nova senha"
+                    onChangeText={setConfirmNewPassword}
+                    placeholder="Digite a senha novamente"
+                    placeholderTextColor={colors.textMuted}
+                    secureTextEntry
+                    style={styles.input}
+                    value={confirmNewPassword}
+                  />
+                  {hasPasswordMismatch ? <Text style={styles.error}>As senhas precisam ser iguais.</Text> : null}
+                  {hasValidPasswordConfirmation ? <Text style={styles.success}>✓ Senhas válidas e iguais.</Text> : null}
+                </View>
+
                 <PrimaryButton
-                  disabled={!isValidResetCode(resetToken) || newPassword.length < 8}
+                  disabled={!isValidResetCode(resetToken) || !hasValidPasswordConfirmation}
                   label={submitting ? 'Salvando...' : 'Salvar nova senha'}
                   loading={submitting}
                   onPress={confirmReset}
