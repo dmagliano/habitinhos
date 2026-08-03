@@ -133,6 +133,8 @@ describe('child navigation flow', () => {
     expect(navigate).toHaveBeenCalledWith('ResponsiblePinReset');
 
     fireEvent.changeText(screen.getByLabelText('PIN do responsável'), '1234');
+    fireEvent.press(screen.getByRole('togglebutton', { name: 'Exibir PIN do responsável' }));
+    expect(screen.getByLabelText('PIN do responsável').props.secureTextEntry).toBe(false);
     fireEvent.press(screen.getByRole('button', { name: 'Confirmar PIN' }));
 
     await waitFor(() => expect(authService.verifyResponsiblePin).toHaveBeenCalledWith('jwt-token', '1234'));

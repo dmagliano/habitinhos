@@ -95,30 +95,38 @@ export function RegisterScreen({ navigation }: Props) {
 
             <View style={styles.field}>
               <Text style={styles.label}>Senha</Text>
-              <TextInput
+              <SecureTextInput
                 accessibilityLabel="Senha"
+                autoCapitalize="none"
+                autoComplete="new-password"
+                autoCorrect={false}
                 onChangeText={setPassword}
                 placeholder="Mínimo de 8 caracteres"
                 placeholderTextColor={colors.textMuted}
-                secureTextEntry
+                spellCheck={false}
                 style={styles.input}
                 value={password}
+                visibilityLabel="senha"
               />
             </View>
 
             <View style={styles.field}>
               <Text style={styles.label}>Confirmar senha</Text>
-              <TextInput
+              <SecureTextInput
                 accessibilityLabel="Confirmar senha"
+                autoCapitalize="none"
+                autoComplete="new-password"
+                autoCorrect={false}
                 onChangeText={setConfirmPassword}
                 placeholder="Digite a senha novamente"
                 placeholderTextColor={colors.textMuted}
-                secureTextEntry
+                spellCheck={false}
                 style={styles.input}
                 value={confirmPassword}
+                visibilityLabel="confirmação da senha"
               />
-              {hasPasswordMismatch ? <Text style={styles.error}>As senhas precisam ser iguais.</Text> : null}
-              {hasValidPasswordConfirmation ? <Text style={styles.success}>✓ Senhas válidas e iguais.</Text> : null}
+              {hasPasswordMismatch ? <Text accessibilityLiveRegion="polite" style={styles.error}>As senhas precisam ser iguais.</Text> : null}
+              {hasValidPasswordConfirmation ? <Text accessibilityLiveRegion="polite" style={styles.success}>✓ Senhas válidas e iguais.</Text> : null}
             </View>
 
             <View style={styles.field}>
@@ -165,8 +173,8 @@ export function RegisterScreen({ navigation }: Props) {
                 value={confirmResponsiblePin}
                 visibilityLabel="confirmação do PIN do responsável"
               />
-              {hasPinMismatch ? <Text style={styles.error}>Os PINs precisam ser iguais.</Text> : null}
-              {hasValidPinConfirmation ? <Text style={styles.success}>✓ PINs válidos e iguais.</Text> : null}
+              {hasPinMismatch ? <Text accessibilityLiveRegion="polite" style={styles.error}>Os PINs precisam ser iguais.</Text> : null}
+              {hasValidPinConfirmation ? <Text accessibilityLiveRegion="polite" style={styles.success}>✓ PINs válidos e iguais.</Text> : null}
             </View>
 
             {registrationErrorMessage ? <Text style={styles.error}>{registrationErrorMessage}</Text> : null}

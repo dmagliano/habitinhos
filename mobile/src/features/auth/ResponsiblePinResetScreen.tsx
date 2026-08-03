@@ -89,14 +89,18 @@ export function ResponsiblePinResetScreen({ navigation }: Props) {
               <>
                 <View style={styles.field}>
                   <Text style={styles.label}>Senha da conta</Text>
-                  <TextInput
+                  <SecureTextInput
                     accessibilityLabel="Senha da conta"
+                    autoCapitalize="none"
+                    autoComplete="current-password"
+                    autoCorrect={false}
                     onChangeText={setPassword}
                     placeholder="Sua senha"
                     placeholderTextColor={colors.textMuted}
-                    secureTextEntry
+                    spellCheck={false}
                     style={styles.input}
                     value={password}
+                    visibilityLabel="senha da conta"
                   />
                 </View>
 
@@ -154,8 +158,8 @@ export function ResponsiblePinResetScreen({ navigation }: Props) {
                     value={confirmNewPin}
                     visibilityLabel="confirmação do novo PIN"
                   />
-                  {hasPinMismatch ? <Text style={styles.error}>Os PINs precisam ser iguais.</Text> : null}
-                  {hasValidPinConfirmation ? <Text style={styles.success}>✓ PINs válidos e iguais.</Text> : null}
+                  {hasPinMismatch ? <Text accessibilityLiveRegion="polite" style={styles.error}>Os PINs precisam ser iguais.</Text> : null}
+                  {hasValidPinConfirmation ? <Text accessibilityLiveRegion="polite" style={styles.success}>✓ PINs válidos e iguais.</Text> : null}
                 </View>
 
                 <PrimaryButton

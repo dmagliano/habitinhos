@@ -11,7 +11,7 @@ import {
 import type { KeyboardAvoidingViewProps } from 'react-native';
 
 import { ApiError } from '../../api/types';
-import { AppScreen, Card, PrimaryButton, SecondaryButton } from '../../components';
+import { AppScreen, Card, PrimaryButton, SecondaryButton, SecureTextInput } from '../../components';
 import { RootStackParamList } from '../../navigation/routes';
 import { colors, radius, spacing, typography } from '../../theme';
 
@@ -125,30 +125,38 @@ export function PasswordResetScreen({ navigation }: Props) {
 
                 <View style={styles.field}>
                   <Text style={styles.label}>Nova senha</Text>
-                  <TextInput
+                  <SecureTextInput
                     accessibilityLabel="Nova senha"
+                    autoCapitalize="none"
+                    autoComplete="new-password"
+                    autoCorrect={false}
                     onChangeText={setNewPassword}
                     placeholder="Nova senha"
                     placeholderTextColor={colors.textMuted}
-                    secureTextEntry
+                    spellCheck={false}
                     style={styles.input}
                     value={newPassword}
+                    visibilityLabel="nova senha"
                   />
                 </View>
 
                 <View style={styles.field}>
                   <Text style={styles.label}>Confirmar nova senha</Text>
-                  <TextInput
+                  <SecureTextInput
                     accessibilityLabel="Confirmar nova senha"
+                    autoCapitalize="none"
+                    autoComplete="new-password"
+                    autoCorrect={false}
                     onChangeText={setConfirmNewPassword}
                     placeholder="Digite a senha novamente"
                     placeholderTextColor={colors.textMuted}
-                    secureTextEntry
+                    spellCheck={false}
                     style={styles.input}
                     value={confirmNewPassword}
+                    visibilityLabel="confirmação da nova senha"
                   />
-                  {hasPasswordMismatch ? <Text style={styles.error}>As senhas precisam ser iguais.</Text> : null}
-                  {hasValidPasswordConfirmation ? <Text style={styles.success}>✓ Senhas válidas e iguais.</Text> : null}
+                  {hasPasswordMismatch ? <Text accessibilityLiveRegion="polite" style={styles.error}>As senhas precisam ser iguais.</Text> : null}
+                  {hasValidPasswordConfirmation ? <Text accessibilityLiveRegion="polite" style={styles.success}>✓ Senhas válidas e iguais.</Text> : null}
                 </View>
 
                 <PrimaryButton

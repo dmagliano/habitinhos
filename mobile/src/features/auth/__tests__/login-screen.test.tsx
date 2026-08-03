@@ -69,6 +69,20 @@ describe('LoginScreen', () => {
     expect(navigate).toHaveBeenCalledWith('AuthPasswordReset');
   });
 
+  it('reveals and hides the login password without changing its value', () => {
+    render(<LoginScreen />);
+
+    fireEvent.changeText(screen.getByLabelText('Senha'), 'segredo123');
+    expect(screen.getByLabelText('Senha').props.secureTextEntry).toBe(true);
+
+    fireEvent.press(screen.getByRole('togglebutton', { name: 'Exibir senha' }));
+
+    expect(screen.getByLabelText('Senha').props.secureTextEntry).toBe(false);
+    expect(screen.getByLabelText('Senha').props.value).toBe('segredo123');
+    fireEvent.press(screen.getByRole('togglebutton', { name: 'Ocultar senha' }));
+    expect(screen.getByLabelText('Senha').props.secureTextEntry).toBe(true);
+  });
+
   it('toggles the remember-session checkbox and submits the checked state', async () => {
     render(<LoginScreen />);
 
@@ -135,6 +149,9 @@ describe('PasswordResetScreen', () => {
     fireEvent.changeText(screen.getByLabelText('Nova senha'), 'novaSenha123');
     fireEvent.changeText(screen.getByLabelText('Confirmar nova senha'), 'novaSenha123');
     expect(screen.getByText('✓ Senhas válidas e iguais.')).toBeOnTheScreen();
+    fireEvent.press(screen.getByRole('togglebutton', { name: 'Exibir nova senha' }));
+    expect(screen.getByLabelText('Nova senha').props.secureTextEntry).toBe(false);
+    expect(screen.getByLabelText('Confirmar nova senha').props.secureTextEntry).toBe(true);
     fireEvent.press(screen.getByRole('button', { name: 'Salvar nova senha' }));
 
     await waitFor(() =>
@@ -344,6 +361,10 @@ describe('RegisterScreen', () => {
       'Confirmar PIN do responsável',
     ]);
     expect(screen.getByPlaceholderText('Mínimo de 8 caracteres')).toBeOnTheScreen();
+    expect(screen.getByRole('togglebutton', { name: 'Exibir senha' })).toBeOnTheScreen();
+    expect(screen.getByRole('togglebutton', { name: 'Exibir confirmação da senha' })).toBeOnTheScreen();
+    expect(screen.getByRole('togglebutton', { name: 'Exibir PIN do responsável' })).toBeOnTheScreen();
+    expect(screen.getByRole('togglebutton', { name: 'Exibir confirmação do PIN do responsável' })).toBeOnTheScreen();
     expect(screen.getByRole('button', { name: 'Criar conta' })).toBeDisabled();
     expect(screen.getByText('Complete os campos obrigatórios para criar a conta.')).toBeOnTheScreen();
   });
