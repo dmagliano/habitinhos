@@ -1,0 +1,28 @@
+name: Release PR preview
+
+on:
+  pull_request:
+    branches: [master]
+    types: [opened, reopened, synchronize, ready_for_review, base_ref_changed]
+
+concurrency:
+  cancel_in_progress: true
+  group: ${{ workflow.filename }}-${{ github.ref }}
+
+jobs:
+  build_android_preview:
+    name: Build Android preview APK
+    if: ${{ startsWith(github.event.pull_request.head.ref, 'release/') && github.event.pull_request.head.repo.full_name == github.repository && !github.event.pull_request.draft }}
+    type: build
+    environment: preview
+    params:
+      platform: android
+      profile: preview
+      message: Release PR #${{ github.event.pull_request.number }} preview
+
+  comment_on_pr:
+    name: Add preview link to PR
+    needs: [build_android_preview]
+    type: github-comment
+    params:
+      message: O APK de preview desta release esta pronto para instalacao e testes.
