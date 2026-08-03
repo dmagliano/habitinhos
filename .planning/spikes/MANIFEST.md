@@ -19,3 +19,4 @@ Validar e implementar um padrão acessível de exibição temporária de senhas 
 |---|------|------|-----------|---------|------|
 | 001 | secure-input-visibility | standard | Toggle masking without losing value or accessible state | VALIDATED | react-native, accessibility, credentials, ux |
 | 002 | pin-confirmation | standard | Accept only matching four-digit PINs without API changes | VALIDATED | react-native, pin, validation, ux |
+| 003 | credential-flow-integration | standard | Apply independent visibility controls across all protected fields | VALIDATED | react-native, integration, credentials, accessibility, ux |
