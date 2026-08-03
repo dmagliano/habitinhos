@@ -10,7 +10,7 @@ import {
 import type { KeyboardAvoidingViewProps } from 'react-native';
 import { NativeStackScreenProps } from '@react-navigation/native-stack';
 
-import { AppScreen, Card, PrimaryButton, SecondaryButton } from '../../components';
+import { AppScreen, Card, PrimaryButton, SecondaryButton, SecureTextInput } from '../../components';
 import { RootStackParamList } from '../../navigation/routes';
 import { colors, radius, spacing, typography } from '../../theme';
 
@@ -26,17 +26,20 @@ export function RegisterScreen({ navigation }: Props) {
   const [confirmPassword, setConfirmPassword] = useState('');
   const [familyName, setFamilyName] = useState('');
   const [responsiblePin, setResponsiblePin] = useState('');
+  const [confirmResponsiblePin, setConfirmResponsiblePin] = useState('');
   const isLoading = status === 'loading';
   const registrationErrorMessage = isSessionRecoveryMessage(errorMessage) ? null : errorMessage;
   const hasPasswordMismatch = confirmPassword.length > 0 && confirmPassword !== password;
   const hasValidPasswordConfirmation = password.length >= 8 && confirmPassword === password;
+  const hasPinMismatch = confirmResponsiblePin.length > 0 && confirmResponsiblePin !== responsiblePin;
+  const hasValidPinConfirmation = /^\d{4}$/.test(responsiblePin) && confirmResponsiblePin === responsiblePin;
   const isFormValid =
     name.trim().length > 0 &&
     email.trim().length > 0 &&
     password.length >= 8 &&
     confirmPassword === password &&
     familyName.trim().length > 0 &&
-    responsiblePin.length === 4;
+    hasValidPinConfirmation;
   const shouldExplainDisabledSubmit = !isLoading && !isFormValid;
 
   async function handleSubmit() {
@@ -133,18 +136,37 @@ export function RegisterScreen({ navigation }: Props) {
 
             <View style={styles.field}>
               <Text style={styles.label}>PIN do responsável</Text>
-              <TextInput
+              <SecureTextInput
                 accessibilityLabel="PIN do responsável"
+                autoComplete="off"
                 keyboardType="number-pad"
                 maxLength={4}
                 onChangeText={(value) => setResponsiblePin(value.replace(/\D/g, '').slice(0, 4))}
                 placeholder="4 dígitos"
                 placeholderTextColor={colors.textMuted}
-                secureTextEntry
                 style={styles.input}
                 value={responsiblePin}
+                visibilityLabel="PIN do responsável"
               />
               <Text style={styles.helper}>Use este PIN para entrar na gestão da família a partir do modo criança.</Text>
+            </View>
+
+            <View style={styles.field}>
+              <Text style={styles.label}>Confirmar PIN do responsável</Text>
+              <SecureTextInput
+                accessibilityLabel="Confirmar PIN do responsável"
+                autoComplete="off"
+                keyboardType="number-pad"
+                maxLength={4}
+                onChangeText={(value) => setConfirmResponsiblePin(value.replace(/\D/g, '').slice(0, 4))}
+                placeholder="Digite o PIN novamente"
+                placeholderTextColor={colors.textMuted}
+                style={styles.input}
+                value={confirmResponsiblePin}
+                visibilityLabel="confirmação do PIN do responsável"
+              />
+              {hasPinMismatch ? <Text style={styles.error}>Os PINs precisam ser iguais.</Text> : null}
+              {hasValidPinConfirmation ? <Text style={styles.success}>✓ PINs válidos e iguais.</Text> : null}
             </View>
 
             {registrationErrorMessage ? <Text style={styles.error}>{registrationErrorMessage}</Text> : null}

@@ -204,12 +204,35 @@ describe('ResponsiblePinResetScreen', () => {
 
     fireEvent.changeText(screen.getByLabelText('Código recebido'), 'pin456');
     fireEvent.changeText(screen.getByLabelText('Novo PIN'), '5678');
+    fireEvent.changeText(screen.getByLabelText('Confirmar novo PIN'), '5678');
+    expect(screen.getByText('✓ PINs válidos e iguais.')).toBeOnTheScreen();
     fireEvent.press(screen.getByRole('button', { name: 'Salvar novo PIN' }));
 
     await waitFor(() =>
       expect(authService.confirmResponsiblePinReset).toHaveBeenCalledWith('jwt-token', 'PIN456', '5678'),
     );
     expect(await screen.findByText('PIN atualizado.')).toBeOnTheScreen();
+  });
+
+  it('blocks PIN reset while the confirmation does not match', async () => {
+    render(
+      <ResponsiblePinResetScreen
+        navigation={{ goBack } as never}
+        route={{ key: 'ResponsiblePinReset', name: 'ResponsiblePinReset' }}
+      />,
+    );
+
+    fireEvent.changeText(screen.getByLabelText('Senha da conta'), 'secret');
+    fireEvent.press(screen.getByRole('button', { name: 'Enviar código' }));
+    await screen.findByLabelText('Código recebido');
+
+    fireEvent.changeText(screen.getByLabelText('Código recebido'), 'pin456');
+    fireEvent.changeText(screen.getByLabelText('Novo PIN'), '5678');
+    fireEvent.changeText(screen.getByLabelText('Confirmar novo PIN'), '5679');
+
+    expect(screen.getByText('Os PINs precisam ser iguais.')).toBeOnTheScreen();
+    expect(screen.getByRole('button', { name: 'Salvar novo PIN' })).toBeDisabled();
+    expect(authService.confirmResponsiblePinReset).not.toHaveBeenCalled();
   });
 });
 
@@ -318,6 +341,7 @@ describe('RegisterScreen', () => {
       'Confirmar senha',
       'Nome da família',
       'PIN do responsável',
+      'Confirmar PIN do responsável',
     ]);
     expect(screen.getByPlaceholderText('Mínimo de 8 caracteres')).toBeOnTheScreen();
     expect(screen.getByRole('button', { name: 'Criar conta' })).toBeDisabled();
@@ -353,6 +377,8 @@ describe('RegisterScreen', () => {
     expect(screen.getByText('✓ Senhas válidas e iguais.')).toBeOnTheScreen();
     fireEvent.changeText(screen.getByLabelText('Nome da família'), 'Familia Silva');
     fireEvent.changeText(screen.getByLabelText('PIN do responsável'), '1234');
+    fireEvent.changeText(screen.getByLabelText('Confirmar PIN do responsável'), '1234');
+    expect(screen.getByText('✓ PINs válidos e iguais.')).toBeOnTheScreen();
     fireEvent.press(screen.getByRole('button', { name: 'Criar conta' }));
 
     await waitFor(() =>
@@ -365,6 +391,18 @@ describe('RegisterScreen', () => {
       }),
     );
     expect(register.mock.calls[0][0]).not.toHaveProperty('confirmPassword');
+    expect(register.mock.calls[0][0]).not.toHaveProperty('confirmResponsiblePin');
+  });
+
+  it('blocks registration while the responsible PIN confirmation does not match', () => {
+    render(<RegisterScreen navigation={{ navigate } as never} route={{ key: 'AuthRegister', name: 'AuthRegister' }} />);
+
+    fireEvent.changeText(screen.getByLabelText('PIN do responsável'), '1234');
+    fireEvent.changeText(screen.getByLabelText('Confirmar PIN do responsável'), '1235');
+
+    expect(screen.getByText('Os PINs precisam ser iguais.')).toBeOnTheScreen();
+    expect(screen.getByRole('button', { name: 'Criar conta' })).toBeDisabled();
+    expect(register).not.toHaveBeenCalled();
   });
 
   it('renders friendly backend errors and lets the user return to login', () => {
