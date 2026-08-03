@@ -201,7 +201,7 @@ For local emulator development, if no Expo variable is set, the app also falls b
 ## Release PR Preview Builds
 
 The EAS workflow in `mobile/.eas/workflows/release-pr-preview.yml` creates an installable Android
-preview APK whenever a non-draft pull request from `release/**` targets `master`. A new commit in the
+preview APK whenever a pull request from `release/**` targets `master`. A new commit in the
 pull request cancels an obsolete in-progress run, starts a new build with the `preview` profile, and
 adds the EAS build and installation link to the pull request.
 
