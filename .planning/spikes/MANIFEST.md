@@ -18,3 +18,4 @@ Validar e implementar um padrão acessível de exibição temporária de senhas 
 | # | Name | Type | Validates | Verdict | Tags |
 |---|------|------|-----------|---------|------|
 | 001 | secure-input-visibility | standard | Toggle masking without losing value or accessible state | VALIDATED | react-native, accessibility, credentials, ux |
+| 002 | pin-confirmation | standard | Accept only matching four-digit PINs without API changes | VALIDATED | react-native, pin, validation, ux |
