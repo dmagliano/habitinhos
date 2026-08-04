@@ -115,7 +115,7 @@ function ProfileTab({
   const [showResponsiblePin, setShowResponsiblePin] = useState(false);
 
   return (
-    <AppScreen>
+    <AppScreen scrollToEndOnKeyboard>
       <AppHeader emoji="🙂" title="Perfil" />
 
       <Card style={styles.profileCard} variant="highlight">

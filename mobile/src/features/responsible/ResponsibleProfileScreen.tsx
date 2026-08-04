@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { StyleSheet, Text, TextInput, View } from 'react-native';
 
 import { ApiError } from '../../api/types';
-import { AppHeader, AppScreen, Card, PrimaryButton, SecondaryButton } from '../../components';
+import { AppHeader, AppScreen, Card, PrimaryButton, SecondaryButton, SecureTextInput } from '../../components';
 import { colors, radius, spacing, typography } from '../../theme';
 import { useAuth } from '../auth/AuthContext';
 import { authService } from '../auth/authService';
@@ -97,14 +97,18 @@ export function ResponsibleProfileScreen({
           </Text>
           <View style={styles.field}>
             <Text style={styles.cardLabel}>Senha</Text>
-            <TextInput
+            <SecureTextInput
               accessibilityLabel="Senha para excluir conta"
+              autoCapitalize="none"
+              autoComplete="current-password"
+              autoCorrect={false}
               onChangeText={setDeletePassword}
               placeholder="Sua senha"
               placeholderTextColor={colors.textMuted}
-              secureTextEntry
+              spellCheck={false}
               style={styles.input}
               value={deletePassword}
+              visibilityLabel="senha para excluir conta"
             />
           </View>
           {deleteStep === 'confirmation' ? (

@@ -1,6 +1,6 @@
 {
   "name": "habitinhos-mobile",
-  "version": "0.0.1",
+  "version": "0.0.5",
   "license": "MIT",
   "main": "index.ts",
   "dependencies": {

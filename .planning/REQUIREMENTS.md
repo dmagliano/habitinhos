@@ -17,7 +17,7 @@
 - [x] **AUTH-08**: Mobile registration screen does not show expired-session or login-only recovery messages; it only shows registration fields, actions, and registration-specific errors.
 - [ ] **AUTH-09**: Responsible adult can request and confirm password reset by email without revealing whether the email exists.
 - [ ] **AUTH-10**: Authenticated responsible adult can request and confirm responsible PIN reset by email after password verification.
-- [ ] **AUTH-11**: Authenticated responsible adult can delete/deactivate their account and family access through a deliberate confirmation flow.
+- [x] **AUTH-11**: Authenticated responsible adult can delete/deactivate their account and family access through a deliberate confirmation flow.
 
 ### Children
 
@@ -80,9 +80,9 @@
 ### Documentation and Demo
 
 - [x] **DOCS-01**: Backend endpoints implemented in each backend phase are exposed through OpenAPI/Swagger and can be inspected/tested from Swagger UI.
-- [ ] **DOCS-02**: `docs/` contains architecture, data model, API contract, and testing strategy.
-- [ ] **DOCS-03**: README explains local setup for backend, mobile, PostgreSQL, and demo flow.
-- [ ] **DOCS-04**: Demo seeds or documented setup steps create a repeatable TCC scenario.
+- [x] **DOCS-02**: `docs/` contains architecture, data model, API contract, and testing strategy.
+- [x] **DOCS-03**: README explains local setup for backend, mobile, PostgreSQL, and demo flow.
+- [x] **DOCS-04**: Demo seeds or documented setup steps create a repeatable TCC scenario.
 
 ## v2 Requirements
 

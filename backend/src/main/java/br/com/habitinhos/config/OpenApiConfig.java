@@ -5,6 +5,7 @@ import io.swagger.v3.oas.models.OpenAPI;
 import io.swagger.v3.oas.models.info.Info;
 import io.swagger.v3.oas.models.security.SecurityRequirement;
 import io.swagger.v3.oas.models.security.SecurityScheme;
+import org.springframework.boot.info.BuildProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
@@ -12,13 +13,18 @@ import org.springframework.context.annotation.Configuration;
 public class OpenApiConfig {
 
   private static final String BEARER_AUTH = "bearerAuth";
+  private final BuildProperties buildProperties;
+
+  OpenApiConfig(BuildProperties buildProperties) {
+    this.buildProperties = buildProperties;
+  }
 
   @Bean
   OpenAPI openAPI() {
     return new OpenAPI()
         .info(new Info()
             .title("Habitinhos API")
-            .version("0.1.0")
+            .version(buildProperties.getVersion())
             .description("Backend API do MVP Habitinhos."))
         .components(new Components().addSecuritySchemes(
             BEARER_AUTH,

@@ -85,6 +85,38 @@ HABITINHOS_JWT_SECRET
 The Render Docker entrypoint can normalize Render's `DATABASE_URL` into the JDBC URL expected by
 Spring. See `render.yaml` and `backend/docker-entrypoint.sh`.
 
+## Local TCC Demo Seed
+
+For a repeatable local demo, start PostgreSQL and run the backend with the demo seed explicitly
+enabled:
+
+```bash
+docker compose up -d postgres
+cd backend
+HABITINHOS_DEMO_SEED_ENABLED=true ./mvnw spring-boot:run
+```
+
+The seed is local-only, opt-in, and idempotent. It creates a representative family with children,
+wallet balances, mission history, rewards, coin transactions, and a recent reward redemption.
+
+Local demo credentials:
+
+```text
+E-mail: demo@habitinhos.local
+Senha: Demo12345
+PIN do responsável: 1234
+```
+
+After the backend is running, start the mobile app against the local API:
+
+```bash
+cd mobile
+npm run android:local
+```
+
+Use `npm run ios:local` for iOS simulator or `npm run web:local` for browser. The walkthrough for the
+presentation is in `docs/tcc-demo-script.md`.
+
 ## Email Delivery
 
 The backend sends welcome, password reset, and responsible PIN reset emails through Resend when
@@ -166,6 +198,34 @@ eas env:create --name EXPO_PUBLIC_API_URL --value https://habitinhos-api.onrende
 For local emulator development, if no Expo variable is set, the app also falls back to
 `http://10.0.2.2:8080`.
 
+## Master Release Builds
+
+Pull requests targeting `master` run CI without creating an EAS build. After a pull request is
+merged, CI validates the resulting `master` commit. When those checks pass, the release workflow
+checks out that exact commit, creates its Git tag and GitHub release, and triggers one installable
+Android APK with the EAS `preview` profile. Render also watches `master` and deploys the backend
+from the same commit after its CI checks pass.
+
+`mobile/app.json` is the canonical release version. CI verifies that the release branch name,
+`mobile/package.json`, `mobile/package-lock.json`, and `backend/pom.xml` all use the same version.
+The backend publishes that version in OpenAPI and `/actuator/info`, and its Docker image always copies
+the stable Maven output `target/app.jar`.
+
+One-time setup:
+
+1. Create an Expo access token and store it as the GitHub Actions secret `EXPO_TOKEN`.
+2. Configure `EXPO_PUBLIC_API_URL` in the EAS `preview` environment as described above.
+3. If Android signing credentials have not been created yet, initialize them with one interactive
+   build:
+
+```bash
+cd mobile
+npx eas-cli@latest build --platform android --profile preview
+```
+
+When the app is promoted to production, keep the same `master`-based flow and change the build step
+to the EAS `production` profile.
+
 ## Tests
 
 Run the automated backend test suite:
@@ -184,6 +244,17 @@ cd mobile
 npm run lint
 npm run typecheck
 npm run test:ci
+```
+
+Focused demo-readiness checks:
+
+```bash
+cd backend
+./mvnw test -Dtest=DemoDataSeederTest
+
+cd mobile
+npm test -- --runInBand src/features/auth/__tests__/login-screen.test.tsx
+npm run typecheck
 ```
 
 ## License, Copyright, and Attribution

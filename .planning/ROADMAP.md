@@ -15,7 +15,8 @@ Habitinhos will be built as a monorepo MVP in seven phases: backend foundation, 
 - [x] **Phase 06.1: Ajustes pós-UAT dos fluxos de entrada, troca de modo e entrega de resgates** - Refine unauthenticated entry, login/register/session persistence, child-first mode switching, dashboard links, and delivered reward redemptions. (INSERTED) (completed 2026-06-03)
 - [x] **Phase 06.2: Ajustes pós-UAT de cadastro, seletor de crianças e navegação responsável** - Remove registration stale-session copy, clarify child creation copy, eliminate entry-mode selection, add family-management access from child selector, and add responsible-home return to children. (INSERTED) (completed 2026-06-04)
 - [x] **Phase 06.3: Recuperação de acesso e exclusão de conta** - Add password reset by email, responsible PIN reset by email, and deliberate account deletion from API through mobile UI. (INSERTED) (completed 2026-06-08)
-- [ ] **Phase 7: Polimento para demonstração do TCC** - Add demo seeds, visual polish, README, architecture docs, presentation script, and final testing.
+- [x] **Phase 7: Polimento para demonstração do TCC** - Add demo seeds, visual polish, README, architecture docs, presentation script, and final testing. (completed 2026-06-18)
+- [x] **Phase 8: Permitir recadastro com e-mail de conta excluída/inativa** - Allow a responsible adult to create a new account with an email that only exists on inactive/deleted accounts while preserving active-account uniqueness. (completed 2026-06-21)
 
 ## Phase Details
 
@@ -300,17 +301,44 @@ Plans:
   6. Final mobile polish verifies all implemented screens against `docs/design/mobile-design-contract.md` and the Stitch visual references mapped in `docs/design/phase-design-map.md`.
 
 **Plans**: 3 plans
+Plans:
+**Wave 1**
 
+- [x] 07-01: Demo seeds/data and final visual polish
+
+**Wave 2** *(blocked on Wave 1 completion)*
+
+- [x] 07-02: README, architecture docs, API/data model docs, presentation script
+
+**Wave 3** *(blocked on Wave 2 completion)*
+
+- [x] 07-03: Final test pass and demo rehearsal fixes
+
+### Phase 8: Permitir recadastro com e-mail de conta excluída/inativa
+
+**Goal:** Registration, login, password reset, and database constraints treat active accounts as the only e-mail uniqueness boundary, allowing deleted/inactive account e-mails to start a new independent family account.
+**Requirements**: AUTH-11, DOCS-01
+**Depends on:** Phase 7
+**Success Criteria** (what must be TRUE):
+
+  1. Registration still rejects an e-mail when an active account exists for that normalized e-mail.
+  2. Registration creates a new `app_users.id` and `family_units.id` when the only matching e-mail belongs to an inactive/deleted account.
+  3. Login and password reset resolve only active accounts, so inactive historical accounts cannot authenticate or receive recovery codes.
+  4. PostgreSQL enforces uniqueness for active e-mails through a migration compatible with existing soft-deleted rows.
+  5. Backend integration tests cover duplicate active registration, inactive-account recadastro, new IDs, login behavior, and reset behavior.
+  6. OpenAPI/API documentation stays aligned with the refined registration behavior.
+
+**Plans:** 1/1 plans complete
 Plans:
 
-- [ ] 07-01: Demo seeds/data and final visual polish
-- [ ] 07-02: README, architecture docs, API/data model docs, presentation script
-- [ ] 07-03: Final test pass and demo rehearsal fixes
+**Wave 1**
+
+- [x] 08-01: Backend recadastro, active-only e-mail uniqueness, tests, seed, and docs
 
 ## Progress
 
 **Execution Order:**
-Phases execute in numeric order: 1 → 2 → 3 → 4 → 5 → 6 → 06.1 → 06.2 → 06.3 → 7
+Phases execute in numeric order: 1 → 2 → 3 → 4 → 5 → 6 → 06.1 → 06.2 → 06.3 → 7 → 8
 
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
@@ -323,4 +351,5 @@ Phases execute in numeric order: 1 → 2 → 3 → 4 → 5 → 6 → 06.1 → 06
 | 06.1 Ajustes pós-UAT dos fluxos de entrada, troca de modo e entrega de resgates | 3/3 | Complete    | 2026-06-03 |
 | 06.2 Ajustes pós-UAT de cadastro, seletor de crianças e navegação responsável | 1/1 | Complete    | 2026-06-04 |
 | 06.3 Recuperação de acesso e exclusão de conta | 2/2 | Complete | 2026-06-08 |
-| 7. Polimento para demonstração do TCC | 0/3 | Not started | - |
+| 7. Polimento para demonstração do TCC | 3/3 | Complete   | 2026-06-18 |
+| 8. Permitir recadastro com e-mail de conta excluída/inativa | 1/1 | Complete   | 2026-06-21 |

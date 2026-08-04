@@ -2,7 +2,7 @@
   "expo": {
     "name": "Habitinhos",
     "slug": "habitinhos",
-    "version": "0.0.1",
+    "version": "0.0.5",
     "orientation": "portrait",
     "icon": "./assets/icon.png",
     "userInterfaceStyle": "light",

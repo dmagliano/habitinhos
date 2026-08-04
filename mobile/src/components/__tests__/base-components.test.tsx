@@ -3,6 +3,7 @@ import { act } from 'react';
 import { Keyboard, ScrollView, Text } from 'react-native';
 
 import { AppScreen, Card, EmojiAvatar, PrimaryButton, StatusBadge } from '..';
+import { shouldScrollToEndAfterKeyboardLayout } from '../AppScreen';
 
 describe('base components', () => {
   beforeEach(() => {
@@ -61,7 +62,7 @@ describe('base components', () => {
     });
 
     const { UNSAFE_getByType } = render(
-      <AppScreen>
+      <AppScreen scrollToEndOnKeyboard>
         <Text>PIN do responsável</Text>
       </AppScreen>,
     );
@@ -74,6 +75,14 @@ describe('base components', () => {
     expect(UNSAFE_getByType(ScrollView).props.contentContainerStyle).toEqual(
       expect.arrayContaining([expect.objectContaining({ paddingBottom: 280 })]),
     );
+
+    act(() => {
+      UNSAFE_getByType(ScrollView).props.onContentSizeChange();
+    });
+
+    expect(shouldScrollToEndAfterKeyboardLayout(true, 280)).toBe(true);
+    expect(shouldScrollToEndAfterKeyboardLayout(true, 0)).toBe(false);
+    expect(shouldScrollToEndAfterKeyboardLayout(false, 280)).toBe(false);
 
     act(() => {
       const hideKeyboard = listeners.keyboardDidHide ?? listeners.keyboardWillHide;

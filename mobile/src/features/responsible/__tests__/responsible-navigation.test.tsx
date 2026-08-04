@@ -155,6 +155,8 @@ describe('responsible navigation flow', () => {
 
     expect(screen.getByLabelText('Senha para excluir conta')).toBeOnTheScreen();
     fireEvent.changeText(screen.getByLabelText('Senha para excluir conta'), 'secret');
+    fireEvent.press(screen.getByRole('togglebutton', { name: 'Exibir senha para excluir conta' }));
+    expect(screen.getByLabelText('Senha para excluir conta').props.secureTextEntry).toBe(false);
     fireEvent.press(screen.getByRole('button', { name: 'Enviar código de confirmação' }));
 
     expect(authService.requestAccountDeletion).toHaveBeenCalledWith('jwt-token', 'secret');
