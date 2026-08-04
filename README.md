@@ -198,12 +198,13 @@ eas env:create --name EXPO_PUBLIC_API_URL --value https://habitinhos-api.onrende
 For local emulator development, if no Expo variable is set, the app also falls back to
 `http://10.0.2.2:8080`.
 
-## Release PR Preview Builds
+## Master Release Builds
 
-The EAS workflow in `mobile/.eas/workflows/release-pr-preview.yml` creates an installable Android
-preview APK whenever a pull request from `release/**` targets `master`. A new commit in the
-pull request cancels an obsolete in-progress run, starts a new build with the `preview` profile, and
-adds the EAS build and installation link to the pull request.
+Pull requests targeting `master` run CI without creating an EAS build. After a pull request is
+merged, CI validates the resulting `master` commit. When those checks pass, the release workflow
+checks out that exact commit, creates its Git tag and GitHub release, and triggers one installable
+Android APK with the EAS `preview` profile. Render also watches `master` and deploys the backend
+from the same commit after its CI checks pass.
 
 `mobile/app.json` is the canonical release version. CI verifies that the release branch name,
 `mobile/package.json`, `mobile/package-lock.json`, and `backend/pom.xml` all use the same version.
@@ -212,10 +213,9 @@ the stable Maven output `target/app.jar`.
 
 One-time setup:
 
-1. Open the Expo project's GitHub settings, install the Expo GitHub App, and connect this repository.
-2. Set the repository **Base directory** to `mobile`, because the Expo project is inside a monorepo.
-3. Configure `EXPO_PUBLIC_API_URL` in the EAS `preview` environment as described above.
-4. If Android signing credentials have not been created yet, initialize them with one interactive
+1. Create an Expo access token and store it as the GitHub Actions secret `EXPO_TOKEN`.
+2. Configure `EXPO_PUBLIC_API_URL` in the EAS `preview` environment as described above.
+3. If Android signing credentials have not been created yet, initialize them with one interactive
    build:
 
 ```bash
@@ -223,10 +223,8 @@ cd mobile
 npx eas-cli@latest build --platform android --profile preview
 ```
 
-No Expo access token or GitHub repository secret is required for this EAS Workflow. The Expo GitHub
-App connection authenticates the trigger and allows the workflow to publish its result on the pull
-request. PRs from forks are intentionally ignored so that untrusted code cannot access the EAS build
-environment.
+When the app is promoted to production, keep the same `master`-based flow and change the build step
+to the EAS `production` profile.
 
 ## Tests
 

@@ -13,7 +13,7 @@ permissions:
 
 jobs:
   release:
-    name: Publish release
+    name: Publish release and build preview
     runs-on: ubuntu-latest
     if: >
       (github.event_name == 'workflow_dispatch' && github.ref == 'refs/heads/master') ||
@@ -71,7 +71,7 @@ jobs:
         run: |
           gh release create "${{ steps.version.outputs.tag }}" \
             --title "${{ steps.version.outputs.version }}" \
-            --notes "Habitinhos ${{ steps.version.outputs.version }} production release."
+            --notes "Habitinhos ${{ steps.version.outputs.version }} release."
 
       - name: Set up Expo and EAS
         if: steps.tag.outputs.exists == 'false'
@@ -85,7 +85,7 @@ jobs:
         working-directory: mobile
         run: npm ci
 
-      - name: Trigger Android EAS production build
+      - name: Trigger Android EAS preview build
         if: steps.tag.outputs.exists == 'false'
         working-directory: mobile
-        run: eas build --platform android --profile production --non-interactive --no-wait
+        run: eas build --platform android --profile preview --non-interactive --no-wait
