@@ -18,7 +18,8 @@ WORKDIR /app
 
 RUN if ! getent group 1000 >/dev/null; then groupadd --gid 1000 render-secrets; fi \
     && useradd --create-home --uid 10001 appuser \
-    && usermod --append --groups 1000 appuser
+    && usermod --append --groups 1000 appuser \
+    && install --directory --mode 0700 --owner appuser --group appuser /home/appuser/.ssh
 
 COPY --from=build /workspace/backend/target/app.jar /app/app.jar
 COPY docker-entrypoint.sh /app/docker-entrypoint.sh
