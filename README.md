@@ -205,6 +205,11 @@ preview APK whenever a pull request from `release/**` targets `master`. A new co
 pull request cancels an obsolete in-progress run, starts a new build with the `preview` profile, and
 adds the EAS build and installation link to the pull request.
 
+`mobile/app.json` is the canonical release version. CI verifies that the release branch name,
+`mobile/package.json`, `mobile/package-lock.json`, and `backend/pom.xml` all use the same version.
+The backend publishes that version in OpenAPI and `/actuator/info`, and its Docker image always copies
+the stable Maven output `target/app.jar`.
+
 One-time setup:
 
 1. Open the Expo project's GitHub settings, install the Expo GitHub App, and connect this repository.

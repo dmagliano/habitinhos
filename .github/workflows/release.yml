@@ -13,7 +13,7 @@ permissions:
 
 jobs:
   release:
-    name: Release 0.0.1
+    name: Publish release
     runs-on: ubuntu-latest
     if: >
       (github.event_name == 'workflow_dispatch' && github.ref == 'refs/heads/master') ||
@@ -41,11 +41,8 @@ jobs:
         id: version
         working-directory: mobile
         run: |
-          VERSION="$(node -p "require('./package.json').version")"
-          if [ "$VERSION" != "0.0.1" ]; then
-            echo "Expected mobile/package.json version 0.0.1, got $VERSION" >&2
-            exit 1
-          fi
+          node ../scripts/verify-release-version.mjs
+          VERSION="$(node -p "require('./app.json').expo.version")"
           echo "version=$VERSION" >> "$GITHUB_OUTPUT"
           echo "tag=v$VERSION" >> "$GITHUB_OUTPUT"
 
