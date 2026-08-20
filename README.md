@@ -201,10 +201,10 @@ For local emulator development, if no Expo variable is set, the app also falls b
 ## Master Release Builds
 
 Pull requests targeting `master` run CI without creating an EAS build. After a pull request is
-merged, CI validates the resulting `master` commit. When those checks pass, the release workflow
-checks out that exact commit, creates its Git tag and GitHub release, and triggers one installable
-Android APK with the EAS `preview` profile. Render also watches `master` and deploys the backend
-from the same commit after its CI checks pass.
+merged, CI validates the resulting `master` commit. When the backend and mobile jobs pass, the
+release job in the same workflow triggers one installable Android APK with the EAS `preview` profile
+and then creates its Git tag and GitHub release. Render also watches `master` and deploys the backend
+from the same commit after all CI jobs pass.
 
 `mobile/app.json` is the canonical release version. CI verifies that the release branch name,
 `mobile/package.json`, `mobile/package-lock.json`, and `backend/pom.xml` all use the same version.
