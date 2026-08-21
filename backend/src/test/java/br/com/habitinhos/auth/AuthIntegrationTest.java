@@ -7,7 +7,9 @@ import static org.hamcrest.Matchers.not;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.reset;
+import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
@@ -22,6 +24,7 @@ import br.com.habitinhos.shared.AbstractIntegrationTest;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import java.time.Instant;
+import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 import org.junit.jupiter.api.Test;
@@ -58,6 +61,9 @@ class AuthIntegrationTest extends AbstractIntegrationTest {
 
   @MockBean
   private AccountEmailSender accountEmailSender;
+
+  @MockBean
+  private PermanentDeletionFailureInjector permanentDeletionFailureInjector;
 
   @Test
   void registerCreatesFamilyAndResponsibleWithHashedPasswordAndPin() throws Exception {
@@ -307,6 +313,141 @@ class AuthIntegrationTest extends AbstractIntegrationTest {
   }
 
   @Test
+  void permanentDeletionTokenIsDedicatedExpiringAndSingleUse() throws Exception {
+    String jwt = register("ciclo@example.com");
+    AppUser user = appUserRepository.findByEmailIgnoreCaseAndActiveTrue("ciclo@example.com").orElseThrow();
+    String permanentToken = requestPermanentDeletionToken("ciclo@example.com");
+
+    mockMvc.perform(post("/auth/account-deletion/confirm")
+            .header("Authorization", "Bearer " + jwt)
+            .contentType(MediaType.APPLICATION_JSON)
+            .content(objectMapper.writeValueAsString(Map.of(
+                "password", RAW_PASSWORD,
+                "token", permanentToken))))
+        .andExpect(status().isBadRequest())
+        .andExpect(jsonPath("$.code").value("INVALID_RESET_TOKEN"));
+    assertThat(appUserRepository.findById(user.getId())).get().extracting(AppUser::isActive).isEqualTo(true);
+
+    jdbcTemplate.update(
+        "UPDATE auth_reset_tokens SET expires_at = now() - interval '1 minute' WHERE purpose = 'PERMANENT_ACCOUNT_DELETION' AND used_at IS NULL");
+    mockMvc.perform(post("/auth/account-deletion/permanent/confirm")
+            .contentType(MediaType.APPLICATION_JSON)
+            .content(objectMapper.writeValueAsString(Map.of(
+                "email", "ciclo@example.com",
+                "token", permanentToken))))
+        .andExpect(status().isBadRequest())
+        .andExpect(jsonPath("$.code").value("INVALID_RESET_TOKEN"));
+
+    String usedToken = requestPermanentDeletionToken("ciclo@example.com");
+    jdbcTemplate.update(
+        "UPDATE auth_reset_tokens SET used_at = now() WHERE purpose = 'PERMANENT_ACCOUNT_DELETION' AND used_at IS NULL");
+    mockMvc.perform(post("/auth/account-deletion/permanent/confirm")
+            .contentType(MediaType.APPLICATION_JSON)
+            .content(objectMapper.writeValueAsString(Map.of(
+                "email", "ciclo@example.com",
+                "token", usedToken))))
+        .andExpect(status().isBadRequest())
+        .andExpect(jsonPath("$.code").value("INVALID_RESET_TOKEN"));
+    assertThat(appUserRepository.findById(user.getId())).isPresent();
+  }
+
+  @Test
+  void permanentDeletionRemovesAllMatchingFamilies() throws Exception {
+    String oldJwt = register("permanente@example.com");
+    AppUser activeUser = appUserRepository
+        .findByEmailIgnoreCaseAndActiveTrue("permanente@example.com")
+        .orElseThrow();
+    UUID firstFamilyId = activeUser.getFamilyUnitId();
+    insertFamilyData(firstFamilyId, activeUser.getId());
+
+    UUID secondFamilyId = insertFamily("Família Histórica");
+    UUID inactiveUserId = insertUser(secondFamilyId, "permanente@example.com", false);
+    insertFamilyData(secondFamilyId, inactiveUserId);
+
+    UUID neighborFamilyId = insertFamily("Família Vizinha");
+    UUID neighborUserId = insertUser(neighborFamilyId, "vizinha@example.com", true);
+    FamilyData neighborData = insertFamilyData(neighborFamilyId, neighborUserId);
+
+    String deletionToken = requestPermanentDeletionToken(" PERMANENTE@example.com ");
+    mockMvc.perform(post("/auth/account-deletion/permanent/confirm")
+            .contentType(MediaType.APPLICATION_JSON)
+            .content(objectMapper.writeValueAsString(Map.of(
+                "email", "permanente@example.com",
+                "token", deletionToken))))
+        .andExpect(status().isNoContent());
+
+    assertFamilyWasDeleted(firstFamilyId);
+    assertFamilyWasDeleted(secondFamilyId);
+    assertThat(count("app_users", "lower(trim(email)) = ?", "permanente@example.com")).isZero();
+    assertFamilyWasPreserved(neighborData);
+
+    mockMvc.perform(get("/me").header("Authorization", "Bearer " + oldJwt))
+        .andExpect(status().isUnauthorized());
+    mockMvc.perform(post("/auth/login")
+            .contentType(MediaType.APPLICATION_JSON)
+            .content(objectMapper.writeValueAsString(new LoginRequest(
+                "permanente@example.com",
+                RAW_PASSWORD))))
+        .andExpect(status().isUnauthorized());
+    mockMvc.perform(post("/auth/account-deletion/permanent/confirm")
+            .contentType(MediaType.APPLICATION_JSON)
+            .content(objectMapper.writeValueAsString(Map.of(
+                "email", "permanente@example.com",
+                "token", deletionToken))))
+        .andExpect(status().isBadRequest())
+        .andExpect(jsonPath("$.code").value("INVALID_RESET_TOKEN"));
+
+    mockMvc.perform(post("/auth/register")
+            .contentType(MediaType.APPLICATION_JSON)
+            .content(objectMapper.writeValueAsString(registerRequest("permanente@example.com"))))
+        .andExpect(status().isCreated());
+    assertThat(count("family_units", "id = ?", neighborFamilyId)).isEqualTo(1);
+  }
+
+  @Test
+  void permanentDeletionRollsBackAllMatchingFamilies() throws Exception {
+    UUID firstFamilyId = insertFamily("Família Um");
+    UUID firstUserId = insertUser(firstFamilyId, "rollback@example.com", true);
+    FamilyData firstData = insertFamilyData(firstFamilyId, firstUserId);
+    UUID secondFamilyId = insertFamily("Família Dois");
+    UUID secondUserId = insertUser(secondFamilyId, "rollback@example.com", false);
+    FamilyData secondData = insertFamilyData(secondFamilyId, secondUserId);
+    String deletionToken = requestPermanentDeletionToken("rollback@example.com");
+    UUID resetTokenId = jdbcTemplate.queryForObject(
+        "SELECT id FROM auth_reset_tokens WHERE purpose = 'PERMANENT_ACCOUNT_DELETION' AND used_at IS NULL",
+        UUID.class);
+
+    doThrow(new IllegalStateException("deterministic purge failure"))
+        .when(permanentDeletionFailureInjector)
+        .afterFirstFamilyDelete();
+
+    mockMvc.perform(post("/auth/account-deletion/permanent/confirm")
+            .contentType(MediaType.APPLICATION_JSON)
+            .content(objectMapper.writeValueAsString(Map.of(
+                "email", "rollback@example.com",
+                "token", deletionToken))))
+        .andExpect(status().isInternalServerError());
+
+    verify(permanentDeletionFailureInjector, times(1)).afterFirstFamilyDelete();
+    assertFamilyWasPreserved(firstData);
+    assertFamilyWasPreserved(secondData);
+    assertThat(jdbcTemplate.queryForObject(
+        "SELECT used_at IS NULL FROM auth_reset_tokens WHERE id = ?",
+        Boolean.class,
+        resetTokenId)).isTrue();
+
+    reset(permanentDeletionFailureInjector);
+    mockMvc.perform(post("/auth/account-deletion/permanent/confirm")
+            .contentType(MediaType.APPLICATION_JSON)
+            .content(objectMapper.writeValueAsString(Map.of(
+                "email", "rollback@example.com",
+                "token", deletionToken))))
+        .andExpect(status().isNoContent());
+    assertFamilyWasDeleted(firstFamilyId);
+    assertFamilyWasDeleted(secondFamilyId);
+  }
+
+  @Test
   void responsiblePinResetRequiresPasswordAndUpdatesPin() throws Exception {
     String token = register("responsavel@example.com");
     reset(accountEmailSender);
@@ -525,7 +666,8 @@ class AuthIntegrationTest extends AbstractIntegrationTest {
     return familyId;
   }
 
-  private void insertUser(UUID familyId, String email, boolean active) {
+  private UUID insertUser(UUID familyId, String email, boolean active) {
+    UUID userId = UUID.randomUUID();
     jdbcTemplate.update(
         """
         INSERT INTO app_users (
@@ -542,11 +684,162 @@ class AuthIntegrationTest extends AbstractIntegrationTest {
         )
         VALUES (?, ?, 'Responsavel Demo', ?, 'RESPONSIBLE', ?, ?, ?, now(), now())
         """,
-        UUID.randomUUID(),
+        userId,
         familyId,
         email,
         passwordEncoder.encode(RAW_PASSWORD),
         passwordEncoder.encode("1234"),
         active);
+    return userId;
+  }
+
+  private String requestPermanentDeletionToken(String email) throws Exception {
+    reset(accountEmailSender);
+    mockMvc.perform(post("/auth/account-deletion/permanent/request")
+            .contentType(MediaType.APPLICATION_JSON)
+            .content(objectMapper.writeValueAsString(Map.of("email", email))))
+        .andExpect(status().isAccepted());
+    ArgumentCaptor<String> tokenCaptor = ArgumentCaptor.forClass(String.class);
+    verify(accountEmailSender).sendPermanentAccountDeletionConfirmation(
+        eq(email.trim().toLowerCase()),
+        tokenCaptor.capture(),
+        any(Instant.class));
+    return tokenCaptor.getValue();
+  }
+
+  private FamilyData insertFamilyData(UUID familyId, UUID userId) {
+    UUID childId = UUID.randomUUID();
+    UUID walletId = UUID.randomUUID();
+    UUID missionId = UUID.randomUUID();
+    UUID assignmentId = UUID.randomUUID();
+    UUID rewardId = UUID.randomUUID();
+    UUID redemptionId = UUID.randomUUID();
+    UUID transactionId = UUID.randomUUID();
+    jdbcTemplate.update(
+        "INSERT INTO child_profiles (id, family_unit_id, name, active, created_at, updated_at) VALUES (?, ?, 'Criança', true, now(), now())",
+        childId,
+        familyId);
+    jdbcTemplate.update(
+        "INSERT INTO wallets (id, family_unit_id, child_id, balance, created_at, updated_at) VALUES (?, ?, ?, 5, now(), now())",
+        walletId,
+        familyId,
+        childId);
+    jdbcTemplate.update(
+        """
+        INSERT INTO missions (
+          id, family_unit_id, title, coin_value, requires_approval, recurrence_type,
+          active, created_by_user_id, created_at, updated_at)
+        VALUES (?, ?, 'Missão', 5, true, 'ONCE', true, ?, now(), now())
+        """,
+        missionId,
+        familyId,
+        userId);
+    jdbcTemplate.update(
+        """
+        INSERT INTO assigned_missions (
+          id, family_unit_id, mission_id, child_id, status, snapshot_title,
+          snapshot_coin_value, snapshot_requires_approval, scheduled_date, created_at, updated_at)
+        VALUES (?, ?, ?, ?, 'COMPLETED', 'Missão', 5, true, current_date, now(), now())
+        """,
+        assignmentId,
+        familyId,
+        missionId,
+        childId);
+    jdbcTemplate.update(
+        """
+        INSERT INTO rewards (
+          id, family_unit_id, title, cost, active, created_by_user_id, created_at, updated_at)
+        VALUES (?, ?, 'Recompensa', 5, true, ?, now(), now())
+        """,
+        rewardId,
+        familyId,
+        userId);
+    jdbcTemplate.update(
+        """
+        INSERT INTO reward_redemptions (
+          id, family_unit_id, reward_id, child_id, wallet_id, status,
+          snapshot_title, snapshot_cost, created_at, updated_at)
+        VALUES (?, ?, ?, ?, ?, 'REDEEMED', 'Recompensa', 5, now(), now())
+        """,
+        redemptionId,
+        familyId,
+        rewardId,
+        childId,
+        walletId);
+    jdbcTemplate.update(
+        """
+        INSERT INTO coin_transactions (
+          id, family_unit_id, wallet_id, child_id, reward_redemption_id, type,
+          source_type, amount, balance_after, created_by_user_id, created_at)
+        VALUES (?, ?, ?, ?, ?, 'DEBIT', 'REWARD_REDEMPTION', 5, 5, ?, now())
+        """,
+        transactionId,
+        familyId,
+        walletId,
+        childId,
+        redemptionId,
+        userId);
+    jdbcTemplate.update(
+        "UPDATE reward_redemptions SET coin_transaction_id = ? WHERE id = ?",
+        transactionId,
+        redemptionId);
+    return new FamilyData(
+        familyId,
+        userId,
+        childId,
+        walletId,
+        missionId,
+        assignmentId,
+        rewardId,
+        redemptionId,
+        transactionId);
+  }
+
+  private void assertFamilyWasDeleted(UUID familyId) {
+    for (String table : List.of(
+        "coin_transactions",
+        "reward_redemptions",
+        "assigned_missions",
+        "wallets",
+        "child_profiles",
+        "rewards",
+        "missions",
+        "app_users")) {
+      assertThat(count(table, "family_unit_id = ?", familyId)).as(table).isZero();
+    }
+    assertThat(count("family_units", "id = ?", familyId)).isZero();
+  }
+
+  private void assertFamilyWasPreserved(FamilyData data) {
+    assertThat(count("family_units", "id = ?", data.familyId())).isEqualTo(1);
+    assertThat(count("app_users", "id = ?", data.userId())).isEqualTo(1);
+    assertThat(count("child_profiles", "id = ?", data.childId())).isEqualTo(1);
+    assertThat(count("wallets", "id = ?", data.walletId())).isEqualTo(1);
+    assertThat(count("missions", "id = ?", data.missionId())).isEqualTo(1);
+    assertThat(count("assigned_missions", "id = ?", data.assignmentId())).isEqualTo(1);
+    assertThat(count("rewards", "id = ?", data.rewardId())).isEqualTo(1);
+    assertThat(count("reward_redemptions", "id = ? AND coin_transaction_id = ?", data.redemptionId(), data.transactionId()))
+        .isEqualTo(1);
+    assertThat(count("coin_transactions", "id = ? AND reward_redemption_id = ?", data.transactionId(), data.redemptionId()))
+        .isEqualTo(1);
+  }
+
+  private int count(String table, String predicate, Object... arguments) {
+    return jdbcTemplate.queryForObject(
+        "SELECT count(*) FROM " + table + " WHERE " + predicate,
+        Integer.class,
+        arguments);
+  }
+
+  private record FamilyData(
+      UUID familyId,
+      UUID userId,
+      UUID childId,
+      UUID walletId,
+      UUID missionId,
+      UUID assignmentId,
+      UUID rewardId,
+      UUID redemptionId,
+      UUID transactionId) {
   }
 }
