@@ -17,7 +17,7 @@ Habitinhos will be built as a monorepo MVP in seven phases: backend foundation, 
 - [x] **Phase 06.3: Recuperação de acesso e exclusão de conta** - Add password reset by email, responsible PIN reset by email, and deliberate account deletion from API through mobile UI. (INSERTED) (completed 2026-06-08)
 - [x] **Phase 7: Polimento para demonstração do TCC** - Add demo seeds, visual polish, README, architecture docs, presentation script, and final testing. (completed 2026-06-18)
 - [x] **Phase 8: Permitir recadastro com e-mail de conta excluída/inativa** - Allow a responsible adult to create a new account with an email that only exists on inactive/deleted accounts while preserving active-account uniqueness. (completed 2026-06-21)
-- [ ] **Phase 9: Exclusão física dos dados da conta** - Add a public e-mail-token flow that permanently deletes all matching accounts, families, and related records, distinct from account deactivation.
+- [x] **Phase 9: Exclusão física dos dados da conta** - Add a public e-mail-token flow that permanently deletes all matching accounts, families, and related records, distinct from account deactivation. (completed 2026-08-21)
 
 ## Phase Details
 
@@ -352,7 +352,7 @@ Plans:
   7. Integration tests run against PostgreSQL and prove complete absence, multi-family coverage, rollback safety, enumeration-safe email behavior, and endpoint documentation.
   8. OpenAPI/Bruno and API documentation distinguish permanent deletion from soft deactivation and document the irreversible token flow.
 
-**Plans:** 1/2 plans executed
+**Plans:** 2/2 plans complete
 
 Plans:
 
@@ -362,7 +362,7 @@ Plans:
 
 **Wave 2** *(blocked on Wave 1 completion)*
 
-- [ ] 09-02: OpenAPI, Bruno, API documentation, and contract verification
+- [x] 09-02: OpenAPI, Bruno, API documentation, and contract verification
 
 ## Progress
 
@@ -382,4 +382,4 @@ Phases execute in numeric order: 1 → 2 → 3 → 4 → 5 → 6 → 06.1 → 06
 | 06.3 Recuperação de acesso e exclusão de conta | 2/2 | Complete | 2026-06-08 |
 | 7. Polimento para demonstração do TCC | 3/3 | Complete   | 2026-06-18 |
 | 8. Permitir recadastro com e-mail de conta excluída/inativa | 1/1 | Complete   | 2026-06-21 |
-| 9. Exclusão física dos dados da conta | 1/2 | In Progress | — |
+| 9. Exclusão física dos dados da conta | 2/2 | Complete   | 2026-08-21 |
