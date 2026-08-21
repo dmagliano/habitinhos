@@ -3,6 +3,7 @@ package br.com.habitinhos.auth;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.hamcrest.Matchers.blankOrNullString;
+import static org.hamcrest.Matchers.containsString;
 import static org.hamcrest.Matchers.not;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
@@ -12,7 +13,9 @@ import static org.mockito.Mockito.reset;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.options;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.header;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
@@ -32,6 +35,8 @@ import org.mockito.ArgumentCaptor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.dao.DataIntegrityViolationException;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpMethod;
 import org.springframework.http.MediaType;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -287,6 +292,59 @@ class AuthIntegrationTest extends AbstractIntegrationTest {
     assertThat(jdbcTemplate.queryForObject(
         "SELECT count(*) FROM auth_reset_tokens WHERE purpose = 'PERMANENT_ACCOUNT_DELETION' AND used_at IS NULL",
         Integer.class)).isEqualTo(1);
+  }
+
+  @Test
+  void permanentDeletionCorsAllowsOnlyOfficialWebOriginsAndPath() throws Exception {
+    mockMvc.perform(options("/auth/account-deletion/permanent/request")
+            .header(HttpHeaders.ORIGIN, "https://www.habitinhos.com.br")
+            .header(HttpHeaders.ACCESS_CONTROL_REQUEST_METHOD, HttpMethod.POST.name())
+            .header(HttpHeaders.ACCESS_CONTROL_REQUEST_HEADERS, HttpHeaders.CONTENT_TYPE))
+        .andExpect(status().isOk())
+        .andExpect(header().string(
+            HttpHeaders.ACCESS_CONTROL_ALLOW_ORIGIN,
+            "https://www.habitinhos.com.br"))
+        .andExpect(header().string(
+            HttpHeaders.ACCESS_CONTROL_ALLOW_METHODS,
+            containsString(HttpMethod.POST.name())))
+        .andExpect(header().string(
+            HttpHeaders.ACCESS_CONTROL_ALLOW_HEADERS,
+            containsString(HttpHeaders.CONTENT_TYPE)))
+        .andExpect(header().string(HttpHeaders.VARY, containsString(HttpHeaders.ORIGIN)));
+
+    mockMvc.perform(options("/auth/account-deletion/permanent/confirm")
+            .header(HttpHeaders.ORIGIN, "https://habitinhos.com.br")
+            .header(HttpHeaders.ACCESS_CONTROL_REQUEST_METHOD, HttpMethod.POST.name())
+            .header(HttpHeaders.ACCESS_CONTROL_REQUEST_HEADERS, HttpHeaders.CONTENT_TYPE))
+        .andExpect(status().isOk())
+        .andExpect(header().string(
+            HttpHeaders.ACCESS_CONTROL_ALLOW_ORIGIN,
+            "https://habitinhos.com.br"));
+
+    mockMvc.perform(options("/auth/account-deletion/permanent/request")
+            .header(HttpHeaders.ORIGIN, "https://malicious.example")
+            .header(HttpHeaders.ACCESS_CONTROL_REQUEST_METHOD, HttpMethod.POST.name())
+            .header(HttpHeaders.ACCESS_CONTROL_REQUEST_HEADERS, HttpHeaders.CONTENT_TYPE))
+        .andExpect(status().isForbidden())
+        .andExpect(header().doesNotExist(HttpHeaders.ACCESS_CONTROL_ALLOW_ORIGIN));
+
+    mockMvc.perform(options("/me")
+            .header(HttpHeaders.ORIGIN, "https://www.habitinhos.com.br")
+            .header(HttpHeaders.ACCESS_CONTROL_REQUEST_METHOD, HttpMethod.GET.name()))
+        .andExpect(status().isForbidden())
+        .andExpect(header().doesNotExist(HttpHeaders.ACCESS_CONTROL_ALLOW_ORIGIN));
+  }
+
+  @Test
+  void permanentDeletionResponseIncludesCorsHeaderForOfficialWebOrigin() throws Exception {
+    mockMvc.perform(post("/auth/account-deletion/permanent/request")
+            .header(HttpHeaders.ORIGIN, "https://habitinhos.com.br")
+            .contentType(MediaType.APPLICATION_JSON)
+            .content(objectMapper.writeValueAsString(Map.of("email", "ausente@example.com"))))
+        .andExpect(status().isAccepted())
+        .andExpect(header().string(
+            HttpHeaders.ACCESS_CONTROL_ALLOW_ORIGIN,
+            "https://habitinhos.com.br"));
   }
 
   @Test
