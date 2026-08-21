@@ -247,6 +247,66 @@ class AuthIntegrationTest extends AbstractIntegrationTest {
   }
 
   @Test
+  void permanentDeletionRequestIsEnumerationSafeAndIncludesInactiveAccounts() throws Exception {
+    UUID inactiveFamilyId = insertFamily("Família Histórica");
+    insertUser(inactiveFamilyId, "permanente@example.com", false);
+    UUID activeFamilyId = insertFamily("Família Atual");
+    insertUser(activeFamilyId, "permanente@example.com", true);
+    reset(accountEmailSender);
+
+    String unknownResponse = mockMvc.perform(post("/auth/account-deletion/permanent/request")
+            .contentType(MediaType.APPLICATION_JSON)
+            .content(objectMapper.writeValueAsString(Map.of("email", "ausente@example.com"))))
+        .andExpect(status().isAccepted())
+        .andReturn()
+        .getResponse()
+        .getContentAsString();
+    verify(accountEmailSender, never()).sendPermanentAccountDeletionConfirmation(any(), any(), any());
+
+    String knownResponse = mockMvc.perform(post("/auth/account-deletion/permanent/request")
+            .contentType(MediaType.APPLICATION_JSON)
+            .content(objectMapper.writeValueAsString(Map.of("email", "  PERMANENTE@example.com "))))
+        .andExpect(status().isAccepted())
+        .andReturn()
+        .getResponse()
+        .getContentAsString();
+
+    assertThat(knownResponse).isEqualTo(unknownResponse);
+    ArgumentCaptor<String> tokenCaptor = ArgumentCaptor.forClass(String.class);
+    verify(accountEmailSender).sendPermanentAccountDeletionConfirmation(
+        eq("permanente@example.com"),
+        tokenCaptor.capture(),
+        any(Instant.class));
+    assertThat(tokenCaptor.getValue()).matches("[A-Z0-9]{6}");
+    assertThat(jdbcTemplate.queryForObject(
+        "SELECT count(*) FROM auth_reset_tokens WHERE purpose = 'PERMANENT_ACCOUNT_DELETION' AND used_at IS NULL",
+        Integer.class)).isEqualTo(1);
+  }
+
+  @Test
+  void permanentDeletionConfirmationRejectsInvalidTokenWithoutAuthenticationOrDml() throws Exception {
+    UUID familyId = insertFamily("Família Protegida");
+    insertUser(familyId, "protegida@example.com", true);
+
+    mockMvc.perform(post("/auth/account-deletion/permanent/confirm")
+            .contentType(MediaType.APPLICATION_JSON)
+            .content(objectMapper.writeValueAsString(Map.of(
+                "email", "protegida@example.com",
+                "token", "ABC123"))))
+        .andExpect(status().isBadRequest())
+        .andExpect(jsonPath("$.code").value("INVALID_RESET_TOKEN"));
+
+    assertThat(jdbcTemplate.queryForObject(
+        "SELECT count(*) FROM app_users WHERE family_unit_id = ?",
+        Integer.class,
+        familyId)).isEqualTo(1);
+    assertThat(jdbcTemplate.queryForObject(
+        "SELECT count(*) FROM family_units WHERE id = ?",
+        Integer.class,
+        familyId)).isEqualTo(1);
+  }
+
+  @Test
   void responsiblePinResetRequiresPasswordAndUpdatesPin() throws Exception {
     String token = register("responsavel@example.com");
     reset(accountEmailSender);

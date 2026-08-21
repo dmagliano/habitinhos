@@ -116,6 +116,29 @@ public class ResendAccountEmailSender implements AccountEmailSender {
         """.formatted(token, EXPIRATION_FORMATTER.format(expiresAt)));
   }
 
+  @Override
+  public void sendPermanentAccountDeletionConfirmation(String email, String token, Instant expiresAt) {
+    sendEmail(
+        email,
+        "Confirmação de exclusão permanente dos dados Habitinhos",
+        """
+        <p>Recebemos uma solicitação para excluir permanentemente seus dados no Habitinhos.</p>
+        <p>Informe este código para confirmar a exclusão irreversível de todas as contas e famílias associadas ao seu e-mail:</p>
+        <p><strong style="font-size: 18px;">%s</strong></p>
+        <p>Ele expira em %s.</p>
+        <p>Se você não pediu essa exclusão, ignore este e-mail.</p>
+        """.formatted(escapeHtml(token), EXPIRATION_FORMATTER.format(expiresAt)),
+        """
+        Recebemos uma solicitação para excluir permanentemente seus dados no Habitinhos.
+
+        Código: %s
+        Expira em: %s
+
+        A confirmação exclui de modo irreversível todas as contas e famílias associadas ao seu e-mail.
+        Se você não pediu essa exclusão, ignore este e-mail.
+        """.formatted(token, EXPIRATION_FORMATTER.format(expiresAt)));
+  }
+
   private void sendEmail(String to, String subject, String html, String text) {
     try {
       ResendEmailResponse response = restClient.post()
@@ -126,14 +149,12 @@ public class ResendAccountEmailSender implements AccountEmailSender {
           .body(ResendEmailResponse.class);
 
       log.info(
-          "Resend email sent: to={} subject={} emailId={}",
-          to,
+          "Resend email sent: subject={} emailId={}",
           subject,
           response == null ? null : response.id());
     } catch (RestClientResponseException exception) {
       log.warn(
-          "Resend email failed: to={} subject={} status={} body={}",
-          to,
+          "Resend email failed: subject={} status={} body={}",
           subject,
           exception.getStatusCode().value(),
           exception.getResponseBodyAsString());
