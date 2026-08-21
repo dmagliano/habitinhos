@@ -17,6 +17,7 @@ Habitinhos will be built as a monorepo MVP in seven phases: backend foundation, 
 - [x] **Phase 06.3: Recuperação de acesso e exclusão de conta** - Add password reset by email, responsible PIN reset by email, and deliberate account deletion from API through mobile UI. (INSERTED) (completed 2026-06-08)
 - [x] **Phase 7: Polimento para demonstração do TCC** - Add demo seeds, visual polish, README, architecture docs, presentation script, and final testing. (completed 2026-06-18)
 - [x] **Phase 8: Permitir recadastro com e-mail de conta excluída/inativa** - Allow a responsible adult to create a new account with an email that only exists on inactive/deleted accounts while preserving active-account uniqueness. (completed 2026-06-21)
+- [ ] **Phase 9: Exclusão física dos dados da conta** - Add a public e-mail-token flow that permanently deletes all matching accounts, families, and related records, distinct from account deactivation.
 
 ## Phase Details
 
@@ -335,10 +336,38 @@ Plans:
 
 - [x] 08-01: Backend recadastro, active-only e-mail uniqueness, tests, seed, and docs
 
+### Phase 9: Exclusão física dos dados da conta
+
+**Goal:** A user can request permanent deletion by e-mail and confirm it through a single-use e-mail token; confirmation removes every account and family associated with that normalized e-mail, active or inactive, while the existing deactivation flow remains separate.
+**Depends on**: Phase 8
+**Requirements**: AUTH-12, DOCS-01
+**Success Criteria** (what must be TRUE):
+
+  1. A permanent-deletion request accepts a normalized e-mail and returns enumeration-safe feedback without deleting data.
+  2. When one or more accounts exist for that e-mail, the system sends a single-use, expiring confirmation token to the e-mail using the existing account-email delivery abstraction.
+  3. Confirmation requires the e-mail and valid token; invalid, expired, used, or mismatched tokens perform no deletion.
+  4. Successful confirmation removes every matching `app_users` row, active or inactive, and every family-owned record for all matched family IDs, respecting foreign-key dependencies.
+  5. The deletion is atomic: a failure rolls back the entire multi-family purge and leaves all accounts/data intact.
+  6. All old JWTs and credentials for the matching accounts stop working, and the e-mail can be registered again normally.
+  7. Integration tests run against PostgreSQL and prove complete absence, multi-family coverage, rollback safety, enumeration-safe email behavior, and endpoint documentation.
+  8. OpenAPI/Bruno and API documentation distinguish permanent deletion from soft deactivation and document the irreversible token flow.
+
+**Plans:** 1/2 plans executed
+
+Plans:
+
+**Wave 1**
+
+- [x] 09-01: Permanent family data deletion endpoint, transactional purge, and integration tests
+
+**Wave 2** *(blocked on Wave 1 completion)*
+
+- [ ] 09-02: OpenAPI, Bruno, API documentation, and contract verification
+
 ## Progress
 
 **Execution Order:**
-Phases execute in numeric order: 1 → 2 → 3 → 4 → 5 → 6 → 06.1 → 06.2 → 06.3 → 7 → 8
+Phases execute in numeric order: 1 → 2 → 3 → 4 → 5 → 6 → 06.1 → 06.2 → 06.3 → 7 → 8 → 9
 
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
@@ -353,3 +382,4 @@ Phases execute in numeric order: 1 → 2 → 3 → 4 → 5 → 6 → 06.1 → 06
 | 06.3 Recuperação de acesso e exclusão de conta | 2/2 | Complete | 2026-06-08 |
 | 7. Polimento para demonstração do TCC | 3/3 | Complete   | 2026-06-18 |
 | 8. Permitir recadastro com e-mail de conta excluída/inativa | 1/1 | Complete   | 2026-06-21 |
+| 9. Exclusão física dos dados da conta | 1/2 | In Progress | — |
