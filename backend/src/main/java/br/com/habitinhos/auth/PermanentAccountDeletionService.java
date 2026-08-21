@@ -22,9 +22,13 @@ public class PermanentAccountDeletionService {
   private static final Logger log = LoggerFactory.getLogger(PermanentAccountDeletionService.class);
 
   private final JdbcTemplate jdbcTemplate;
+  private final PermanentDeletionFailureInjector failureInjector;
 
-  public PermanentAccountDeletionService(JdbcTemplate jdbcTemplate) {
+  public PermanentAccountDeletionService(
+      JdbcTemplate jdbcTemplate,
+      PermanentDeletionFailureInjector failureInjector) {
     this.jdbcTemplate = jdbcTemplate;
+    this.failureInjector = failureInjector;
   }
 
   @Transactional
@@ -55,11 +59,16 @@ public class PermanentAccountDeletionService {
         "DELETE FROM auth_reset_tokens WHERE user_id IN (SELECT id FROM app_users WHERE lower(trim(email)) = ?)",
         email);
 
+    boolean firstFamily = true;
     for (UUID familyId : familyIds) {
       jdbcTemplate.update(
           "UPDATE reward_redemptions SET coin_transaction_id = NULL WHERE family_unit_id = ?",
           familyId);
       jdbcTemplate.update("DELETE FROM coin_transactions WHERE family_unit_id = ?", familyId);
+      if (firstFamily) {
+        failureInjector.afterFirstFamilyDelete();
+        firstFamily = false;
+      }
       jdbcTemplate.update("DELETE FROM reward_redemptions WHERE family_unit_id = ?", familyId);
       jdbcTemplate.update("DELETE FROM assigned_missions WHERE family_unit_id = ?", familyId);
       jdbcTemplate.update("DELETE FROM wallets WHERE family_unit_id = ?", familyId);
