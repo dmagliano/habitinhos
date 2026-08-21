@@ -30,4 +30,9 @@ public class LoggingAccountEmailSender implements AccountEmailSender {
     log.info("Account deletion confirmation email requested for email={} expiresAt={}", email, expiresAt);
     log.debug("Account deletion local code for email={} code={}", email, token);
   }
+
+  @Override
+  public void sendPermanentAccountDeletionConfirmation(String email, String token, Instant expiresAt) {
+    log.info("Permanent account deletion confirmation email requested; expiresAt={}", expiresAt);
+  }
 }

@@ -26,3 +26,13 @@ Variáveis criadas:
 
 - Se adicionar endpoints, reimporte o OAS.
 - Se quiser atualização contínua, conecte via OpenAPI Sync no Bruno.
+
+## 5) Exclusão de conta: soft versus permanente
+
+O contrato mantém dois fluxos distintos:
+
+- `POST /auth/account-deletion/request` e `POST /auth/account-deletion/confirm` exigem Bearer, usam o token de desativação e fazem soft deactivation, preservando o histórico.
+- `POST /auth/account-deletion/permanent/request` recebe somente `email`, não exige Bearer e sempre responde `202`, sem revelar se existem contas correspondentes.
+- `POST /auth/account-deletion/permanent/confirm` recebe somente `email` e `token`, não exige Bearer e responde `204` após o purge.
+
+O fluxo permanente usa token dedicado, expirável e de uso único enviado por e-mail. A confirmação remove irreversivelmente todas as contas ativas e inativas com o e-mail normalizado e todas as famílias associadas. Ela não aceita senha, JWT nem texto de confirmação literal. Não registre o token em logs, scripts ou variáveis compartilhadas.
