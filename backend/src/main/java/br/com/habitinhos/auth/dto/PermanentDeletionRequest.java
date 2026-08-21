@@ -7,7 +7,7 @@ import jakarta.validation.constraints.Size;
 
 @Schema(description = "Solicitação pública de exclusão permanente por e-mail")
 public record PermanentDeletionRequest(
-    @Schema(description = "E-mail de todas as contas que serão excluídas", example = "responsavel@example.com")
+    @Schema(description = "E-mail de todas as contas que serão excluídas", format = "email", example = "responsavel@example.com")
     @NotBlank(message = "E-mail é obrigatório.")
     @Email(message = "E-mail inválido.")
     @Size(max = 320, message = "E-mail deve ter no máximo 320 caracteres.")
