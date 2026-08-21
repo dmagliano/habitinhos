@@ -35,10 +35,13 @@ public class SecurityConfig {
                 "/auth/login",
                 "/auth/password-reset/request",
                 "/auth/password-reset/confirm",
+                "/auth/account-deletion/permanent/request",
+                "/auth/account-deletion/permanent/confirm",
                 "/v3/api-docs/**",
                 "/swagger-ui/**",
                 "/swagger-ui.html",
-                "/actuator/health")
+                "/actuator/health",
+                "/actuator/info")
             .permitAll()
             .anyRequest()
             .authenticated())
