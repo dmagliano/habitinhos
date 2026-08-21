@@ -7,11 +7,16 @@ import br.com.habitinhos.auth.dto.LoginRequest;
 import br.com.habitinhos.auth.dto.MeResponse;
 import br.com.habitinhos.auth.dto.PasswordResetConfirmRequest;
 import br.com.habitinhos.auth.dto.PasswordResetRequest;
+import br.com.habitinhos.auth.dto.PermanentDeletionConfirmRequest;
+import br.com.habitinhos.auth.dto.PermanentDeletionRequest;
 import br.com.habitinhos.auth.dto.RegisterRequest;
 import br.com.habitinhos.auth.dto.ResponsiblePinResetConfirmRequest;
 import br.com.habitinhos.auth.dto.ResponsiblePinResetRequest;
 import br.com.habitinhos.auth.dto.VerifyResponsiblePinRequest;
 import jakarta.validation.Valid;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
@@ -28,10 +33,15 @@ public class AuthController {
 
   private final AuthService authService;
   private final CurrentUserProvider currentUserProvider;
+  private final PermanentAccountDeletionService permanentAccountDeletionService;
 
-  public AuthController(AuthService authService, CurrentUserProvider currentUserProvider) {
+  public AuthController(
+      AuthService authService,
+      CurrentUserProvider currentUserProvider,
+      PermanentAccountDeletionService permanentAccountDeletionService) {
     this.authService = authService;
     this.currentUserProvider = currentUserProvider;
+    this.permanentAccountDeletionService = permanentAccountDeletionService;
   }
 
   @PostMapping("/auth/register")
@@ -106,5 +116,35 @@ public class AuthController {
     CurrentUser currentUser = currentUserProvider.getCurrentUser();
     log.info("Account deletion confirmation received for userId={}", currentUser.userId());
     authService.confirmAccountDeletion(currentUser, request);
+  }
+
+  @PostMapping("/auth/account-deletion/permanent/request")
+  @ResponseStatus(HttpStatus.ACCEPTED)
+  @Operation(
+      summary = "Solicitar exclusão permanente dos dados",
+      description = "Responde de forma idêntica exista ou não uma conta e envia um código quando há correspondência.",
+      security = {})
+  @ApiResponses({
+      @ApiResponse(responseCode = "202", description = "Solicitação processada sem revelar se o e-mail existe"),
+      @ApiResponse(responseCode = "400", description = "Corpo inválido")
+  })
+  public void requestPermanentAccountDeletion(@Valid @RequestBody PermanentDeletionRequest request) {
+    log.info("Permanent account deletion request received");
+    authService.requestPermanentAccountDeletion(request);
+  }
+
+  @PostMapping("/auth/account-deletion/permanent/confirm")
+  @ResponseStatus(HttpStatus.NO_CONTENT)
+  @Operation(
+      summary = "Confirmar exclusão permanente dos dados",
+      description = "Exclui irreversivelmente todas as contas e famílias associadas ao e-mail confirmado.",
+      security = {})
+  @ApiResponses({
+      @ApiResponse(responseCode = "204", description = "Dados excluídos permanentemente"),
+      @ApiResponse(responseCode = "400", description = "E-mail ou código inválido, expirado ou já utilizado")
+  })
+  public void confirmPermanentAccountDeletion(@Valid @RequestBody PermanentDeletionConfirmRequest request) {
+    log.info("Permanent account deletion confirmation received");
+    permanentAccountDeletionService.confirm(request);
   }
 }

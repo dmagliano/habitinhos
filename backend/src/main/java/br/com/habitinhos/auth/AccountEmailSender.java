@@ -11,4 +11,6 @@ public interface AccountEmailSender {
   void sendResponsiblePinReset(String email, String token, Instant expiresAt);
 
   void sendAccountDeletionConfirmation(String email, String token, Instant expiresAt);
+
+  void sendPermanentAccountDeletionConfirmation(String email, String token, Instant expiresAt);
 }

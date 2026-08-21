@@ -7,6 +7,7 @@ import br.com.habitinhos.auth.dto.LoginRequest;
 import br.com.habitinhos.auth.dto.MeResponse;
 import br.com.habitinhos.auth.dto.PasswordResetConfirmRequest;
 import br.com.habitinhos.auth.dto.PasswordResetRequest;
+import br.com.habitinhos.auth.dto.PermanentDeletionRequest;
 import br.com.habitinhos.auth.dto.RegisterRequest;
 import br.com.habitinhos.auth.dto.ResponsiblePinResetConfirmRequest;
 import br.com.habitinhos.auth.dto.ResponsiblePinResetRequest;
@@ -25,6 +26,7 @@ import java.security.SecureRandom;
 import java.time.Clock;
 import java.time.Instant;
 import java.util.Base64;
+import java.util.List;
 import java.util.Locale;
 import java.util.UUID;
 import org.slf4j.Logger;
@@ -223,6 +225,31 @@ public class AuthService {
     log.info("Account deactivated: userId={} familyUnitId={}", user.getId(), family.getId());
   }
 
+  @Transactional
+  public void requestPermanentAccountDeletion(PermanentDeletionRequest request) {
+    String email = normalizeEmail(request.email());
+    List<AppUser> matchingUsers = appUserRepository.findAllByNormalizedEmail(email);
+    if (matchingUsers.isEmpty()) {
+      log.info("Permanent account deletion requested with no matching accounts");
+      return;
+    }
+
+    Instant now = Instant.now(clock);
+    matchingUsers.forEach(user ->
+        invalidateActiveTokens(user.getId(), AuthResetPurpose.PERMANENT_ACCOUNT_DELETION, now));
+
+    AppUser representative = matchingUsers.get(0);
+    IssuedResetToken issuedToken = createResetToken(
+        representative,
+        AuthResetPurpose.PERMANENT_ACCOUNT_DELETION,
+        now);
+    accountEmailSender.sendPermanentAccountDeletionConfirmation(
+        email,
+        issuedToken.rawToken(),
+        issuedToken.expiresAt());
+    log.info("Permanent account deletion token issued for matchingAccountCount={}", matchingUsers.size());
+  }
+
   @Transactional(readOnly = true)
   public MeResponse me(CurrentUser currentUser) {
     log.debug("Resolving /me for userId={} familyUnitId={}", currentUser.userId(), currentUser.familyUnitId());
@@ -265,8 +292,13 @@ public class AuthService {
 
   private IssuedResetToken issueResetToken(AppUser user, AuthResetPurpose purpose) {
     Instant now = Instant.now(clock);
-    Instant expiresAt = now.plusSeconds(RESET_TOKEN_EXPIRATION_MINUTES * 60);
     invalidateActiveTokens(user.getId(), purpose, now);
+
+    return createResetToken(user, purpose, now);
+  }
+
+  private IssuedResetToken createResetToken(AppUser user, AuthResetPurpose purpose, Instant now) {
+    Instant expiresAt = now.plusSeconds(RESET_TOKEN_EXPIRATION_MINUTES * 60);
 
     String rawToken = generateUniqueResetCode();
     authResetTokenRepository.save(new AuthResetToken(
