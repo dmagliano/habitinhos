@@ -382,4 +382,4 @@ Phases execute in numeric order: 1 → 2 → 3 → 4 → 5 → 6 → 06.1 → 06
 | 06.3 Recuperação de acesso e exclusão de conta | 2/2 | Complete | 2026-06-08 |
 | 7. Polimento para demonstração do TCC | 3/3 | Complete   | 2026-06-18 |
 | 8. Permitir recadastro com e-mail de conta excluída/inativa | 1/1 | Complete   | 2026-06-21 |
-| 9. Exclusão física dos dados da conta | 2/2 | Complete   | 2026-08-21 |
+| 9. Exclusão física dos dados da conta | 2/2 | Complete    | 2026-08-21 |
