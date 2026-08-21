@@ -17,6 +17,7 @@ import jakarta.validation.Valid;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import io.swagger.v3.oas.annotations.security.SecurityRequirements;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
@@ -122,8 +123,8 @@ public class AuthController {
   @ResponseStatus(HttpStatus.ACCEPTED)
   @Operation(
       summary = "Solicitar exclusão permanente dos dados",
-      description = "Responde de forma idêntica exista ou não uma conta e envia um código quando há correspondência.",
-      security = {})
+      description = "Responde de forma idêntica exista ou não uma conta e envia um código quando há correspondência.")
+  @SecurityRequirements
   @ApiResponses({
       @ApiResponse(responseCode = "202", description = "Solicitação processada sem revelar se o e-mail existe"),
       @ApiResponse(responseCode = "400", description = "Corpo inválido")
@@ -137,8 +138,8 @@ public class AuthController {
   @ResponseStatus(HttpStatus.NO_CONTENT)
   @Operation(
       summary = "Confirmar exclusão permanente dos dados",
-      description = "Exclui irreversivelmente todas as contas e famílias associadas ao e-mail confirmado.",
-      security = {})
+      description = "Exclui irreversivelmente todas as contas e famílias associadas ao e-mail confirmado.")
+  @SecurityRequirements
   @ApiResponses({
       @ApiResponse(responseCode = "204", description = "Dados excluídos permanentemente"),
       @ApiResponse(responseCode = "400", description = "E-mail ou código inválido, expirado ou já utilizado")

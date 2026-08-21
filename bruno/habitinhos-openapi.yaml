@@ -158,7 +158,49 @@ paths:
               $ref: '#/components/schemas/DeleteAccountConfirmRequest'
       responses:
         '204':
-          description: Conta excluída
+          description: Conta desativada, com dados históricos preservados
+
+  /auth/account-deletion/permanent/request:
+    post:
+      tags: [Auth]
+      summary: Solicitar exclusão permanente por e-mail
+      description: >-
+        Aceita um e-mail e sempre responde 202, exista ou não qualquer conta ativa
+        ou inativa correspondente. Quando há correspondência, envia por e-mail um
+        token expirável, de uso único e dedicado à exclusão permanente. Não requer Bearer.
+      security: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PermanentDeletionRequest'
+      responses:
+        '202':
+          description: Solicitação processada sem revelar se o e-mail existe
+        '400':
+          description: Corpo inválido
+
+  /auth/account-deletion/permanent/confirm:
+    post:
+      tags: [Auth]
+      summary: Confirmar exclusão permanente por e-mail e token
+      description: >-
+        Exclui irreversivelmente todas as contas ativas e inativas associadas ao
+        e-mail e todas as famílias dessas contas. Usa somente o token dedicado à
+        exclusão permanente e não requer Bearer, senha ou confirmação literal.
+      security: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PermanentDeletionConfirmRequest'
+      responses:
+        '204':
+          description: Dados excluídos permanentemente
+        '400':
+          description: E-mail ou token inválido, expirado ou já utilizado
 
   /me:
     get:
@@ -696,6 +738,35 @@ components:
         password:
           type: string
           example: SenhaForte123
+
+    PermanentDeletionRequest:
+      type: object
+      description: Solicitação pública e enumeration-safe de exclusão permanente por e-mail.
+      required: [email]
+      properties:
+        email:
+          type: string
+          format: email
+          maxLength: 320
+          description: E-mail de todas as contas ativas e inativas que serão excluídas.
+          example: responsavel@example.com
+
+    PermanentDeletionConfirmRequest:
+      type: object
+      description: Confirmação irreversível com token dedicado à exclusão permanente.
+      required: [email, token]
+      properties:
+        email:
+          type: string
+          format: email
+          maxLength: 320
+          description: Mesmo e-mail informado na solicitação.
+          example: responsavel@example.com
+        token:
+          type: string
+          pattern: '[A-Za-z0-9]{6}'
+          description: Token expirável e de uso único enviado por e-mail; não deve ser registrado em logs.
+          example: A1B2C3
 
     AuthResponse:
       type: object
