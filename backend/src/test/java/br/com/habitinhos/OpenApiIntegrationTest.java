@@ -10,6 +10,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import br.com.habitinhos.shared.AbstractIntegrationTest;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.info.BuildProperties;
 import org.springframework.test.web.servlet.MockMvc;
 
 class OpenApiIntegrationTest extends AbstractIntegrationTest {
@@ -17,10 +18,15 @@ class OpenApiIntegrationTest extends AbstractIntegrationTest {
   @Autowired
   private MockMvc mockMvc;
 
+  @Autowired
+  private BuildProperties buildProperties;
+
   @Test
   void apiDocsExposeBackendPhaseEndpoints() throws Exception {
     mockMvc.perform(get("/v3/api-docs"))
         .andExpect(status().isOk())
+        .andExpect(content().string(containsString(
+            "\"version\":\"" + buildProperties.getVersion() + "\"")))
         .andExpect(content().string(containsString("\"/auth/register\"")))
         .andExpect(content().string(containsString("\"/auth/password-reset/request\"")))
         .andExpect(content().string(containsString("\"/auth/password-reset/confirm\"")))
@@ -46,6 +52,14 @@ class OpenApiIntegrationTest extends AbstractIntegrationTest {
         .andExpect(content().string(containsString("\"/rewards/{id}/deactivate\"")))
         .andExpect(content().string(containsString("\"/rewards/{id}/redeem\"")))
         .andExpect(content().string(containsString("\"/children/{childId}/wallet/transactions\"")));
+  }
+
+  @Test
+  void actuatorInfoExposesBackendReleaseVersion() throws Exception {
+    mockMvc.perform(get("/actuator/info"))
+        .andExpect(status().isOk())
+        .andExpect(content().string(containsString(
+            "\"version\":\"" + buildProperties.getVersion() + "\"")));
   }
 
   @Test

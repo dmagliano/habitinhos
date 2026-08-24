@@ -46,6 +46,11 @@ jobs:
           cache: npm
           cache-dependency-path: mobile/package-lock.json
 
+      - name: Validate release versions
+        env:
+          RELEASE_BRANCH: ${{ github.head_ref }}
+        run: node ../scripts/verify-release-version.mjs
+
       - name: Install dependencies
         run: npm ci
 
@@ -58,3 +63,81 @@ jobs:
       - name: Test
         timeout-minutes: 10
         run: npm run test:ci
+
+  release:
+    name: Publish release and build preview
+    if: github.event_name == 'push' && github.ref == 'refs/heads/master'
+    needs:
+      - backend
+      - mobile
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    defaults:
+      run:
+        shell: bash
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v5
+        with:
+          fetch-depth: 0
+
+      - name: Set up Node
+        uses: actions/setup-node@v6
+        with:
+          node-version: "22"
+          cache: npm
+          cache-dependency-path: mobile/package-lock.json
+
+      - name: Read release version
+        id: version
+        working-directory: mobile
+        run: |
+          node ../scripts/verify-release-version.mjs
+          VERSION="$(node -p "require('./app.json').expo.version")"
+          echo "version=$VERSION" >> "$GITHUB_OUTPUT"
+          echo "tag=v$VERSION" >> "$GITHUB_OUTPUT"
+
+      - name: Check existing tag
+        id: tag
+        run: |
+          git fetch --tags --force
+          if git rev-parse "${{ steps.version.outputs.tag }}" >/dev/null 2>&1; then
+            echo "exists=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "exists=false" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Set up Expo and EAS
+        if: steps.tag.outputs.exists == 'false'
+        uses: expo/expo-github-action@v8
+        with:
+          eas-version: latest
+          token: ${{ secrets.EXPO_TOKEN }}
+
+      - name: Install mobile dependencies
+        if: steps.tag.outputs.exists == 'false'
+        working-directory: mobile
+        run: npm ci
+
+      - name: Trigger Android EAS preview build
+        if: steps.tag.outputs.exists == 'false'
+        working-directory: mobile
+        run: eas build --platform android --profile preview --non-interactive --no-wait
+
+      - name: Create tag
+        if: steps.tag.outputs.exists == 'false'
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git tag -a "${{ steps.version.outputs.tag }}" -m "Release ${{ steps.version.outputs.version }}"
+          git push origin "${{ steps.version.outputs.tag }}"
+
+      - name: Create GitHub release
+        if: steps.tag.outputs.exists == 'false'
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          gh release create "${{ steps.version.outputs.tag }}" \
+            --title "${{ steps.version.outputs.version }}" \
+            --notes "Habitinhos ${{ steps.version.outputs.version }} release."
