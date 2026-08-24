@@ -3,15 +3,15 @@ gsd_state_version: 1.0
 milestone: v1.0
 milestone_name: milestone
 status: milestone_complete
-last_updated: 2026-06-21T20:40:11.706Z
-last_activity: 2026-06-21 -- Phase 08 completed; milestone complete
+last_updated: 2026-08-21T02:36:55.022Z
+last_activity: 2026-08-21
 progress:
-  total_phases: 11
-  completed_phases: 11
-  total_plans: 33
-  completed_plans: 33
+  total_phases: 12
+  completed_phases: 12
+  total_plans: 35
+  completed_plans: 35
   percent: 100
-stopped_at: Milestone complete (Phase 08 was final phase)
+stopped_at: Milestone complete (Phase 09 was final phase)
 ---
 
 # Project State
@@ -25,10 +25,10 @@ See: .planning/PROJECT.md (updated 2026-06-01)
 
 ## Current Position
 
-Phase: 08 (permitir-recadastro-com-e-mail-de-conta-exclu-da-inativa) - COMPLETE
-Plan: 1 of 1
+Phase: 09 (exclusao-fisica-dos-dados-da-conta) - COMPLETE
+Plan: 2 of 2
 Status: Milestone complete
-Last activity: 2026-06-21 -- Phase 08 completed
+Last activity: 2026-08-21
 
 Progress: [██████████] 100%
 
@@ -36,7 +36,7 @@ Progress: [██████████] 100%
 
 **Velocity:**
 
-- Total plans completed: 33
+- Total plans completed: 35
 - Average duration: n/a
 - Total execution time: 0 hours
 
@@ -55,11 +55,12 @@ Progress: [██████████] 100%
 | 06.3 | 2 | 2 | n/a |
 | 07 Polimento para demonstração do TCC | 3 | 3 | n/a |
 | 08 Permitir recadastro com e-mail de conta excluída/inativa | 1 | 1 | 40min |
+| 09 Exclusão física dos dados da conta | 2 | 2 | 22min |
 
 **Recent Trend:**
 
-- Last 5 plans: 06.3-02, 07-01, 07-02, 07-03, 08-01
-- Trend: Phase 08 completed active-only recadastro after Phase 7 demo polish
+- Last 5 plans: 07-02, 07-03, 08-01, 09-01, 09-02
+- Trend: Phase 09 completed permanent deletion implementation and public API contract
 
 | Phase 02 P03 | 10 min | 3 tasks | 12 files |
 | Phase 02 P02 | 12 min | 3 tasks | 9 files |
@@ -82,6 +83,8 @@ Progress: [██████████] 100%
 | Phase 07 P01 | 12min | 4 tasks | 5 files |
 | Phase 07 P02 | 8min | 4 tasks | 6 files |
 | Phase 07 P03 | 6min | 3 tasks | 1 files |
+| Phase 09 P01 | 25min | 2 tasks | 14 files |
+| Phase 09 P02 | 19min | 1 tasks | 7 files |
 
 ## Accumulated Context
 
@@ -109,6 +112,9 @@ Decisions are logged in PROJECT.md Key Decisions table and .planning/DECISIONS.m
 - [Phase 06.1]: Authenticated mobile entry starts at ChildProfileSelect while FamilyHub remains as fallback. — Post-UAT MOBL-07 removes the mandatory role hub from the normal demo path.
 - [Phase 06.1]: ResponsibleTabs preserves active child via route params for mode switching. — This keeps switching as UI/navigation state only and avoids JWT or backend authorization changes.
 - [Phase 06.1]: Recent redemptions use a pressable dashboard metric to focus the real section. — DASH-05 is satisfied without mock redemption data or a new route.
+- [Phase 09]: Permanent deletion uses a dedicated e-mail token purpose and public e-mail+token confirmation. — Soft deactivation semantics remain isolated and unchanged.
+- [Phase 09]: Token consumption and explicit FK-safe multi-family purge share one PostgreSQL transaction. — Any failure restores all records, links, and token state.
+- [Phase 09]: Public permanent-deletion operations emit explicit empty OpenAPI security. — They accept e-mail/token without inheriting global Bearer authentication.
 
 ### Pending Todos
 
@@ -127,9 +133,9 @@ None yet.
 
 ## Session Continuity
 
-Last session: 2026-06-21T20:40:11.706Z
-Stopped at: Phase 8 completed; milestone complete
-Resume file: .planning/phases/08-permitir-recadastro-com-e-mail-de-conta-exclu-da-inativa/08-01-SUMMARY.md
+Last session: 2026-08-21T02:20:34.239Z
+Stopped at: Completed 09-02-PLAN.md
+Resume file: None
 
 ## Quick Tasks Completed
 
