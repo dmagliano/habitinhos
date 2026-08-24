@@ -18,6 +18,7 @@
 - [ ] **AUTH-09**: Responsible adult can request and confirm password reset by email without revealing whether the email exists.
 - [ ] **AUTH-10**: Authenticated responsible adult can request and confirm responsible PIN reset by email after password verification.
 - [x] **AUTH-11**: Authenticated responsible adult can delete/deactivate their account and family access through a deliberate confirmation flow.
+- [x] **AUTH-12**: Account data can be permanently and transactionally deleted for every account and family associated with a normalized e-mail, active or inactive, only after a single-use confirmation token sent to that e-mail through a flow distinct from soft deactivation.
 
 ### Children
 
@@ -114,6 +115,7 @@
 | AUTH-07 | Phase 06.1 | Complete |
 | AUTH-08 | Phase 06.2 | Complete |
 | AUTH-09..AUTH-11 | Phase 06.3 | Pending |
+| AUTH-12 | Phase 9 | Complete |
 | CHLD-01..CHLD-04 | Phase 1 | Complete |
 | CHLD-05 | Phase 06.2 | Complete |
 | DOCS-01 | Phases 1, 2, 3 | Complete |
